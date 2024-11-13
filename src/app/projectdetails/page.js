@@ -4,49 +4,63 @@ import Navbar from "orchestronic/app/components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
-import React from "react";
+import React, { useState } from "react";
+import unfilter from "../../../public/filter-circle.svg";
+import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetail() {
   const TABLE_HEAD = ["Name", "Status", "Deployed Component"];
 
   const TABLE_ROWS = [
-    {
-      name: "Development",
-      status: "Manager",
-      deploy: "0",
-    },
-    {
-      name: "Production",
-      status: "Developer",
-      deploy: "0",
-    },
+    { name: "Development", status: "Healthy", deploy: "0" },
+    { name: "Production", status: "Pending", deploy: "0" },
+    { name: "Testing", status: "Failed", deploy: "1" },
   ];
+
+  // Custom orders for sorting
+  const order1 = ["Pending", "Failed", "Healthy"];
+  const order2 = ["Healthy", "Failed", "Pending"];
+
+  const [sortAsc, setSortAsc] = useState(true);
+
+  // Toggle sort order
+  const toggleSortOrder = () => {
+    setSortAsc((prev) => !prev);
+  };
+
+  // Sort rows based on the selected order and direction
+  const sortedRows = [...TABLE_ROWS].sort((a, b) => {
+    const currentOrder = sortAsc ? order1 : order2;
+    return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
+  });
 
   return (
     <div>
       <Navbar />
-      <p className="text-4xl font-bold mx-16 my-5">Todo List</p>
+      <p className="text-5xl font-bold mx-16 my-5">Todo List</p>
       {/* Project Details box */}
       <div className="bg-white mx-16 mt-8 text-black text-xl rounded font-normal h-dvh">
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
-          <p className="text-2xl font-medium ml-4 mt-5">Application Details</p>
-          <button className="mr-4 mt-5 text-sm text-white bg-[#29B95F] rounded py-2 px-2">
+          <p className="text-3xl font-semibold ml-4 mt-8">
+            Application Details
+          </p>
+          <button className="mr-4 mt-8 text-sm text-white bg-[#29B95F] rounded py-2 px-2">
             Send Request
           </button>
         </div>
         {/* Project name, description and source */}
-        <div className="grid grid-rows-1 grid-flow-col gap-3 items-top mt-5">
+        <div className="grid grid-rows-1 grid-flow-col gap-3 items-top mt-10">
           <div>
-            <p className="text-xl font-bold mx-16 mt-5">Application name</p>
-            <p className="text-lg font-normal ml-16">Todo list</p>
+            <p className="text-xl font-medium mx-16 mt-5">Application name</p>
+            <p className="text-lg font-normal ml-16 mt-2">Todo list</p>
           </div>
           <div>
-            <p className="text-xl font-bold mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16">Todo Application</p>
+            <p className="text-xl font-medium mx-16 mt-5">Description</p>
+            <p className="text-lg font-normal ml-16 mt-2">Todo Application</p>
           </div>
           <div>
-            <p className="text-xl font-bold mx-16 mt-5">Repository</p>
+            <p className="text-xl font-medium mx-16 mt-5">Repository</p>
             <div className="flex flex-row mx-16">
               <Image src={gitlab} width="45" height="45" alt="logo" />
               <p className="text-lg font-normal flex items-center">
@@ -55,27 +69,42 @@ export default function Projectdetail() {
             </div>
           </div>
         </div>
-        <div className="grid grid-rows-2 grid-flow-col">
-          <div className="flex flex-row items-center">
-            <p className="text-xl font-bold ml-16 mr-5 mt-5">Environment</p>
+        {/* Environment */}
+        <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
+          <div className="flex flex-row items-center h-12">
+            <p className="text-xl font-medium ml-16 mr-5 mt-5">Environment</p>
             <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
               Add
             </button>
           </div>
-          <Card className="overflow-hidden rounded-lg shadow-lg mx-16">
+
+          {/* Environment list */}
+          <Card className="overflow-hidden rounded-lg shadow-lg mx-16 mt-8">
             <table className="w-full min-w-max table-auto text-left">
               <thead>
                 <tr>
                   {TABLE_HEAD.map((head) => (
                     <th
                       key={head}
-                      className="border-b border-blue-gray-100 bg-blue-gray-50 p-4 text-blue-gray-700 font-semibold"
+                      className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
                     >
                       <Typography
                         variant="small"
-                        color="blue-gray"
-                        className="font-normal leading-none opacity-70"
+                        className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
+                        onClick={
+                          head === "Status" ? toggleSortOrder : undefined
+                        }
                       >
+                        {head === "Status" && (
+                          <span className="mr-2">
+                            <Image
+                              src={sortAsc ? filter : unfilter}
+                              alt="filter"
+                              height="20"
+                              width="20"
+                            />
+                          </span>
+                        )}
                         {head}
                       </Typography>
                     </th>
@@ -83,9 +112,9 @@ export default function Projectdetail() {
                 </tr>
               </thead>
               <tbody>
-                {TABLE_ROWS.map(({ name, status, deploy }, index) => {
-                  const isEven = index % 2 === 0;
-                  const rowBgColor = isEven ? "bg-gray-50" : "bg-white";
+                {sortedRows.map(({ name, status, deploy }, index) => {
+                  const isOdd = index % 2 === 1;
+                  const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
                   return (
                     <tr key={name} className={`${rowBgColor}`}>
                       <td className="p-4 border-b border-blue-gray-50">
@@ -100,8 +129,13 @@ export default function Projectdetail() {
                       <td className="p-4 border-b border-blue-gray-50">
                         <Typography
                           variant="small"
-                          color="blue-gray"
-                          className="font-normal"
+                          className={`font-normal px-2 py-1 rounded-md ${
+                            status === "Healthy"
+                              ? "text-green-600 bg-green-100"
+                              : status === "Pending"
+                              ? "text-amber-600 bg-amber-100"
+                              : "text-red-600 bg-red-100"
+                          }`}
                         >
                           {status}
                         </Typography>
