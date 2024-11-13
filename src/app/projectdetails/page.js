@@ -9,9 +9,9 @@ import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetail() {
-  const TABLE_HEAD = ["Name", "Status", "Deployed Component"];
+  const TABLE_HEAD_ENV = ["Name", "Status", "Deployed Component"];
 
-  const TABLE_ROWS = [
+  const TABLE_ROWS_ENV = [
     { name: "Development", status: "Healthy", deploy: "0" },
     { name: "Production", status: "Pending", deploy: "0" },
     { name: "Testing", status: "Failed", deploy: "1" },
@@ -29,10 +29,17 @@ export default function Projectdetail() {
   };
 
   // Sort rows based on the selected order and direction
-  const sortedRows = [...TABLE_ROWS].sort((a, b) => {
+  const sortedRows = [...TABLE_ROWS_ENV].sort((a, b) => {
     const currentOrder = sortAsc ? order1 : order2;
     return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
   });
+
+  const TABLE_HEAD_CR = ["Name", "Type"];
+
+  const TABLE_ROWS_CR = [
+    { name: "VM_Development", type: "Virtual Machine" },
+    { name: "VM_Production", type: "Virtual Machine" },
+  ];
 
   return (
     <div>
@@ -83,7 +90,7 @@ export default function Projectdetail() {
             <table className="w-full min-w-max table-auto text-left">
               <thead>
                 <tr>
-                  {TABLE_HEAD.map((head) => (
+                  {TABLE_HEAD_ENV.map((head) => (
                     <th
                       key={head}
                       className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
@@ -147,6 +154,82 @@ export default function Projectdetail() {
                           className="font-normal"
                         >
                           {deploy}
+                        </Typography>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+
+        {/* Cloud Resources */}
+        <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
+          <div className="flex flex-row items-center h-12">
+            <p className="text-xl font-medium ml-16 mr-5 mt-5">
+              Cloud Resources
+            </p>
+            <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
+              Add
+            </button>
+          </div>
+
+          {/* Cloud Resource list */}
+          <Card className="overflow-hidden rounded-lg shadow-lg mx-16 mt-8">
+            <table className="w-full min-w-max table-auto text-left">
+              <thead>
+                <tr>
+                  {TABLE_HEAD_CR.map((head) => (
+                    <th
+                      key={head}
+                      className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
+                    >
+                      <Typography
+                        variant="small"
+                        className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
+                        onClick={
+                          head === "Status" ? toggleSortOrder : undefined
+                        }
+                      >
+                        {head === "Status" && (
+                          <span className="mr-2">
+                            <Image
+                              src={sortAsc ? filter : unfilter}
+                              alt="filter"
+                              height="20"
+                              width="20"
+                            />
+                          </span>
+                        )}
+                        {head}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {TABLE_ROWS_CR.map(({ name, type }, index) => {
+                  const isOdd = index % 2 === 1;
+                  const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+                  return (
+                    <tr key={name} className={`${rowBgColor}`}>
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {name}
+                        </Typography>
+                      </td>
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {type}
                         </Typography>
                       </td>
                     </tr>
