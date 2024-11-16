@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "orchestronic/app/components/navbar";
+import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";

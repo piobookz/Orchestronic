@@ -1,21 +1,24 @@
-"use client";
+import Navbar from "../components/navbar";
 
-import React, { useState } from "react";
-
-export default function PolicyEdit() {
-
-    const [memory, setMemory] = useState("");
-    const [memoryMes, setMemoryMes] = useState("");
-
+export default function PolicyDetails() {
     return (
-        <main className="bg-[#07032B]">
-            <h3 className="text-white">Terms and Policies</h3>
-            <div className="container bg-white rounded">
-                <h1>Resource Allocation Terms and Policies</h1>
-                <form>
-                    <input type="text" className="w-[300px] block bg-gray-200 border py-2 px-3 rounded text-lg my-2" placeholder="Message"></input>
-                </form>
+        <div>
+            <Navbar />
+            {/* Details box */}
+            <div className="bg-white mx-16 my-8 py-8 text-black text-x1 rounded font-normal">
+
+                {/* Subtitle */}
+                <div className="flex flex-row justify-center items-center">
+                    <p className="text-3xl font-semibold">
+                        Resource Allocation Terms and Policies
+                    </p>
+                </div>
+
+                {/* Policy details */}
+                <div>
+                    
+                </div>
             </div>
-        </main>
+        </div>
     );
 }
