@@ -62,10 +62,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Memory (RAM)</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="memory" className="text-lg font-normal">
+                                    <label htmlFor="memory" className="text-lg font-normal">
                                         Maximum
                                     </label>
-                                    <label for="memory-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="memory-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -93,10 +93,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Storage - Hard Disk Drive (HDD)</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="hdd" className="text-lg font-normal">
+                                    <label htmlFor="hdd" className="text-lg font-normal">
                                         Maximum
                                     </label>
-                                    <label for="hdd-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="hdd-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -123,10 +123,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Storage - Solid State Drive (SSD)</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="ssd" className="text-lg font-normal">
+                                    <label htmlFor="ssd" className="text-lg font-normal">
                                         Storage
                                     </label>
-                                    <label for="ssd-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="ssd-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -153,10 +153,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">CPU Cores</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="cpu" className="text-lg font-normal">
+                                    <label htmlFor="cpu" className="text-lg font-normal">
                                         Maximum
                                     </label>
-                                    <label for="cpu-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="cpu-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -183,10 +183,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Network Bandwidth</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="netBand" className="text-lg font-normal">
+                                    <label htmlFor="netBand" className="text-lg font-normal">
                                         Maximum
                                     </label>
-                                    <label for="netBand-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="netBand-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -196,7 +196,7 @@ export default function PolicyEdit() {
                                         value={netBand}
                                         onChange={(e) => setNetBand(e.target.value)}
                                         className="w-1/3 bg-gray-50 border">
-                                        <option selected>Choose maximum Network Bandwidth</option>
+                                        <option selected>Choose maximum network bandwidth</option>
                                         <option value="1Gbps">1 Gbps</option>
                                     </select>
                                     <textarea
@@ -213,10 +213,10 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Environment Limits</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="env" className="text-lg font-normal">
+                                    <label htmlFor="env" className="text-lg font-normal">
                                         Maximum
                                     </label>
-                                    <label for="env-message" className="mt-2 text-lg font-normal">
+                                    <label htmlFor="env-message" className="mt-2 text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -243,7 +243,7 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Approval Process for Exceeding Limits</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="apel-message" className="text-lg font-normal">
+                                    <label htmlFor="apel-message" className="text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
@@ -262,7 +262,7 @@ export default function PolicyEdit() {
                             <p className="text-xl font-medium ml-4 mt-5">Note</p>
                             <div className="flex flex-row">
                                 <div className="flex flex-col mx-16 mt-2">
-                                    <label for="note-message" className="text-lg font-normal">
+                                    <label htmlFor="note-message" className="text-lg font-normal">
                                         Message
                                     </label>
                                 </div>
