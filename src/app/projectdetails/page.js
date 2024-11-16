@@ -46,7 +46,7 @@ export default function Projectdetail() {
       <Navbar />
       <p className="text-5xl font-bold mx-16 my-5">Todo List</p>
       {/* Project Details box */}
-      <div className="bg-white mx-16 mt-8 text-black text-xl rounded font-normal h-dvh">
+      <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded font-normal">
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
           <p className="text-3xl font-semibold ml-4 mt-8">
