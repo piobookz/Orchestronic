@@ -2,8 +2,10 @@
 
 import Navbar from "../components/navbar";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PolicyEdit() {
+    const router = useRouter();
 
     // Memory (RAM)
     const [memory, setMemory] = useState("");
@@ -35,6 +37,30 @@ export default function PolicyEdit() {
     // Note
     const [noteMes, setNoteMes] = useState("");
 
+    const handleEdit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await fetch("http://localhost:3000/api/policy", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    memory, memoryMes, hdd, hddMes, ssd, ssdMes, cpu, cpuMes, netBand, netBandMes, env, envMes, apelMes, noteMes
+                })
+            })
+
+            if (res.ok) {
+                router.push("/policy");
+            } else {
+                throw new Error("Failed to set policy");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div>
             <Navbar />
@@ -43,19 +69,20 @@ export default function PolicyEdit() {
             {/* Details box */}
             <div className="bg-white mx-16 my-8 py-8 text-black text-x1 rounded font-normal">
 
-                {/* Subtitle */}
-                <div className="flex flex-row justify-between items-center">
-                    <p className="text-3xl font-semibold ml-4">
-                        Resource Allocation Terms and Policies
-                    </p>
-                    <button className="mr-4 py-2 px-10 text-sm text-black bg-[#E3E3E3] rounded">
-                        Save
-                    </button>
-                </div>
+                <form onSubmit={handleEdit}>
+                    {/* Subtitle */}
+                    <div className="flex flex-row justify-between items-center">
+                        <p className="text-3xl font-semibold ml-4">
+                            Resource Allocation Terms and Policies
+                        </p>
+                        <button type="submit" className="mr-4 py-2 px-10 text-sm text-black bg-[#E3E3E3] rounded">
+                            Save
+                        </button>
+                    </div>
 
-                {/* Policy details */}
-                <div>
-                    <form>
+                    {/* Policy details */}
+                    <div>
+
 
                         {/* Memory (RAM) */}
                         <div>
@@ -275,10 +302,10 @@ export default function PolicyEdit() {
                                 </div>
                             </div>
                         </div>
-
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
+
         </div>
     );
 }

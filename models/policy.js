@@ -2,29 +2,34 @@ import mongoose, { Schema } from "mongoose";
 
 const policySchema = new Schema(
     {
-        memory: Number,
-        memoryMes: String,
+        memory: { type: String },
+        memoryMes: { type: String },
 
-        hdd: Number,
-        hddMes: String,
+        hdd: { type: String },
+        hddMes: { type: String },
 
-        ssd: Number,
-        ssdMes: String,
+        ssd: { type: String },
+        ssdMes: { type: String },
 
-        cpu: Number,
-        cpuMes: String,
+        cpu: { type: String },
+        cpuMes: { type: String },
 
-        netBand: Number,
-        netBandMes: String,
+        netBand: { type: String },
+        netBandMes: { type: String },
 
-        env: Number,
-        envMes: String,
+        env: { type: String },
+        envMes: { type: String },
 
-        apelMes: String,
+        apelMes: { type: String },
 
-        noteMes: String,
+        noteMes: { type: String },
     }
 )
 
-const Policy = mongoose.models.Policy || mongoose.models("Policy", policySchema);
+// if (mongoose.models.Policy) {
+//     delete mongoose.models.Policy;
+// }
+// const Policy = mongoose.model("Policy", policySchema);
+
+const Policy = mongoose.models.Policy || mongoose.model("Policy", policySchema);
 export default Policy;
