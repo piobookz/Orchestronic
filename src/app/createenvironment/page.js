@@ -8,7 +8,7 @@ import Azure from "../../../public/azure-logo.png";
 
 export default function Environment() {
   return (
-    <div className="bg-gray-900 min-h-screen text-white">
+    <div className="min-h-screen text-white">
       <Navbar />
       {/* Header */}
       <div className="mx-16 my-6">
