@@ -49,10 +49,8 @@ export default function Projectdetail() {
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded font-normal">
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
-          <p className="text-3xl font-semibold ml-4 mt-8">
-            Application Details
-          </p>
-          <button className="mr-4 mt-8 text-sm text-white bg-[#29B95F] rounded py-2 px-2">
+          <p className="text-3xl font-semibold ml-4">Application Details</p>
+          <button className="mr-4 text-sm text-white bg-[#29B95F] rounded py-2 px-2">
             Send Request
           </button>
         </div>
