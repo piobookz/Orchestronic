@@ -1,16 +1,24 @@
 "use client";
 
 import Navbar from "../components/navbar";
-import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
+import Image from "next/image";
 
 export default function Environment() {
+  const [environmentName, setEnvironmentName] = useState(
+    "Todo List Development"
+  );
+  const [environmentType, setEnvironmentType] = useState("Development");
+  const [region, setRegion] = useState("West Europe");
+
   return (
     <div className="min-h-screen text-white">
+      {/* Navber */}
       <Navbar />
-      {/* Header */}
+
+      {/* Title */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Environment</h1>
         <p className="text-lg text-gray-400 ml-1 mt-4">
@@ -18,14 +26,10 @@ export default function Environment() {
         </p>
       </div>
 
-      {/* Form Container */}
+      {/* Project Details */}
       <div className="bg-white text-black mx-16 my-8 p-8 rounded-lg shadow-lg">
-        {/* Form Title */}
         <h2 className="text-2xl font-semibold mb-6">Details</h2>
-
-        {/* Form Fields */}
         <div className="grid grid-cols-2 gap-8">
-          {/* Environment Name */}
           <div>
             <label htmlFor="environmentName" className="font-medium block mb-2">
               Environment Name
@@ -35,11 +39,12 @@ export default function Environment() {
               id="environmentName"
               name="environmentName"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
-              defaultValue="Todo List Development"
+              value={environmentName}
+              onChange={(e) => setEnvironmentName(e.target.value)}
             />
           </div>
 
-          {/* Environment Type */}
+          {/* Environment type */}
           <div>
             <label htmlFor="environmentType" className="font-medium block mb-2">
               Environment Type
@@ -48,7 +53,8 @@ export default function Environment() {
               id="environmentType"
               name="environmentType"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
-              defaultValue="Development"
+              value={environmentType}
+              onChange={(e) => setEnvironmentType(e.target.value)}
             >
               <option value="Development">Development</option>
               <option value="Production">Production</option>
@@ -58,12 +64,8 @@ export default function Environment() {
 
           {/* Cloud Provider */}
           <div>
-            <label htmlFor="cloudProvider" className="font-medium block mb-2">
-              Cloud Provider
-            </label>
-            <div className="flex items-center space-x-2 ml-2">
-              <Image src={Azure} width={80} height={80} alt="Azure Logo" />
-            </div>
+            <h3 className="font-medium block mb-3">Cloud Provider</h3>
+            <Image src={Azure} alt="Azure Logo" height={64} width={64} />
           </div>
 
           {/* Region */}
@@ -75,7 +77,8 @@ export default function Environment() {
               id="region"
               name="region"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
-              defaultValue="West Europe"
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
             >
               <option value="West Europe">West Europe</option>
               <option value="East US">East US</option>
@@ -86,7 +89,7 @@ export default function Environment() {
 
         {/* Buttons */}
         <div className="flex justify-between items-center mt-8">
-          <Link href={"/homepage"}>
+          <Link href="/homepage">
             <button className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400">
               Back
             </button>
