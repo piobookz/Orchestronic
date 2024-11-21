@@ -11,7 +11,7 @@ export async function POST(req) {
   // Connect to MongoDB
   await connectMongoDB();
 
-  // Create policy document
+  //Create environment details
   await Environment.create({
     envname: environmentName,
     envtype: environmentType,
