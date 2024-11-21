@@ -5,13 +5,39 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Environment() {
-  const [environmentName, setEnvironmentName] = useState(
-    "Todo List Development"
-  );
-  const [environmentType, setEnvironmentType] = useState("Development");
-  const [region, setRegion] = useState("West Europe");
+  const router = useRouter();
+  const [environmentName, setEnvironmentName] = useState("");
+  const [environmentType, setEnvironmentType] = useState("");
+  const [region, setRegion] = useState("");
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://localhost:3000/api/environment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          environmentName,
+          environmentType,
+          region,
+        }),
+      });
+
+      if (res.ok) {
+        router.push("/projectlist");
+      } else {
+        throw new Error("Failed to create environment");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="min-h-screen text-white">
@@ -65,7 +91,7 @@ export default function Environment() {
           {/* Cloud Provider */}
           <div>
             <h3 className="font-medium block mb-3">Cloud Provider</h3>
-            <Image src={Azure} alt="Azure Logo" height={64} width={64} />
+            <Image src={Azure} alt="Azure Logo" height="auto" width={84} />
           </div>
 
           {/* Region */}
