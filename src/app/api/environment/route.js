@@ -5,21 +5,21 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   // Parse JSON
-  const { envname, envtype, region } = await req.json();
-  console.log(envname, envtype, region);
+  const { environmentName, environmentType, region } = await req.json();
+  console.log(environmentName, environmentType, region);
 
   // Connect to MongoDB
   await connectMongoDB();
 
   // Create policy document
   await Environment.create({
-    envname,
-    envtype,
+    envname: environmentName,
+    envtype: environmentType,
     region,
   });
 
   return NextResponse.json(
-    { message: "Successful added environment" },
+    { message: "Successfully added environment" },
     { status: 201 }
   );
 }
