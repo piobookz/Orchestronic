@@ -3,12 +3,15 @@
 import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
 import React, { useState } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetail() {
+  const [sortAsc, setSortAsc] = useState(true);
+
   const TABLE_HEAD_ENV = ["Name", "Status", "Deployed Component"];
 
   const TABLE_ROWS_ENV = [
@@ -20,8 +23,6 @@ export default function Projectdetail() {
   // Custom orders for sorting
   const order1 = ["Pending", "Failed", "Healthy"];
   const order2 = ["Healthy", "Failed", "Pending"];
-
-  const [sortAsc, setSortAsc] = useState(true);
 
   // Toggle sort order
   const toggleSortOrder = () => {
@@ -44,9 +45,9 @@ export default function Projectdetail() {
   return (
     <div>
       <Navbar />
-      <p className="text-5xl font-bold mx-16 my-5">Todo List</p>
+      <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
       {/* Project Details box */}
-      <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded font-normal">
+      <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
           <p className="text-3xl font-semibold ml-4">Application Details</p>
@@ -78,9 +79,11 @@ export default function Projectdetail() {
         <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
           <div className="flex flex-row items-center h-12">
             <p className="text-xl font-medium ml-16 mr-5 mt-5">Environment</p>
-            <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
-              Add
-            </button>
+            <Link href="/createenvironment">
+              <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
+                Add
+              </button>
+            </Link>
           </div>
 
           {/* Environment list */}
@@ -168,9 +171,11 @@ export default function Projectdetail() {
             <p className="text-xl font-medium ml-16 mr-5 mt-5">
               Cloud Resources
             </p>
-            <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
-              Add
-            </button>
+            <Link href="/cloudresources">
+              <button className="mr-4 mt-5 text-sm text-white bg-[#0A7AFF] rounded py-1 px-8">
+                Add
+              </button>
+            </Link>
           </div>
 
           {/* Cloud Resource list */}
@@ -183,23 +188,7 @@ export default function Projectdetail() {
                       key={head}
                       className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
                     >
-                      <Typography
-                        variant="small"
-                        className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
-                        onClick={
-                          head === "Status" ? toggleSortOrder : undefined
-                        }
-                      >
-                        {head === "Status" && (
-                          <span className="mr-2">
-                            <Image
-                              src={sortAsc ? filter : unfilter}
-                              alt="filter"
-                              height="20"
-                              width="20"
-                            />
-                          </span>
-                        )}
+                      <Typography variant="small" className="font-medium">
                         {head}
                       </Typography>
                     </th>

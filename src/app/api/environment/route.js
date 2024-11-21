@@ -1,5 +1,4 @@
 import { connectMongoDB } from "../../../../lib/mongodb";
-
 import Environment from "../../../../models/environment";
 import { NextResponse } from "next/server";
 
