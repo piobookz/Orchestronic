@@ -17,6 +17,7 @@ export default function Navbar() {
               width={70}
               height="auto"
               alt="logo"
+              priority="true"
               className="mr-5"
             ></Image>
           </Link>

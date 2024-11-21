@@ -25,6 +25,11 @@ export default function Environment() {
 
     try {
       // Attempt to save the data
+      console.log("Sending to API:", {
+        environmentName,
+        environmentType,
+        region,
+      });
       const res = await fetch("http://localhost:3000/api/environment", {
         method: "POST",
         headers: {
