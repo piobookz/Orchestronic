@@ -10,13 +10,21 @@ import { useRouter } from "next/navigation";
 export default function Environment() {
   const router = useRouter();
   const [environmentName, setEnvironmentName] = useState("");
-  const [environmentType, setEnvironmentType] = useState("");
-  const [region, setRegion] = useState("");
+  const [environmentType, setEnvironmentType] = useState("Development");
+  const [region, setRegion] = useState("West Europe");
+  const [alert, setAlert] = useState("");
 
   const handleSave = async (e) => {
     e.preventDefault();
+    console.log(environmentName, environmentType, region);
+    // Check if all fields are filled
+    if (!(environmentName && environmentType && region)) {
+      setAlert("Please fill out the environment name");
+      return; // Prevent further execution
+    }
 
     try {
+      // Attempt to save the data
       const res = await fetch("http://localhost:3000/api/environment", {
         method: "POST",
         headers: {
@@ -50,6 +58,11 @@ export default function Environment() {
         <p className="text-lg text-gray-400 ml-1 mt-4">
           Create Environment → Todo List
         </p>
+        {alert && (
+          <div className="bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md mt-2">
+            {alert}
+          </div>
+        )}
       </div>
 
       {/* Project Details */}
@@ -120,7 +133,10 @@ export default function Environment() {
               Back
             </button>
           </Link>
-          <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+          <button
+            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+            onClick={handleSave}
+          >
             Save
           </button>
         </div>
