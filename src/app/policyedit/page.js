@@ -105,10 +105,7 @@ export default function PolicyEdit() {
                   <label htmlFor="memory" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label
-                    htmlFor="memory-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="memory-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -119,17 +116,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setMemory(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose maximum memory (RAM)</option>
+                    <option value="" disabled>Choose maximum memory (RAM)</option>
                     <option value="32GB">32 GB</option>
                   </select>
                   <textarea
                     id="memory-message"
                     value={memoryMes}
                     onChange={(e) => setMemoryMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -144,10 +140,7 @@ export default function PolicyEdit() {
                   <label htmlFor="hdd" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label
-                    htmlFor="hdd-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="hdd-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -158,17 +151,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setHDD(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose maximum HDD</option>
+                    <option value="" disabled>Choose maximum HDD</option>
                     <option value="1TB">1 TB</option>
                   </select>
                   <textarea
                     id="hdd-message"
                     value={hddMes}
                     onChange={(e) => setHDDMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -183,10 +175,7 @@ export default function PolicyEdit() {
                   <label htmlFor="ssd" className="text-lg font-normal">
                     Storage
                   </label>
-                  <label
-                    htmlFor="ssd-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="ssd-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -197,17 +186,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setSSD(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose maximum SSD</option>
+                    <option value="" disabled>Choose maximum SSD</option>
                     <option value="500GB">500 GB</option>
                   </select>
                   <textarea
                     id="ssd-message"
                     value={ssdMes}
                     onChange={(e) => setSSDMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -220,10 +208,7 @@ export default function PolicyEdit() {
                   <label htmlFor="cpu" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label
-                    htmlFor="cpu-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="cpu-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -234,17 +219,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setCPU(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose maximum CPU Cors</option>
+                    <option value="" disabled>Choose maximum CPU Cors</option>
                     <option value="16CPU">16 CPU</option>
                   </select>
                   <textarea
                     id="cpu-message"
                     value={cpuMes}
                     onChange={(e) => setCPUMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -257,10 +241,7 @@ export default function PolicyEdit() {
                   <label htmlFor="netBand" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label
-                    htmlFor="netBand-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="netBand-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -271,17 +252,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setNetBand(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose maximum network bandwidth</option>
+                    <option value="" disabled>Choose maximum network bandwidth</option>
                     <option value="1Gbps">1 Gbps</option>
                   </select>
                   <textarea
                     id="netBand-message"
                     value={netBandMes}
                     onChange={(e) => setNetBandMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -296,10 +276,7 @@ export default function PolicyEdit() {
                   <label htmlFor="env" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label
-                    htmlFor="env-message"
-                    className="mt-2 text-lg font-normal"
-                  >
+                  <label htmlFor="env-message" className="mt-2 text-lg font-normal">
                     Message
                   </label>
                 </div>
@@ -310,17 +287,16 @@ export default function PolicyEdit() {
                     onChange={(e) => setEnv(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option selected>Choose environment limits</option>
+                    <option value="" disabled>Choose environment limits</option>
                     <option value="5env">5 environments</option>
                   </select>
                   <textarea
                     id="env-message"
                     value={envMes}
                     onChange={(e) => setEnvMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -341,10 +317,9 @@ export default function PolicyEdit() {
                     id="apel-message"
                     value={apelMes}
                     onChange={(e) => setApelMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
@@ -363,10 +338,9 @@ export default function PolicyEdit() {
                     id="note-message"
                     value={noteMes}
                     onChange={(e) => setNoteMes(e.target.value)}
-                    rows="3"
-                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment..."
-                  ></textarea>
+                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment...">
+                  </textarea>
                 </div>
               </div>
             </div>
