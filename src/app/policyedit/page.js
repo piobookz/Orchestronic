@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "../components/navbar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function PolicyEdit() {
@@ -37,12 +37,52 @@ export default function PolicyEdit() {
   // Note
   const [noteMes, setNoteMes] = useState("");
 
+
+  useEffect(() => {
+    // Fetch policy data from the API
+    const fetchPolicy = async () => {
+      try {
+        const res = await fetch("/api/policy", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const result = await res.json();
+        console.log("test");
+        console.log(result.data.memoryMes);
+
+        if (res.ok) {
+          // Update state with fetched data
+          setMemory(result.data.memory);
+          setHDD(result.data.hdd);
+          setSSD(result.data.ssd);
+          setCPU(result.data.cpu);
+          setNetBand(result.data.netBand);
+          setEnv(result.data.env);
+          
+          setMemoryMes(result.data.memoryMes);
+          setHDDMes(result.data.hddMes);
+          setSSDMes(result.data.ssdMes);
+          setCPUMes(result.data.cpuMes);
+          setNetBandMes(result.data.netBandMes);
+          setEnvMes(result.data.envMes);
+          setApelMes(result.data.apelMes);
+          setNoteMes(result.data.noteMes);
+        }
+      } catch (error) {
+        console.error("Error fetching policy:", error);
+      }
+    };
+    fetchPolicy();
+  }, []);
+
   const handleEdit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await fetch("http://localhost:3000/api/policy", {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,7 +105,7 @@ export default function PolicyEdit() {
       });
 
       if (res.ok) {
-        router.push("/policy");
+        router.push("/policy"); // Redirect to policy page if success
       } else {
         throw new Error("Failed to set policy");
       }
@@ -73,6 +113,7 @@ export default function PolicyEdit() {
       console.log(error);
     }
   };
+
 
   return (
     <div>
@@ -117,6 +158,12 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum memory (RAM)</option>
+                    <option value="2GB">2 GB</option>
+                    <option value="4GB">4 GB</option>
+                    <option value="8GB">8 GB</option>
+                    <option value="16GB">16 GB</option>
+                    <option value="18GB">18 GB</option>
+                    <option value="20GB">20 GB</option>
                     <option value="32GB">32 GB</option>
                   </select>
                   <textarea
@@ -124,7 +171,7 @@ export default function PolicyEdit() {
                     value={memoryMes}
                     onChange={(e) => setMemoryMes(e.target.value)}
                     rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
+                    placeholder="comment...">
                   </textarea>
                 </div>
               </div>
@@ -152,7 +199,12 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum HDD</option>
+                    <option value="500GB">500 GB</option>
                     <option value="1TB">1 TB</option>
+                    <option value="2TB">2 TB</option>
+                    <option value="4TB">4 TB</option>
+                    <option value="8TB">8 TB</option>
+                    <option value="16TB">16 TB</option>
                   </select>
                   <textarea
                     id="hdd-message"
@@ -187,7 +239,12 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum SSD</option>
+                    <option value="256GB">256 GB</option>
                     <option value="500GB">500 GB</option>
+                    <option value="1TB">1 TB</option>
+                    <option value="2TB">2 TB</option>
+                    <option value="4TB">4 TB</option>
+                    <option value="8TB">8 TB</option>
                   </select>
                   <textarea
                     id="ssd-message"
@@ -220,7 +277,11 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum CPU Cors</option>
+                    <option value="2CPU">2 CPU</option>
+                    <option value="4CPU">4 CPU</option>
+                    <option value="8CPU">8 CPU</option>
                     <option value="16CPU">16 CPU</option>
+                    <option value="32CPU">32 CPU</option>
                   </select>
                   <textarea
                     id="cpu-message"
@@ -253,7 +314,10 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum network bandwidth</option>
+                    <option value="100Mbps">100 Mbps</option>
+                    <option value="500Mbps">500 Mbps</option>
                     <option value="1Gbps">1 Gbps</option>
+                    <option value="10Gbps">10 Gbps</option>
                   </select>
                   <textarea
                     id="netBand-message"
@@ -288,7 +352,10 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose environment limits</option>
+                    <option value="2env">2 environments</option>
                     <option value="5env">5 environments</option>
+                    <option value="10env">10 environments</option>
+                    <option value="20env">20 environments</option>
                   </select>
                   <textarea
                     id="env-message"
@@ -350,3 +417,40 @@ export default function PolicyEdit() {
     </div>
   );
 }
+
+  // const handleCreate = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await fetch("http://localhost:3000/api/policy", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         memory,
+  //         memoryMes,
+  //         hdd,
+  //         hddMes,
+  //         ssd,
+  //         ssdMes,
+  //         cpu,
+  //         cpuMes,
+  //         netBand,
+  //         netBandMes,
+  //         env,
+  //         envMes,
+  //         apelMes,
+  //         noteMes,
+  //       }),
+  //     });
+
+  //     if (res.ok) {
+  //       router.push("/policy");
+  //     } else {
+  //       throw new Error("Failed to set policy");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
