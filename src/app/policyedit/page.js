@@ -39,7 +39,42 @@ export default function PolicyEdit() {
 
 
   useEffect(() => {
+    // Fetch policy data from the API
+    const fetchPolicy = async () => {
+      try {
+        const res = await fetch("/api/policy", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const result = await res.json();
+        console.log("test");
+        console.log(result.data.memoryMes);
 
+        if (res.ok) {
+          // Update state with fetched data
+          setMemory(result.data.memory);
+          setHDD(result.data.hdd);
+          setSSD(result.data.ssd);
+          setCPU(result.data.cpu);
+          setNetBand(result.data.netBand);
+          setEnv(result.data.env);
+          
+          setMemoryMes(result.data.memoryMes);
+          setHDDMes(result.data.hddMes);
+          setSSDMes(result.data.ssdMes);
+          setCPUMes(result.data.cpuMes);
+          setNetBandMes(result.data.netBandMes);
+          setEnvMes(result.data.envMes);
+          setApelMes(result.data.apelMes);
+          setNoteMes(result.data.noteMes);
+        }
+      } catch (error) {
+        console.error("Error fetching policy:", error);
+      }
+    };
+    fetchPolicy();
   }, []);
 
   const handleEdit = async (e) => {
@@ -79,42 +114,6 @@ export default function PolicyEdit() {
     }
   };
 
-  // const handleCreate = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const res = await fetch("http://localhost:3000/api/policy", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         memory,
-  //         memoryMes,
-  //         hdd,
-  //         hddMes,
-  //         ssd,
-  //         ssdMes,
-  //         cpu,
-  //         cpuMes,
-  //         netBand,
-  //         netBandMes,
-  //         env,
-  //         envMes,
-  //         apelMes,
-  //         noteMes,
-  //       }),
-  //     });
-
-  //     if (res.ok) {
-  //       router.push("/policy");
-  //     } else {
-  //       throw new Error("Failed to set policy");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   return (
     <div>
@@ -172,7 +171,7 @@ export default function PolicyEdit() {
                     value={memoryMes}
                     onChange={(e) => setMemoryMes(e.target.value)}
                     rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
+                    placeholder="comment...">
                   </textarea>
                 </div>
               </div>
@@ -200,7 +199,6 @@ export default function PolicyEdit() {
                     className="w-1/3 bg-gray-50 border"
                   >
                     <option value="" disabled>Choose maximum HDD</option>
-                    <option value="1TB">1 TB</option>
                     <option value="500GB">500 GB</option>
                     <option value="1TB">1 TB</option>
                     <option value="2TB">2 TB</option>
@@ -419,3 +417,40 @@ export default function PolicyEdit() {
     </div>
   );
 }
+
+  // const handleCreate = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await fetch("http://localhost:3000/api/policy", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         memory,
+  //         memoryMes,
+  //         hdd,
+  //         hddMes,
+  //         ssd,
+  //         ssdMes,
+  //         cpu,
+  //         cpuMes,
+  //         netBand,
+  //         netBandMes,
+  //         env,
+  //         envMes,
+  //         apelMes,
+  //         noteMes,
+  //       }),
+  //     });
+
+  //     if (res.ok) {
+  //       router.push("/policy");
+  //     } else {
+  //       throw new Error("Failed to set policy");
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
