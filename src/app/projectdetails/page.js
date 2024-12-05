@@ -10,7 +10,7 @@ import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetail() {
-  const [sortAsc, setSortAsc] = useState(true);
+  // const [sortAsc, setSortAsc] = useState(true);
 
   // const TABLE_HEAD_ENV = ["Name", "Status", "Deployed Component"];
 
@@ -21,13 +21,13 @@ export default function Projectdetail() {
   // ];
 
   // Custom orders for sorting
-  const order1 = ["Pending", "Failed", "Healthy"];
-  const order2 = ["Healthy", "Failed", "Pending"];
+  // const order1 = ["Pending", "Failed", "Healthy"];
+  // const order2 = ["Healthy", "Failed", "Pending"];
 
   // Toggle sort order
-  const toggleSortOrder = () => {
-    setSortAsc((prev) => !prev);
-  };
+  // const toggleSortOrder = () => {
+  //   setSortAsc((prev) => !prev);
+  // };
 
   // Sort rows based on the selected order and direction
   // const sortedRows = [...TABLE_ROWS_ENV].sort((a, b) => {
