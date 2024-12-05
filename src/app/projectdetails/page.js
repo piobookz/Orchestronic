@@ -12,13 +12,13 @@ import filter from "../../../public/filter-circle-fill.svg";
 export default function Projectdetail() {
   const [sortAsc, setSortAsc] = useState(true);
 
-  const TABLE_HEAD_ENV = ["Name", "Status", "Deployed Component"];
+  // const TABLE_HEAD_ENV = ["Name", "Status", "Deployed Component"];
 
-  const TABLE_ROWS_ENV = [
-    { name: "Development", status: "Healthy", deploy: "0" },
-    { name: "Production", status: "Pending", deploy: "0" },
-    { name: "Testing", status: "Failed", deploy: "1" },
-  ];
+  // const TABLE_ROWS_ENV = [
+  //   { name: "Development", status: "Healthy", deploy: "0" },
+  //   { name: "Production", status: "Pending", deploy: "0" },
+  //   { name: "Testing", status: "Failed", deploy: "1" },
+  // ];
 
   // Custom orders for sorting
   const order1 = ["Pending", "Failed", "Healthy"];
@@ -30,10 +30,10 @@ export default function Projectdetail() {
   };
 
   // Sort rows based on the selected order and direction
-  const sortedRows = [...TABLE_ROWS_ENV].sort((a, b) => {
-    const currentOrder = sortAsc ? order1 : order2;
-    return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
-  });
+  // const sortedRows = [...TABLE_ROWS_ENV].sort((a, b) => {
+  //   const currentOrder = sortAsc ? order1 : order2;
+  //   return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
+  // });
 
   const TABLE_HEAD_CR = ["Name", "Type"];
 
@@ -75,7 +75,8 @@ export default function Projectdetail() {
             </div>
           </div>
         </div>
-        {/* Environment */}
+
+        {/* Environment
         <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
           <div className="flex flex-row items-center h-12">
             <p className="text-xl font-medium ml-16 mr-5 mt-5">Environment</p>
@@ -86,7 +87,7 @@ export default function Projectdetail() {
             </Link>
           </div>
 
-          {/* Environment list */}
+          {/* Environment list
           <Card className="overflow-hidden rounded-lg shadow-lg mx-16 mt-8">
             <table className="w-full min-w-max table-auto text-left">
               <thead>
@@ -163,7 +164,7 @@ export default function Projectdetail() {
               </tbody>
             </table>
           </Card>
-        </div>
+        </div> */}
 
         {/* Cloud Resources */}
         <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
