@@ -20,7 +20,29 @@ export default function CloudResources() {
     },
     {
       title: "United States",
-      options: [{ value: "East US", label: "East US" }],
+      options: [
+        { value: "East US", label: "East US" },
+        { value: "East US 2", label: "East US 2" },
+        { value: "North Central US", label: "North Central US" },
+        { value: "West US 2", label: "West US 2" },
+        { value: "West US 3", label: "West US 3" },
+      ],
+    },
+    {
+      title: "Europe",
+      options: [
+        { value: "North Europe (Ireland)", label: "North Europe (Ireland)" },
+      ],
+    },
+    {
+      title: "France",
+      options: [{ value: "France Central", label: "France Central" }],
+    },
+    {
+      title: "Germany",
+      options: [
+        { value: "Germany West Central", label: "Germany West Central" },
+      ],
     },
   ];
 
@@ -79,12 +101,12 @@ export default function CloudResources() {
               id="name"
               name="name"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
-              placeholder="Enter name"
-              defaultValue="VM_1"
+              placeholder="Enter virtual machine name"
+              onChange={(e) => setResourceName(e.target.value)}
             />
           </div>
 
-          {/* Resource Group */}
+          {/* Resource Group
           <div>
             <label htmlFor="resourceGroup" className="font-medium block mb-2">
               Resource Group
@@ -98,7 +120,7 @@ export default function CloudResources() {
               <option value="Group1">Group1</option>
               <option value="Group2">Group2</option>
             </select>
-          </div>
+          </div> */}
 
           {/* Region */}
           <div>
@@ -110,7 +132,8 @@ export default function CloudResources() {
                 id="region"
                 name="region"
                 className="w-full focus:outline-none"
-                defaultValue=""
+                defaultValue="East Asia"
+                onChange={(e) => setRegion(e.target.value)}
               >
                 <option value="" disabled>
                   Select a region
