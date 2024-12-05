@@ -12,6 +12,7 @@ export default function CloudResources() {
   const [os, setOS] = useState("");
   const [adminUser, setAdminUser] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [allocation, setAllocation] = useState("");
 
   const regions = [
     {
@@ -46,6 +47,12 @@ export default function CloudResources() {
     },
   ];
 
+  const vmSize = [
+    {
+      title: "Family B for general purpose",
+      options: [{ value: "East Asia", label: "East Asia" }],
+    },
+  ];
   return (
     <div className="min-h-screen text-white">
       <Navbar />
@@ -181,6 +188,7 @@ export default function CloudResources() {
               name="os"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
               defaultValue="Ubuntu"
+              onChange={(e) => setOS(e.target.value)}
             >
               <option value="Ubuntu">Ubuntu</option>
               <option value="Windows">Windows</option>
@@ -199,6 +207,7 @@ export default function CloudResources() {
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
               placeholder="Enter username"
               defaultValue="Admin"
+              onChange={(e) => setAdminUser(e.target.value)}
             />
           </div>
 
@@ -213,6 +222,7 @@ export default function CloudResources() {
               name="adminPassword"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
               placeholder="Enter password"
+              onChange={(e) => setAdminPassword(e.target.value)}
             />
           </div>
 
@@ -239,6 +249,7 @@ export default function CloudResources() {
               id="ipAllocation"
               name="ipAllocation"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
+              onChange={(e) => setAllocation(e.target.value)}
             >
               <option value="">Select private IP allocation</option>
               <option value="Dynamic">Dynamic</option>
