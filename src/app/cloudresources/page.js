@@ -12,6 +12,7 @@ export default function CloudResources() {
   const [os, setOS] = useState("");
   const [adminUser, setAdminUser] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
 
   const regions = [
@@ -47,12 +48,186 @@ export default function CloudResources() {
     },
   ];
 
-  const vmSize = [
+  const vmSizeOptions = [
     {
-      title: "Family B for general purpose",
-      options: [{ value: "East Asia", label: "East Asia" }],
+      title: "Family A (Av2-series)",
+      options: [
+        {
+          value: "Standard_A1_v2",
+          label: "Standard_A1_v2",
+          cpu: "1",
+          memory: "2GB",
+        },
+        {
+          value: "Standard_A2_v2",
+          label: "Standard_A2_v2",
+          cpu: "2",
+          memory: "4GB",
+        },
+        {
+          value: "Standard_A4_v2",
+          label: "Standard_A4_v2",
+          cpu: "4",
+          memory: "8GB",
+        },
+        {
+          value: "Standard_A8_v2",
+          label: "Standard_A8_v2",
+          cpu: "8",
+          memory: "16GB",
+        },
+        {
+          value: "Standard_A2m_v2",
+          label: "Standard_A2m_v2",
+          cpu: "2",
+          memory: "16GB",
+        },
+        {
+          value: "Standard_A4m_v2",
+          label: "Standard_A4m_v2",
+          cpu: "4",
+          memory: "32GB",
+        },
+        {
+          value: "Standard_A8m_v2",
+          label: "Standard_A8m_v2",
+          cpu: "8",
+          memory: "64GB",
+        },
+      ],
+    },
+    {
+      title: "Family B (Basv2-series)",
+      options: [
+        {
+          value: "Standard_B2ts_v2",
+          label: "Standard_B2ts_v2",
+          cpu: "2",
+          memory: "1GB",
+        },
+        {
+          value: "Standard_B2ls_v2",
+          label: "Standard_B2ls_v2",
+          cpu: "2",
+          memory: "4GB",
+        },
+        {
+          value: "Standard_B2s_v2",
+          label: "Standard_B2s_v2",
+          cpu: "2",
+          memory: "8GB",
+        },
+        {
+          value: "Standard_B4ls_v2",
+          label: "Standard_B4ls_v2",
+          cpu: "4",
+          memory: "8GB",
+        },
+        {
+          value: "Standard_B4s_v2",
+          label: "Standard_B4s_v2",
+          cpu: "4",
+          memory: "16GB",
+        },
+        {
+          value: "Standard_B8ls_v2",
+          label: "Standard_B8ls_v2",
+          cpu: "8",
+          memory: "16GB",
+        },
+        {
+          value: "Standard_B8s_v2",
+          label: "Standard_B8s_v2",
+          cpu: "8",
+          memory: "32GB",
+        },
+        {
+          value: "Standard_B16ls_v2",
+          label: "Standard_B16ls_v2",
+          cpu: "16",
+          memory: "32GB",
+        },
+        {
+          value: "Standard_B16s_v2",
+          label: "Standard_B16s_v2",
+          cpu: "16",
+          memory: "64GB",
+        },
+        {
+          value: "Standard_B32ls_v2",
+          label: "Standard_B32ls_v2",
+          cpu: "32",
+          memory: "64GB",
+        },
+        {
+          value: "Standard_B32s_v2",
+          label: "Standard_B32s_v2",
+          cpu: "32",
+          memory: "128GB",
+        },
+      ],
+    },
+    {
+      title: "Family D (Dsv6 sizes)",
+      options: [
+        {
+          value: "Standard_D2s_v6",
+          label: "Standard_D2s_v6",
+          cpu: "2",
+          memory: "8GB",
+        },
+        {
+          value: "Standard_D4s_v6",
+          label: "Standard_D4s_v6",
+          cpu: "4",
+          memory: "16GB",
+        },
+        {
+          value: "Standard_D8s_v6",
+          label: "Standard_D8s_v6",
+          cpu: "8",
+          memory: "32GB",
+        },
+        {
+          value: "Standard_D16s_v6",
+          label: "Standard_D16s_v6",
+          cpu: "16",
+          memory: "64GB",
+        },
+        {
+          value: "Standard_D32s_v6",
+          label: "Standard_D32s_v6",
+          cpu: "32",
+          memory: "128GB",
+        },
+        {
+          value: "Standard_D48s_v6",
+          label: "Standard_D48s_v6",
+          cpu: "48",
+          memory: "192GB",
+        },
+        {
+          value: "Standard_D64s_v6",
+          label: "Standard_D64s_v6",
+          cpu: "64",
+          memory: "256GB",
+        },
+        {
+          value: "Standard_D96s_v6",
+          label: "Standard_D96s_v6",
+          cpu: "96",
+          memory: "384GB",
+        },
+        {
+          value: "Standard_D128s_v6",
+          label: "Standard_D128s_v6",
+          cpu: "128",
+          memory: "512GB",
+        },
+      ],
     },
   ];
+
   return (
     <div className="min-h-screen text-white">
       <Navbar />
@@ -165,16 +340,36 @@ export default function CloudResources() {
           {/* VM Size */}
           <div>
             <label htmlFor="vmSize" className="font-medium block mb-2">
-              VM Size
+              VM Size{" "}
+              <Link href={"/vmexplanation"}>
+                <span className="font-light font-xs ml-2 text-blue-600">
+                  Difference between the A, B, and D families
+                </span>
+              </Link>
             </label>
             <select
               id="vmSize"
               name="vmSize"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
+              defaultValue="Standard_A1_v2"
+              onChange={(e) => setVMSize(e.target.value)}
             >
-              <option value="Standard_DS1_v2">Standard_DS1_v2</option>
-              <option value="Standard_DS2_v2">Standard_DS2_v2</option>
-              <option value="Standard_DS3_v2">Standard_DS3_v2</option>
+              <option value="" disabled>
+                Select a VM Size
+              </option>
+              {vmSizeOptions.map((section, index) => (
+                <optgroup key={index} label={section.title}>
+                  {section.options.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      className={option.className || ""}
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
           </div>
 
