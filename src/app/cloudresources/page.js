@@ -8,15 +8,15 @@ import Azure from "../../../public/azure-logo.png";
 
 export default function CloudResources() {
   const [resourceName, setResourceName] = useState("");
-  const [region, setRegion] = useState("");
-  const [os, setOS] = useState("");
-  const [adminUser, setAdminUser] = useState("");
+  const [region, setRegion] = useState("East Asia");
+  const [os, setOS] = useState("Ubuntu");
+  const [adminUser, setAdminUser] = useState("Admin");
   const [adminPassword, setAdminPassword] = useState("");
-  const [vmSize, setVMSize] = useState("");
+  const [vmSize, setVMSize] = useState("Standard_A1_v2");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
   const [userID, setUserID] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState("Virtual Machine");
 
   const regions = [
     {
@@ -233,6 +233,7 @@ export default function CloudResources() {
 
   const handleSave = async () => {
     setUserID("12345");
+    setAlert("");
     if (!resourceName || !adminUser || !adminPassword || !allocation) {
       setAlert("Please fill out the request form");
       return;
@@ -322,7 +323,6 @@ export default function CloudResources() {
               name="resourceType"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
               defaultValue="Virtual Machine"
-              onChange={(e) => setType(e.target.value)}
             >
               <option value="Virtual Machine">Virtual Machine</option>
               {/* <option value="Storage">Storage</option>
