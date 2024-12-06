@@ -241,7 +241,7 @@ export default function CloudResources() {
 
     try {
       // Attempt to save the data
-      console.log("Sending to API:", {
+      /* console.log("Sending to API:", {
         userID,
         resourceName,
         region,
@@ -251,7 +251,7 @@ export default function CloudResources() {
         adminPassword,
         vmSize,
         allocation,
-      });
+      }); */
       const res = await fetch("http://localhost:3000/api/resource", {
         method: "POST",
         headers: {
@@ -274,8 +274,8 @@ export default function CloudResources() {
         throw new Error(`Failed to save: ${res.statusText}`);
       }
 
-      const data = await res.json();
-      console.log("Response from API:", data);
+      // const data = await res.json();
+      // console.log("Response from API:", data);
     } catch (error) {
       console.error("Error while saving resource:", error);
     }
