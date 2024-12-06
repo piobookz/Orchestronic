@@ -14,6 +14,9 @@ export default function CloudResources() {
   const [adminPassword, setAdminPassword] = useState("");
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
+  const [alert, setAlert] = useState("");
+  const [userID, setUserID] = useState("");
+  const [type, setType] = useState("");
 
   const regions = [
     {
@@ -228,6 +231,55 @@ export default function CloudResources() {
     },
   ];
 
+  const handleSave = async () => {
+    setUserID("12345");
+    if (!resourceName || !adminUser || !adminPassword || !allocation) {
+      setAlert("Please fill out the request form");
+      return;
+    }
+
+    try {
+      // Attempt to save the data
+      console.log("Sending to API:", {
+        userID,
+        resourceName,
+        region,
+        os,
+        type,
+        adminUser,
+        adminPassword,
+        vmSize,
+        allocation,
+      });
+      const res = await fetch("http://localhost:3000/api/resource", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userID,
+          resourceName,
+          region,
+          os,
+          type,
+          adminUser,
+          adminPassword,
+          vmSize,
+          allocation,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to save: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log("Response from API:", data);
+    } catch (error) {
+      console.error("Error while saving resource:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen text-white">
       <Navbar />
@@ -238,7 +290,11 @@ export default function CloudResources() {
           Create Cloud Resource → Todo List
         </p>
       </div>
-
+      {alert && (
+        <div className="bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md ml-16">
+          {alert}
+        </div>
+      )}
       {/* Form Container */}
       <div className="bg-white text-black mx-16 my-8 p-8 rounded-lg shadow-lg">
         {/* Section Title */}
@@ -266,6 +322,7 @@ export default function CloudResources() {
               name="resourceType"
               className="border border-slate-300 rounded w-full px-4 py-2 text-base"
               defaultValue="Virtual Machine"
+              onChange={(e) => setType(e.target.value)}
             >
               <option value="Virtual Machine">Virtual Machine</option>
               {/* <option value="Storage">Storage</option>
@@ -465,7 +522,10 @@ export default function CloudResources() {
               Cancel
             </button>
           </Link>
-          <button className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+          <button
+            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+            onClick={handleSave}
+          >
             Save
           </button>
         </div>
