@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Internal Developer Platform (IDP) Senior Project
 
-## Getting Started
+This repository showcases my senior project: a comprehensive **Internal Developer Platform (IDP)** designed to streamline and automate resource provisioning and management for development teams. By integrating cutting-edge tools and frameworks, this project delivers a robust, user-friendly solution to optimize workflows and improve efficiency in modern development environments.
 
-First, run the development server:
+## Key Features and Solutions
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Automated Resource Provisioning**:  
+  Utilize Terraform to implement infrastructure as code (IaC) for seamless automation of resource creation, updates, and deletion, reducing manual intervention and minimizing errors.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Streamlined User Management**:  
+  Build a secure and user-friendly management interface with Next.js and NextAuth, enabling efficient and reliable handling of user accounts and access controls.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Efficient Approval Workflows**:  
+  Integrate RabbitMQ for event-driven processes, enabling smooth management of IT approvals and resource request queues.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Policy Compliance**:  
+  Ensure adherence to organizational policies by enforcing resource allocation limits and approval conditions automatically through predefined rules.
 
-## Learn More
+- **Centralized Interface**:  
+  Provide a single, intuitive platform to manage all aspects of the development environment, reducing complexity and enhancing usability for IT and project managers.
 
-To learn more about Next.js, take a look at the following resources:
+- **Enhanced Productivity**:  
+  Accelerate the development cycle by automating repetitive tasks, removing bottlenecks, and enabling faster delivery of features and updates.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project demonstrates how automation, modern frameworks, and efficient workflows can significantly enhance the development experience, improve collaboration, and enforce compliance seamlessly.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Team members
+- **Yumi Yoshida**
+- **Pattiya Yiadram**
+- **Santawan Sanpha-asa**
