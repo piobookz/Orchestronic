@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const resourceSchema = new Schema({
+  userid: { type: String },
   vmname: { type: String },
   vmsize: { type: String },
   region: { type: String },
