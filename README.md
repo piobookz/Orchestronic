@@ -25,6 +25,6 @@ This repository showcases my senior project: a comprehensive **Internal Develope
 This project demonstrates how automation, modern frameworks, and efficient workflows can significantly enhance the development experience, improve collaboration, and enforce compliance seamlessly.
 
 ## Team members
-- **Yumi Yoshida**
-- **Pattiya Yiadram**
-- **Santawan Sanpha-asa**
+**Yumi Yoshida**  
+**Pattiya Yiadram**  
+**Santawan Sanpha-asa**  
