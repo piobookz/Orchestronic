@@ -287,9 +287,9 @@ export default function CloudResources() {
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>
-        <p className="text-lg text-gray-400 ml-1 mt-4">
+        <h2 className="text-lg text-gray-400 ml-1 mt-4">
           Create Cloud Resource → Todo List
-        </p>
+        </h2>
       </div>
       {alert && (
         <div className="bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md ml-16">
