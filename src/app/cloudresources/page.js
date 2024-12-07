@@ -17,6 +17,7 @@ export default function CloudResources() {
   const [alert, setAlert] = useState("");
   const [userID, setUserID] = useState("");
   const [type, setType] = useState("Virtual Machine");
+  const [projectID, setProjectID] = useState("");
 
   const regions = [
     {
@@ -232,7 +233,8 @@ export default function CloudResources() {
   ];
 
   const handleSave = async () => {
-    setUserID("12345");
+    setUserID("12345"); // need to be fixed
+    setProjectID("675266f7b8c017a58d37feaf"); // need to be fixed
     setAlert("");
     if (!resourceName || !adminUser || !adminPassword || !allocation) {
       setAlert("Please fill out the request form");
@@ -251,6 +253,7 @@ export default function CloudResources() {
         adminPassword,
         vmSize,
         allocation,
+        projectID,
       }); */
       const res = await fetch("http://localhost:3000/api/resource", {
         method: "POST",
@@ -267,6 +270,7 @@ export default function CloudResources() {
           adminPassword,
           vmSize,
           allocation,
+          projectID,
         }),
       });
 
