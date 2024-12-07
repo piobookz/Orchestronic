@@ -10,9 +10,9 @@ const resourceSchema = new Schema({
   username: { type: String },
   password: { type: String },
   allocationip: { type: String },
-  projectname: { type: String },
+  projectid: { type: String },
 });
 
 const Resource =
-  mongoose.models.Resource || mongoose.model("Resource", resourceSchema);
+  mongoose.models.Resource || mongoose.model("resources", resourceSchema);
 export default Resource;
