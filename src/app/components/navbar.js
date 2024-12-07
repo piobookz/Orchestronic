@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="bg-[#07032B] text-white p-5">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row">
-          <Link href={"/homepage"}>
+          <Link href={"/"}>
             <Image
               src={logo}
               width={70}
@@ -23,7 +23,7 @@ export default function Navbar() {
           </Link>
           <ul className="flex flex-row space-x-6 text-center items-center">
             <Link
-              href="/homepage"
+              href="/"
               className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
             >
               <li>Home</li>
