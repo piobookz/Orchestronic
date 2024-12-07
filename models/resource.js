@@ -10,6 +10,7 @@ const resourceSchema = new Schema({
   username: { type: String },
   password: { type: String },
   allocationip: { type: String },
+  projectname: { type: String },
 });
 
 const Resource =
