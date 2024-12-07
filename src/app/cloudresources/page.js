@@ -15,9 +15,11 @@ export default function CloudResources() {
   const [vmSize, setVMSize] = useState("Standard_A1_v2");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
-  const [userID, setUserID] = useState("");
+  const [userID, setUserID] = useState("12345");
   const [type, setType] = useState("Virtual Machine");
-  const [projectID, setProjectID] = useState("");
+  const [projectID, setProjectID] = useState("675266f7b8c017a58d37feaf");
+  // const DEFAULT_USER_ID = "12345"; // Replace with dynamic data later
+  // const DEFAULT_PROJECT_ID = "675266f7b8c017a58d37feaf"; // Replace with dynamic data later
 
   const regions = [
     {
@@ -233,8 +235,6 @@ export default function CloudResources() {
   ];
 
   const handleSave = async () => {
-    setUserID("12345"); // need to be fixed
-    setProjectID("675266f7b8c017a58d37feaf"); // need to be fixed
     setAlert("");
     if (!resourceName || !adminUser || !adminPassword || !allocation) {
       setAlert("Please fill out the request form");
@@ -281,7 +281,7 @@ export default function CloudResources() {
       // const data = await res.json();
       // console.log("Response from API:", data);
     } catch (error) {
-      console.error("Error while saving resource:", error);
+      console.log("Error while saving resource:", error);
     }
   };
 
