@@ -5,7 +5,7 @@ import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
@@ -37,10 +37,37 @@ export default function Projectdetail() {
 
   const TABLE_HEAD_CR = ["Name", "Type"];
 
-  const TABLE_ROWS_CR = [
-    { name: "VM_Development", type: "Virtual Machine" },
-    { name: "VM_Production", type: "Virtual Machine" },
-  ];
+  const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
+
+  useEffect(() => {
+    const handleRequest = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/resource", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        const rows = data.map((element) => ({
+          name: element.vmname,
+          type: element.type,
+        }));
+
+        setTableRowsCR(rows);
+        console.log(rows); // Logs the final state
+      } catch (error) {
+        console.log("Failed to send request:", error.message);
+      }
+    };
+
+    handleRequest();
+  }, []);
 
   return (
     <div>
@@ -200,8 +227,9 @@ export default function Projectdetail() {
                 {TABLE_ROWS_CR.map(({ name, type }, index) => {
                   const isOdd = index % 2 === 1;
                   const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+                  console.log(TABLE_ROWS_CR);
                   return (
-                    <tr key={name} className={`${rowBgColor}`}>
+                    <tr key={`${name}-${index}`} className={`${rowBgColor}`}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <Typography
                           variant="small"
