@@ -16,7 +16,7 @@ export async function POST(req) {
     allocation,
     projectID,
   } = await req.json();
-  console.log(
+  /* console.log(
     userID,
     resourceName,
     region,
@@ -27,7 +27,7 @@ export async function POST(req) {
     vmSize,
     allocation,
     projectID
-  );
+  ); */
 
   // Connect to MongoDB
   await connectMongoDB();

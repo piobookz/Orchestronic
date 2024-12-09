@@ -60,7 +60,7 @@ export default function Projectdetail() {
         }));
 
         setTableRowsCR(rows);
-        console.log(rows); // Logs the final state
+        // console.log(rows); // Logs the final state
       } catch (error) {
         console.log("Failed to send request:", error.message);
       }
