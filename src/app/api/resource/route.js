@@ -58,7 +58,7 @@ export async function GET() {
     console.log("Connected to MongoDB");
 
     const resources = await Resource.find({});
-    console.log("Fetched resources:", resources);
+    // console.log("Fetched resources:", resources);
 
     return NextResponse.json(resources, { status: 200 });
   } catch (error) {
