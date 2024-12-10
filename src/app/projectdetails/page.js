@@ -40,7 +40,7 @@ export default function Projectdetail() {
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
 
   useEffect(() => {
-    const handleRequest = async () => {
+    const requests = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/resource", {
           method: "GET",
@@ -55,19 +55,46 @@ export default function Projectdetail() {
 
         const data = await res.json();
         const rows = data.map((element) => ({
+          id: element._id,
           name: element.vmname,
           type: element.type,
+          userid: element.userid,
+          projectid: element.projectid,
+          status: "pending",
         }));
 
         setTableRowsCR(rows);
-        // console.log(rows); // Logs the final state
+        // console.log(data); // Logs the final state
       } catch (error) {
         console.log("Failed to send request:", error.message);
       }
     };
 
-    handleRequest();
+    requests();
   }, []);
+
+  const handleRequest = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(TABLE_ROWS_CR),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      }
+
+      /* 
+      const result = await res.json();
+      console.log("Request successfully saved:", result);
+      */
+    } catch (error) {
+      console.log("Error while saving request:", error.message);
+    }
+  };
 
   return (
     <div>
@@ -78,7 +105,10 @@ export default function Projectdetail() {
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
           <p className="text-3xl font-semibold ml-4">Application Details</p>
-          <button className="mr-4 text-sm text-white bg-[#29B95F] rounded py-2 px-2">
+          <button
+            className="mr-4 text-sm text-white bg-[#29B95F] rounded py-2 px-2"
+            onClick={handleRequest}
+          >
             Send Request
           </button>
         </div>
