@@ -257,7 +257,7 @@ export default function Projectdetail() {
                 {TABLE_ROWS_CR.map(({ name, type }, index) => {
                   const isOdd = index % 2 === 1;
                   const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
-                  console.log(TABLE_ROWS_CR);
+                  // console.log(TABLE_ROWS_CR);
                   return (
                     <tr key={`${name}-${index}`} className={`${rowBgColor}`}>
                       <td className="p-4 border-b border-blue-gray-50">

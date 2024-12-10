@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const resources = await req.json(); // Parse JSON array
-  console.log("Incoming Requests:", resources);
+  // console.log("Incoming Requests:", resources);
 
   // Connect to MongoDB
   await connectMongoDB();
