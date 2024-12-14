@@ -14,8 +14,9 @@ export async function POST(req) {
     adminPassword,
     vmSize,
     allocation,
+    projectID,
   } = await req.json();
-  console.log(
+  /* console.log(
     userID,
     resourceName,
     region,
@@ -24,8 +25,9 @@ export async function POST(req) {
     adminUser,
     adminPassword,
     vmSize,
-    allocation
-  );
+    allocation,
+    projectID
+  ); */
 
   // Connect to MongoDB
   await connectMongoDB();
@@ -41,10 +43,30 @@ export async function POST(req) {
     username: adminUser,
     password: adminPassword,
     allocationip: allocation,
+    projectid: projectID,
   });
 
   return NextResponse.json(
     { message: "Successfully added resource" },
     { status: 201 }
   );
+}
+
+export async function GET() {
+  try {
+    await connectMongoDB();
+    console.log("Connected to MongoDB");
+
+    const resources = await Resource.find({});
+    // console.log("Fetched resources:", resources);
+
+    return NextResponse.json(resources, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching resources:", error);
+
+    return NextResponse.json(
+      { message: "Error fetching resources", error: error.message },
+      { status: 500 }
+    );
+  }
 }

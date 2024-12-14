@@ -15,8 +15,11 @@ export default function CloudResources() {
   const [vmSize, setVMSize] = useState("Standard_A1_v2");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
-  const [userID, setUserID] = useState("");
+  const [userID, setUserID] = useState("12345");
   const [type, setType] = useState("Virtual Machine");
+  const [projectID, setProjectID] = useState("675266f7b8c017a58d37feaf");
+  // const DEFAULT_USER_ID = "12345"; // Replace with dynamic data later
+  // const DEFAULT_PROJECT_ID = "675266f7b8c017a58d37feaf"; // Replace with dynamic data later
 
   const regions = [
     {
@@ -232,7 +235,6 @@ export default function CloudResources() {
   ];
 
   const handleSave = async () => {
-    setUserID("12345");
     setAlert("");
     if (!resourceName || !adminUser || !adminPassword || !allocation) {
       setAlert("Please fill out the request form");
@@ -251,6 +253,7 @@ export default function CloudResources() {
         adminPassword,
         vmSize,
         allocation,
+        projectID,
       }); */
       const res = await fetch("http://localhost:3000/api/resource", {
         method: "POST",
@@ -267,6 +270,7 @@ export default function CloudResources() {
           adminPassword,
           vmSize,
           allocation,
+          projectID,
         }),
       });
 
@@ -277,7 +281,7 @@ export default function CloudResources() {
       // const data = await res.json();
       // console.log("Response from API:", data);
     } catch (error) {
-      console.error("Error while saving resource:", error);
+      console.log("Error while saving resource:", error);
     }
   };
 
@@ -287,9 +291,9 @@ export default function CloudResources() {
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>
-        <p className="text-lg text-gray-400 ml-1 mt-4">
+        <h2 className="text-lg text-gray-400 ml-1 mt-4">
           Create Cloud Resource → Todo List
-        </p>
+        </h2>
       </div>
       {alert && (
         <div className="bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md ml-16">
