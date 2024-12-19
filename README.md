@@ -1,6 +1,6 @@
 # Internal Developer Platform (IDP) Senior Project
 
-This repository showcases my senior project: a comprehensive **Internal Developer Platform (IDP)** designed to streamline and automate resource provisioning and management for development teams. By integrating cutting-edge tools and frameworks, this project delivers a robust, user-friendly solution to optimize workflows and improve efficiency in modern development environments.
+This repository showcases a senior project: a comprehensive **Internal Developer Platform (IDP)** designed to streamline and automate resource provisioning and management for development teams. By integrating cutting-edge tools and frameworks, this project delivers a robust, user-friendly solution to optimize workflows and improve efficiency in modern development environments.
 
 ## Key Features and Solutions
 
