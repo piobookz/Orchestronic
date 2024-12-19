@@ -11,7 +11,7 @@ export default function Navbar() {
     <nav className="bg-[#07032B] text-white p-5">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row">
-          <Link href={"/"}>
+          <Link href={"/"} rel="preload" as="image">
             <Image
               src={logo}
               width={70}

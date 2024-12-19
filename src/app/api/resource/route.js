@@ -16,7 +16,7 @@ export async function POST(req) {
     allocation,
     projectID,
   } = await req.json();
-  console.log(
+  /* console.log(
     userID,
     resourceName,
     region,
@@ -27,7 +27,7 @@ export async function POST(req) {
     vmSize,
     allocation,
     projectID
-  );
+  ); */
 
   // Connect to MongoDB
   await connectMongoDB();
@@ -58,7 +58,7 @@ export async function GET() {
     console.log("Connected to MongoDB");
 
     const resources = await Resource.find({});
-    console.log("Fetched resources:", resources);
+    // console.log("Fetched resources:", resources);
 
     return NextResponse.json(resources, { status: 200 });
   } catch (error) {
