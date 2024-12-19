@@ -4,24 +4,56 @@ import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
-import React, { useState } from "react";
+import React, { useState, useEffect, use } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
 export default function ProjectMG() {
   const TABLE_HEAD_CR = ["Name", "Type"];
 
-  const TABLE_ROWS_CR = [
-    { name: "VM_Development", type: "Virtual Machine" },
-    { name: "VM_Production", type: "Virtual Machine" },
-  ];
+  const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
+
+  useEffect(() => {
+    const requests = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/resource", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        }
+
+        //TODO: write logic to match current project
+        const data = await res.json();
+        // console.log(data);
+        const rows = data.map((element) => ({
+          id: element._id,
+          name: element.vmname,
+          type: element.type,
+          userid: element.userid,
+          projectid: element.projectid,
+          status: "Pending",
+        }));
+
+        setTableRowsCR(rows);
+        // console.log(data); // Logs the final state
+      } catch (error) {
+        console.log("Failed to send request:", error.message);
+      }
+    };
+    requests();
+  }, []);
 
   const [selectedButton, setSelectedButton] = useState("Pending");
   // if approve then set as pending
   // if reject set as reject
   // if Under set as under review
   const handleChange = (event) => {
-    setSelectedButton(event.target.value);
+    setSelectedButton(event);
   };
 
   return (
@@ -30,11 +62,13 @@ export default function ProjectMG() {
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
           <p className="text-5xl font-bold ml-16 my-5">Todo List</p>
-          <span className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${selectedButton === "Approved"
-            ? "bg-green-500"
-            : selectedButton === "Rejected"
-              ? "bg-red-500"
-              : selectedButton === "Under Review"
+          <span
+            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
+              selectedButton === "Approved"
+                ? "bg-green-500"
+                : selectedButton === "Rejected"
+                ? "bg-red-500"
+                : selectedButton === "Under Review"
                 ? "bg-amber-500"
                 : "bg-gray-500"
             }`}
@@ -47,28 +81,28 @@ export default function ProjectMG() {
           <div className="flex flex-row">
             <button
               role="radio"
-              onClick={() => setSelectedButton("Approved")}
-              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-green-500 focus:bg-green-500">
+              onClick={() => handleChange("Approved")}
+              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-green-500 focus:bg-green-500"
+            >
               Approved
             </button>
             <button
               role="radio"
-              onClick={() => setSelectedButton("Rejected")}
-              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-red-500 focus:bg-red-500">
+              onClick={() => handleChange("Rejected")}
+              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-red-500 focus:bg-red-500"
+            >
               Rejected
             </button>
             <button
               role="radio"
-              onClick={() => setSelectedButton("Under Review")}
-              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-amber-500 focus:bg-amber-500">
+              onClick={() => handleChange("Under Review")}
+              className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-amber-500 focus:bg-amber-500"
+            >
               Under Review
             </button>
           </div>
         </div>
-
       </div>
-
-
 
       {/* Project Details box */}
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded font-normal">
@@ -97,7 +131,7 @@ export default function ProjectMG() {
           </div>
         </div>
         {/* Cloud Resources */}
-        <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10" >
+        <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
           <div className="flex flex-row items-center h-12">
             <p className="text-xl font-medium ml-16 mr-5 mt-5">
               Cloud Resources
@@ -114,23 +148,7 @@ export default function ProjectMG() {
                       key={head}
                       className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
                     >
-                      <Typography
-                        variant="small"
-                        className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
-                        onClick={
-                          head === "Status" ? toggleSortOrder : undefined
-                        }
-                      >
-                        {head === "Status" && (
-                          <span className="mr-2">
-                            <Image
-                              src={sortAsc ? filter : unfilter}
-                              alt="filter"
-                              height="20"
-                              width="20"
-                            />
-                          </span>
-                        )}
+                      <Typography variant="small" className="font-medium">
                         {head}
                       </Typography>
                     </th>
@@ -141,8 +159,9 @@ export default function ProjectMG() {
                 {TABLE_ROWS_CR.map(({ name, type }, index) => {
                   const isOdd = index % 2 === 1;
                   const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+                  // console.log(TABLE_ROWS_CR);
                   return (
-                    <tr key={name} className={`${rowBgColor}`}>
+                    <tr key={`${name}-${index}`} className={`${rowBgColor}`}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <Typography
                           variant="small"
@@ -167,8 +186,8 @@ export default function ProjectMG() {
               </tbody>
             </table>
           </Card>
-        </div >
-      </div >
-    </div >
+        </div>
+      </div>
+    </div>
   );
 }
