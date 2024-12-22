@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
@@ -52,13 +51,26 @@ export default function ProjectMG() {
   // if approve then set as pending
   // if reject set as reject
   // if Under set as under review
-  const handleChange = (event) => {
+  const handleChange = async (event) => {
     setSelectedButton(event);
+    // console.log(event);
+    const projectid = TABLE_ROWS_CR[0].projectid;
+
+    try {
+      const res = await fetch("http://localhost:3000/api/request", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: event, projectid: projectid }),
+      });
+    } catch (error) {
+      console.log("Failed to send request:", error.message);
+    }
   };
 
   return (
     <div>
-      <Navbar />
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
           <p className="text-5xl font-bold ml-16 my-5">Todo List</p>
