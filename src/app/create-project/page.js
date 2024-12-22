@@ -1,12 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import Navbar from "orchestronic/app/components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 
 export default function CreateProject() {
   return (
     <>
-      <Navbar />
       <h1 className="mx-16 my-10 text-4xl font-bold dark:text-white">
         Create a New Project
       </h1>
@@ -32,9 +30,7 @@ export default function CreateProject() {
                     height="45"
                     alt="GitLab logo"
                   />
-                  <span className="text-black">
-                    GitLab
-                  </span>
+                  <span className="text-black">GitLab</span>
                 </div>
               </div>
 

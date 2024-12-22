@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import React, { useState } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
@@ -54,9 +53,6 @@ export default function Environment() {
 
   return (
     <div className="min-h-screen text-white">
-      {/* Navber */}
-      <Navbar />
-
       {/* Title */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Environment</h1>

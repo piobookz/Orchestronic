@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -37,7 +36,6 @@ export default function PolicyEdit() {
   // Note
   const [noteMes, setNoteMes] = useState("");
 
-
   useEffect(() => {
     // Fetch policy data from the API
     const fetchPolicy = async () => {
@@ -60,7 +58,7 @@ export default function PolicyEdit() {
           setCPU(result.data.cpu);
           setNetBand(result.data.netBand);
           setEnv(result.data.env);
-          
+
           setMemoryMes(result.data.memoryMes);
           setHDDMes(result.data.hddMes);
           setSSDMes(result.data.ssdMes);
@@ -114,10 +112,8 @@ export default function PolicyEdit() {
     }
   };
 
-
   return (
     <div>
-      <Navbar />
       <p className="text-5xl font-bold mx-16 my-5">Terms and Policies</p>
 
       {/* Details box */}
@@ -146,7 +142,10 @@ export default function PolicyEdit() {
                   <label htmlFor="memory" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label htmlFor="memory-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="memory-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -157,7 +156,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setMemory(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose maximum memory (RAM)</option>
+                    <option value="" disabled>
+                      Choose maximum memory (RAM)
+                    </option>
                     <option value="2GB">2 GB</option>
                     <option value="4GB">4 GB</option>
                     <option value="8GB">8 GB</option>
@@ -170,9 +171,10 @@ export default function PolicyEdit() {
                     id="memory-message"
                     value={memoryMes}
                     onChange={(e) => setMemoryMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -187,7 +189,10 @@ export default function PolicyEdit() {
                   <label htmlFor="hdd" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label htmlFor="hdd-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="hdd-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -198,7 +203,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setHDD(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose maximum HDD</option>
+                    <option value="" disabled>
+                      Choose maximum HDD
+                    </option>
                     <option value="500GB">500 GB</option>
                     <option value="1TB">1 TB</option>
                     <option value="2TB">2 TB</option>
@@ -210,9 +217,10 @@ export default function PolicyEdit() {
                     id="hdd-message"
                     value={hddMes}
                     onChange={(e) => setHDDMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -227,7 +235,10 @@ export default function PolicyEdit() {
                   <label htmlFor="ssd" className="text-lg font-normal">
                     Storage
                   </label>
-                  <label htmlFor="ssd-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="ssd-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -238,7 +249,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setSSD(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose maximum SSD</option>
+                    <option value="" disabled>
+                      Choose maximum SSD
+                    </option>
                     <option value="256GB">256 GB</option>
                     <option value="500GB">500 GB</option>
                     <option value="1TB">1 TB</option>
@@ -250,9 +263,10 @@ export default function PolicyEdit() {
                     id="ssd-message"
                     value={ssdMes}
                     onChange={(e) => setSSDMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -265,7 +279,10 @@ export default function PolicyEdit() {
                   <label htmlFor="cpu" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label htmlFor="cpu-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="cpu-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -276,7 +293,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setCPU(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose maximum CPU Cors</option>
+                    <option value="" disabled>
+                      Choose maximum CPU Cors
+                    </option>
                     <option value="2CPU">2 CPU</option>
                     <option value="4CPU">4 CPU</option>
                     <option value="8CPU">8 CPU</option>
@@ -287,9 +306,10 @@ export default function PolicyEdit() {
                     id="cpu-message"
                     value={cpuMes}
                     onChange={(e) => setCPUMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -302,7 +322,10 @@ export default function PolicyEdit() {
                   <label htmlFor="netBand" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label htmlFor="netBand-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="netBand-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -313,7 +336,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setNetBand(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose maximum network bandwidth</option>
+                    <option value="" disabled>
+                      Choose maximum network bandwidth
+                    </option>
                     <option value="100Mbps">100 Mbps</option>
                     <option value="500Mbps">500 Mbps</option>
                     <option value="1Gbps">1 Gbps</option>
@@ -323,9 +348,10 @@ export default function PolicyEdit() {
                     id="netBand-message"
                     value={netBandMes}
                     onChange={(e) => setNetBandMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -340,7 +366,10 @@ export default function PolicyEdit() {
                   <label htmlFor="env" className="text-lg font-normal">
                     Maximum
                   </label>
-                  <label htmlFor="env-message" className="mt-2 text-lg font-normal">
+                  <label
+                    htmlFor="env-message"
+                    className="mt-2 text-lg font-normal"
+                  >
                     Message
                   </label>
                 </div>
@@ -351,7 +380,9 @@ export default function PolicyEdit() {
                     onChange={(e) => setEnv(e.target.value)}
                     className="w-1/3 bg-gray-50 border"
                   >
-                    <option value="" disabled>Choose environment limits</option>
+                    <option value="" disabled>
+                      Choose environment limits
+                    </option>
                     <option value="2env">2 environments</option>
                     <option value="5env">5 environments</option>
                     <option value="10env">10 environments</option>
@@ -361,9 +392,10 @@ export default function PolicyEdit() {
                     id="env-message"
                     value={envMes}
                     onChange={(e) => setEnvMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -384,9 +416,10 @@ export default function PolicyEdit() {
                     id="apel-message"
                     value={apelMes}
                     onChange={(e) => setApelMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -405,9 +438,10 @@ export default function PolicyEdit() {
                     id="note-message"
                     value={noteMes}
                     onChange={(e) => setNoteMes(e.target.value)}
-                    rows="3" className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
-                    placeholder="Comment...">
-                  </textarea>
+                    rows="3"
+                    className="mt-2 px-3 py-1 bg-gray-50 rounded-lg border"
+                    placeholder="Comment..."
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -418,39 +452,39 @@ export default function PolicyEdit() {
   );
 }
 
-  // const handleCreate = async (e) => {
-  //   e.preventDefault();
+// const handleCreate = async (e) => {
+//   e.preventDefault();
 
-  //   try {
-  //     const res = await fetch("http://localhost:3000/api/policy", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         memory,
-  //         memoryMes,
-  //         hdd,
-  //         hddMes,
-  //         ssd,
-  //         ssdMes,
-  //         cpu,
-  //         cpuMes,
-  //         netBand,
-  //         netBandMes,
-  //         env,
-  //         envMes,
-  //         apelMes,
-  //         noteMes,
-  //       }),
-  //     });
+//   try {
+//     const res = await fetch("http://localhost:3000/api/policy", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         memory,
+//         memoryMes,
+//         hdd,
+//         hddMes,
+//         ssd,
+//         ssdMes,
+//         cpu,
+//         cpuMes,
+//         netBand,
+//         netBandMes,
+//         env,
+//         envMes,
+//         apelMes,
+//         noteMes,
+//       }),
+//     });
 
-  //     if (res.ok) {
-  //       router.push("/policy");
-  //     } else {
-  //       throw new Error("Failed to set policy");
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+//     if (res.ok) {
+//       router.push("/policy");
+//     } else {
+//       throw new Error("Failed to set policy");
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };

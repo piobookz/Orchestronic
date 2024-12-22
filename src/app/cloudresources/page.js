@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
@@ -281,8 +280,6 @@ export default function CloudResources() {
 
   return (
     <div className="min-h-screen text-white">
-      <Navbar />
-
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>

@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
@@ -102,7 +101,6 @@ export default function Projectdetail() {
 
   return (
     <div>
-      <Navbar />
       <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
       {/* Project Details box */}
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
