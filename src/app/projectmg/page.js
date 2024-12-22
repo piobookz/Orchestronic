@@ -48,9 +48,7 @@ export default function ProjectMG() {
   }, []);
 
   const [selectedButton, setSelectedButton] = useState("Pending");
-  // if approve then set as pending
-  // if reject set as reject
-  // if Under set as under review
+
   const handleChange = async (event) => {
     setSelectedButton(event);
     // console.log(event);
