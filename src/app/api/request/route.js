@@ -26,3 +26,19 @@ export async function POST(req) {
     { status: 201 }
   );
 }
+
+export async function PUT(req) {
+  const { status, projectid } = await req.json(); // Parse JSON object
+  // console.log("Incoming Status:", status);
+
+  // Connect to MongoDB
+  await connectMongoDB();
+
+  // Update all requests with the given project ID
+  const updatedRequests = await Request.updateMany({ projectid }, { status });
+
+  return NextResponse.json(
+    { message: "Successfully updated requests", updatedRequests },
+    { status: 200 }
+  );
+}
