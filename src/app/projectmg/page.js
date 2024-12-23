@@ -11,9 +11,10 @@ export default function ProjectMG() {
   const TABLE_HEAD_CR = ["Name", "Type"];
 
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
+  const [selectedButton, setSelectedButton] = useState("Pending");
 
   useEffect(() => {
-    const requests = async () => {
+    const fetchTableRows = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/resource", {
           method: "GET",
@@ -26,28 +27,70 @@ export default function ProjectMG() {
           throw new Error(`Error: ${res.status} - ${res.statusText}`);
         }
 
-        //TODO: write logic to match current project
         const data = await res.json();
-        // console.log(data);
         const rows = data.map((element) => ({
           id: element._id,
           name: element.vmname,
           type: element.type,
           userid: element.userid,
           projectid: element.projectid,
-          status: "Pending",
+          status: "Pending", // Default status
         }));
 
         setTableRowsCR(rows);
-        // console.log(data); // Logs the final state
       } catch (error) {
-        console.log("Failed to send request:", error.message);
+        console.error("Failed to send request:", error.message);
       }
     };
-    requests();
-  }, []);
 
-  const [selectedButton, setSelectedButton] = useState("Pending");
+    fetchTableRows();
+  }, []); // Runs once on component mount
+
+  useEffect(() => {
+    if (TABLE_ROWS_CR.length === 0) return; // Prevent running when TABLE_ROWS_CR is empty
+
+    const fetchProjectStatus = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/request", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        }
+
+        const { requests } = await res.json();
+        //console.log("API Response for /api/request:", requests);
+
+        if (Array.isArray(requests)) {
+          const matchingRequest = requests.find(
+            (item) => item.projectid === TABLE_ROWS_CR[0].projectid
+          );
+
+          if (matchingRequest) {
+            setSelectedButton(matchingRequest.status);
+          } else {
+            console.warn(
+              "No matching request found for project ID:",
+              TABLE_ROWS_CR[0].projectid
+            );
+          }
+        } else {
+          console.error(
+            "Unexpected API response format. Expected an array but received:",
+            requests
+          );
+        }
+      } catch (error) {
+        console.error("Failed to retrieve request:", error.message);
+      }
+    };
+
+    fetchProjectStatus();
+  }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
 
   const handleChange = async (event) => {
     setSelectedButton(event);
@@ -55,7 +98,7 @@ export default function ProjectMG() {
     const projectid = TABLE_ROWS_CR[0].projectid;
 
     try {
-      const res = await fetch("http://localhost:3000/api/request", {
+      await fetch("http://localhost:3000/api/request", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
