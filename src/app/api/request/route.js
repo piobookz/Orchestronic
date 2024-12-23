@@ -2,6 +2,16 @@ import { connectMongoDB } from "../../../../lib/mongodb";
 import Request from "../../../../models/request";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+  // Connect to MongoDB
+  await connectMongoDB();
+
+  // Retrieve all requests
+  const requests = await Request.find({});
+
+  return NextResponse.json({ requests }, { status: 200 });
+}
+
 export async function POST(req) {
   const resources = await req.json(); // Parse JSON array
   // console.log("Incoming Requests:", resources);
