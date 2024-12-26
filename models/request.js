@@ -6,7 +6,8 @@ const requestSchema = new Schema({
   type: { type: String },
   userid: { type: String },
   projectid: { type: String },
-  status: { type: String },
+  statuspm: { type: String },
+  statusops: { type: String },
 });
 
 const Request =
