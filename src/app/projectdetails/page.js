@@ -61,7 +61,8 @@ export default function Projectdetail() {
           type: element.type,
           userid: element.userid,
           projectid: element.projectid,
-          status: "Pending",
+          statuspm: "Pending",
+          statusops: "Pending",
         }));
 
         setTableRowsCR(rows);
@@ -87,7 +88,7 @@ export default function Projectdetail() {
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
       } else {
-        router.push("/projectlist");
+        router.push("/projects");
       }
 
       /* 
