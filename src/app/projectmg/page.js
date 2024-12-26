@@ -34,7 +34,7 @@ export default function ProjectMG() {
           type: element.type,
           userid: element.userid,
           projectid: element.projectid,
-          status: "Pending", // Default status
+          statuspm: "Pending",
         }));
 
         setTableRowsCR(rows);
@@ -71,7 +71,7 @@ export default function ProjectMG() {
           );
 
           if (matchingRequest) {
-            setSelectedButton(matchingRequest.status);
+            setSelectedButton(matchingRequest.statuspm);
           } else {
             console.warn(
               "No matching request found for project ID:",
@@ -103,7 +103,10 @@ export default function ProjectMG() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: event, projectid: projectid }),
+        body: JSON.stringify({
+          statuspm: event,
+          projectid: projectid,
+        }),
       });
     } catch (error) {
       console.log("Failed to send request:", error.message);
