@@ -21,14 +21,17 @@ export async function POST(req) {
 
   // Save each resource
   const requests = await Request.insertMany(
-    resources.map(({ id, name, type, userid, projectid, status }) => ({
-      requestid: id,
-      name,
-      type,
-      userid,
-      projectid,
-      status,
-    }))
+    resources.map(
+      ({ id, name, type, userid, projectid, statuspm, statusops }) => ({
+        requestid: id,
+        name,
+        type,
+        userid,
+        projectid,
+        statuspm,
+        statusops,
+      })
+    )
   );
 
   return NextResponse.json(
@@ -38,14 +41,24 @@ export async function POST(req) {
 }
 
 export async function PUT(req) {
-  const { status, projectid } = await req.json(); // Parse JSON object
-  // console.log("Incoming Status:", status);
+  const { projectid, ...updates } = await req.json(); // Destructure the request JSON
+
+  // Check if there is a valid `projectid` and update fields are not empty
+  if (!projectid || Object.keys(updates).length === 0) {
+    return NextResponse.json(
+      { message: "Invalid input, project ID and updates are required" },
+      { status: 400 }
+    );
+  }
 
   // Connect to MongoDB
   await connectMongoDB();
 
-  // Update all requests with the given project ID
-  const updatedRequests = await Request.updateMany({ projectid }, { status });
+  // Perform the update
+  const updatedRequests = await Request.updateMany(
+    { projectid },
+    { $set: updates } // Only update fields provided in the body
+  );
 
   return NextResponse.json(
     { message: "Successfully updated requests", updatedRequests },
