@@ -27,7 +27,7 @@ const sendToQueue = async (queue, message) => {
 
 // POST request handler to send a message to the RabbitMQ queue
 export async function POST(req, res) {
-  const { message, queue } = req.body; // Get the message and queue from the request body
+  const { message, queue } = await req.json(); // Get the message and queue from the request body
   console.log("Message to Queue:", message, "Queue:", queue);
 
   if (!message || !queue) {
