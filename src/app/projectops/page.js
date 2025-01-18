@@ -9,9 +9,9 @@ import filter from "../../../public/filter-circle-fill.svg";
 
 export default function ProjectOPS() {
   const TABLE_HEAD_CR = ["Name", "Type"];
-
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const [selectedButton, setSelectedButton] = useState("Pending");
+  const [pmApprove, setPMApprove] = useState("");
 
   useEffect(() => {
     const fetchTableRows = async () => {
@@ -63,7 +63,15 @@ export default function ProjectOPS() {
         }
 
         const { requests } = await res.json();
-        //console.log("API Response for /api/request:", requests);
+        const hasRejected = requests.some(
+          (request) => request.statusops === "Rejected"
+        );
+        if (hasRejected) {
+          setPMApprove("Rejected");
+        } else {
+          setPMApprove("Approved");
+        }
+        // console.log("API Response for /api/request:", requests);
 
         if (Array.isArray(requests)) {
           const matchingRequest = requests.find(
@@ -110,6 +118,40 @@ export default function ProjectOPS() {
       });
     } catch (error) {
       console.log("Failed to send request:", error.message);
+    }
+
+    // Compare PM approve and Ops approve before sending the message
+    if (pmApprove === event) {
+      console.log(`PM and Ops approval matched. Sending message to queue.`);
+      try {
+        await sendMessageToQueue("Create VM", projectid);
+        console.log("Message sent to queue successfully.");
+      } catch (error) {
+        console.error("Failed to send message to RabbitMQ:", error.message);
+      }
+    } else {
+      console.log(`PM and Ops approval do not match. Skipping queue message.`);
+    }
+  };
+
+  const sendMessageToQueue = async (message, queue) => {
+    try {
+      const res = await fetch("http://localhost:3000/api/producer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message, queue }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      }
+
+      const result = await res.json();
+      console.log("Message sent to queue:", result.message);
+    } catch (error) {
+      console.log("Failed to send message to queue:", error.message);
     }
   };
 
