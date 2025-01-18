@@ -17,11 +17,11 @@ export const startListening = async (queue) => {
     const connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
 
-    await channel.assertQueue(queue, { durable: false });
+    await channel.assertQueue(queue, { durable: true });
     console.log(`Listening for messages in queue: ${queue}`);
 
     // Consume messages from the queue
-    channel.consume(queue, (msg) => {
+    await channel.consume(queue, (msg) => {
       if (msg !== null) {
         const content = msg.content.toString();
         console.log(`Received message: ${content}`);
@@ -29,14 +29,15 @@ export const startListening = async (queue) => {
       }
     });
   } catch (error) {
-    console.error("Error in listener:", error);
+    console.log("Error in listener:", error);
     listenerInitialized = false; // Reset the guard on failure
   }
 };
 
 // GET request handler to start listening on a specified queue
 export async function GET(req, res) {
-  const { queue } = req.query; // Get the 'queue' parameter from the query string
+  const { searchParams } = new URL(req.url);
+  const queue = searchParams.get("queue");
   console.log("Initializing GET request for queue:", queue);
 
   if (!queue) {
@@ -54,7 +55,7 @@ export async function GET(req, res) {
       message: `Listener started for queue: ${queue}`,
     });
   } catch (error) {
-    console.error("Error in GET endpoint:", error);
+    console.log("Error in GET endpoint:", error);
     return NextResponse.json({ success: false, error: error.message });
   }
 }
