@@ -17,17 +17,25 @@ export const startListening = async (queue) => {
     const connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
 
-    await channel.assertQueue(queue, { durable: true });
+    await channel.assertQueue(queue, {
+      durable: true,
+      autoDelete: true, // The queue is deleted when the last consumer disconnects
+    });
     console.log(`Listening for messages in queue: ${queue}`);
 
     // Consume messages from the queue
-    await channel.consume(queue, (msg) => {
-      if (msg !== null) {
-        const content = msg.content.toString();
-        console.log(`Received message: ${content}`);
-        channel.ack(msg); // Acknowledge the message
-      }
-    });
+    await channel.consume(
+      queue,
+      (msg) => {
+        if (msg !== null) {
+          const content = msg.content.toString();
+          console.log(`Received message: ${content}`);
+          channel.ack(msg); // Acknowledge the message
+        }
+      },
+      { noAck: false }
+    );
+    connection.close();
   } catch (error) {
     console.log("Error in listener:", error);
     listenerInitialized = false; // Reset the guard on failure

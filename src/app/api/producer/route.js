@@ -9,7 +9,10 @@ const sendToQueue = async (queue, message) => {
     connection = await amqp.connect(rabbitUrl);
     const channel = await connection.createChannel();
 
-    await channel.assertQueue(queue, { durable: true });
+    await channel.assertQueue(queue, {
+      durable: true,
+      autoDelete: true, // Automatically delete the queue once all consumers disconnect
+    });
     console.log(`Sending message to queue: ${queue}`);
 
     // Send the message to the queue
