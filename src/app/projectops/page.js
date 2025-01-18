@@ -87,7 +87,7 @@ export default function ProjectOPS() {
             );
           }
         } else {
-          console.error(
+          console.log(
             "Unexpected API response format. Expected an array but received:",
             requests
           );
@@ -123,11 +123,33 @@ export default function ProjectOPS() {
     // Compare PM approve and Ops approve before sending the message
     if (pmApprove === event) {
       console.log(`PM and Ops approval matched. Sending message to queue.`);
+
+      //Produce Queue
       try {
         await sendMessageToQueue("Create VM", projectid);
+        //console.log("Message:", "Create VM", "Queue:", projectid);
         console.log("Message sent to queue successfully.");
       } catch (error) {
-        console.error("Failed to send message to RabbitMQ:", error.message);
+        console.log("Failed to send message to RabbitMQ:", error.message);
+      }
+
+      //Consume Queue
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/consumer?queue=${projectid}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        }
+      } catch (error) {
+        console.log("Failed to consume message from RabbitMQ:", error.message);
       }
     } else {
       console.log(`PM and Ops approval do not match. Skipping queue message.`);
@@ -135,13 +157,14 @@ export default function ProjectOPS() {
   };
 
   const sendMessageToQueue = async (message, queue) => {
+    //console.log("Message:", message, "Queue:", queue);
     try {
       const res = await fetch("http://localhost:3000/api/producer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message, queue }),
+        body: JSON.stringify({ message: message, queue: queue }),
       });
 
       if (!res.ok) {
