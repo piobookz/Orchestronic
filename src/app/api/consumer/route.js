@@ -5,6 +5,10 @@ let listenerInitialized = false; // Singleton guard
 
 // Helper to start listening for messages from a specified queue
 export const startListening = async (queue) => {
+  /* 
+  The purpose of the listenerInitialized guard is to ensure that the consumer (startListening) only starts listening for messages once per queue. This is to prevent multiple consumers from simultaneously consuming the same queue, which could cause unintended behavior, like consuming duplicate messages or locking the queue.
+  */
+
   if (listenerInitialized) {
     console.log("Listener is already running.");
     return;
