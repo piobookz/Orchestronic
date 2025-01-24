@@ -1,12 +1,13 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
+import { useRouter } from "next/navigation";
 
 export default function CloudResources() {
+  const router = useRouter();
   const [resourceName, setResourceName] = useState("");
   const [region, setRegion] = useState("East Asia");
   const [os, setOS] = useState("Ubuntu");
@@ -15,11 +16,17 @@ export default function CloudResources() {
   const [vmSize, setVMSize] = useState("Standard_A1_v2");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
+  /* 
+  UserID may refer to the email or ID 
+  indicating the specified user owns the project.
+  */
   const [userID, setUserID] = useState("12345");
   const [type, setType] = useState("Virtual Machine");
+  /*
+  Project ID will be based on the created project.  
+  For example, a to-do list, the ID will correspond to the to-do list to indicate that the resources come from the specified project.
+  */
   const [projectID, setProjectID] = useState("675266f7b8c017a58d37feaf");
-  // const DEFAULT_USER_ID = "12345"; // Replace with dynamic data later
-  // const DEFAULT_PROJECT_ID = "675266f7b8c017a58d37feaf"; // Replace with dynamic data later
 
   const regions = [
     {
@@ -242,19 +249,6 @@ export default function CloudResources() {
     }
 
     try {
-      // Attempt to save the data
-      /* console.log("Sending to API:", {
-        userID,
-        resourceName,
-        region,
-        os,
-        type,
-        adminUser,
-        adminPassword,
-        vmSize,
-        allocation,
-        projectID,
-      }); */
       const res = await fetch("http://localhost:3000/api/resource", {
         method: "POST",
         headers: {
@@ -276,10 +270,9 @@ export default function CloudResources() {
 
       if (!res.ok) {
         throw new Error(`Failed to save: ${res.statusText}`);
+      } else {
+        router.push("/projectdetails");
       }
-
-      // const data = await res.json();
-      // console.log("Response from API:", data);
     } catch (error) {
       console.log("Error while saving resource:", error);
     }
@@ -287,7 +280,6 @@ export default function CloudResources() {
 
   return (
     <div className="min-h-screen text-white">
-      <Navbar />
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>
@@ -313,7 +305,7 @@ export default function CloudResources() {
               Cloud Provider
             </label>
             <div className="flex items-center space-x-2 ml-2">
-              <Image src={Azure} width={84} height={16} alt="Azure Logo" />
+              <Image src={Azure} width={84} height={"auto"} alt="Azure Logo" />
             </div>
           </div>
 

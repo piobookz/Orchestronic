@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
@@ -43,7 +42,6 @@ export default function Projectstatus() {
 
   return (
     <div>
-      <Navbar />
       <div className="flex flex-row items-center">
         <p className="text-5xl font-bold ml-16 my-5">Todo List</p>
         <span className="bg-green-500 rounded-2xl px-6 py-1 mt-3 ml-8">

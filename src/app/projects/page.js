@@ -1,11 +1,9 @@
 import Link from "next/link";
-import Navbar from "orchestronic/app/components/navbar";
 import { Container } from "postcss";
 
 export default function Projects() {
   return (
     <>
-      <Navbar />
       <p className="mx-16 my-5 text-balance text-center text-5xl font-bold text-white">
         Welcome Back, Alex!
       </p>

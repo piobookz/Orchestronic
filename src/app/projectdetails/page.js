@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "../components/navbar";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +7,7 @@ import { Card, Typography } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
+import { useRouter } from "next/navigation";
 
 export default function Projectdetail() {
   // const [sortAsc, setSortAsc] = useState(true);
@@ -35,6 +35,7 @@ export default function Projectdetail() {
   //   return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
   // });
 
+  const router = useRouter();
   const TABLE_HEAD_CR = ["Name", "Type"];
 
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
@@ -60,7 +61,8 @@ export default function Projectdetail() {
           type: element.type,
           userid: element.userid,
           projectid: element.projectid,
-          status: "pending",
+          statuspm: "Pending",
+          statusops: "Pending",
         }));
 
         setTableRowsCR(rows);
@@ -85,6 +87,8 @@ export default function Projectdetail() {
 
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      } else {
+        router.push("/projects");
       }
 
       /* 
@@ -98,13 +102,12 @@ export default function Projectdetail() {
 
   return (
     <div>
-      <Navbar />
       <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
       {/* Project Details box */}
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
         {/* subtitle */}
         <div className="flex flex-row justify-between items-center">
-          <p className="text-3xl font-semibold ml-4">Application Details</p>
+          <h1 className="text-3xl font-semibold ml-4">Application Details</h1>
           <button
             className="mr-4 text-sm text-white bg-[#29B95F] rounded py-2 px-2"
             onClick={handleRequest}

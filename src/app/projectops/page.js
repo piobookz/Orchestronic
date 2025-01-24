@@ -7,11 +7,11 @@ import React, { useState, useEffect, use } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 
-export default function ProjectMG() {
+export default function ProjectOPS() {
   const TABLE_HEAD_CR = ["Name", "Type"];
-
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const [selectedButton, setSelectedButton] = useState("Pending");
+  const [pmApprove, setPMApprove] = useState("");
 
   useEffect(() => {
     const fetchTableRows = async () => {
@@ -34,7 +34,7 @@ export default function ProjectMG() {
           type: element.type,
           userid: element.userid,
           projectid: element.projectid,
-          statuspm: "Pending",
+          statusops: "Pending",
         }));
 
         setTableRowsCR(rows);
@@ -63,7 +63,15 @@ export default function ProjectMG() {
         }
 
         const { requests } = await res.json();
-        //console.log("API Response for /api/request:", requests);
+        const hasRejected = requests.some(
+          (request) => request.statusops === "Rejected"
+        );
+        if (hasRejected) {
+          setPMApprove("Rejected");
+        } else {
+          setPMApprove("Approved");
+        }
+        // console.log("API Response for /api/request:", requests);
 
         if (Array.isArray(requests)) {
           const matchingRequest = requests.find(
@@ -71,7 +79,7 @@ export default function ProjectMG() {
           );
 
           if (matchingRequest) {
-            setSelectedButton(matchingRequest.statuspm);
+            setSelectedButton(matchingRequest.statusops);
           } else {
             console.warn(
               "No matching request found for project ID:",
@@ -79,7 +87,7 @@ export default function ProjectMG() {
             );
           }
         } else {
-          console.error(
+          console.log(
             "Unexpected API response format. Expected an array but received:",
             requests
           );
@@ -104,12 +112,69 @@ export default function ProjectMG() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          statuspm: event,
+          statusops: event,
           projectid: projectid,
         }),
       });
     } catch (error) {
       console.log("Failed to send request:", error.message);
+    }
+
+    // Compare PM approve and Ops approve before sending the message
+    if (pmApprove === event) {
+      console.log(`PM and Ops approval matched. Sending message to queue.`);
+
+      //Produce Queue
+      try {
+        await sendMessageToQueue("Create VM", projectid);
+        //console.log("Message:", "Create VM", "Queue:", projectid);
+        console.log("Message sent to queue successfully.");
+      } catch (error) {
+        console.log("Failed to send message to RabbitMQ:", error.message);
+      }
+
+      //Consume Queue
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/consumer?queue=${projectid}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        }
+      } catch (error) {
+        console.log("Failed to consume message from RabbitMQ:", error.message);
+      }
+    } else {
+      console.log(`PM and Ops approval do not match. Skipping queue message.`);
+    }
+  };
+
+  const sendMessageToQueue = async (message, queue) => {
+    //console.log("Message:", message, "Queue:", queue);
+    try {
+      const res = await fetch("http://localhost:3000/api/producer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: message, queue: queue }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      }
+
+      const result = await res.json();
+      console.log("Message sent to queue:", result.message);
+    } catch (error) {
+      console.log("Failed to send message to queue:", error.message);
     }
   };
 
