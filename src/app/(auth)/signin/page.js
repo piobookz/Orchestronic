@@ -1,8 +1,9 @@
-"use client";
+'use client'
 
 import Image from "next/image";
-import logo from "../../../public/idp-logo.png";
-import gitlab from "../../../public/gitlab-logo-500.svg";
+import logo from "../../../../public/idp-logo.png";
+import gitlab from "../../../../public/gitlab-logo-500.svg";
+import SignInButton from "orchestronic/app/components/sign-in";
 
 export default function Signin() {
   return (
@@ -19,6 +20,9 @@ export default function Signin() {
           <span className="pl-3">Sign in with GitLab</span>
           <Image src={gitlab} width="45" height="45" alt="GitLab logo" />
         </button>
+      </div>
+      <div className="flex items-center justify-center">
+        <SignInButton />
       </div>
     </div>
   );
