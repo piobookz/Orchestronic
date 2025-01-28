@@ -3,10 +3,9 @@ import { NextResponse } from "next/server";
 import { URLSearchParams } from "url";
 
 export async function POST(req, res) {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const params = new URLSearchParams(url.search);
-  const dagId = params.get("dagId");
-  const projectId = params.get("projectId");
+  const { searchParams } = new URL(req.url);
+  const dagId = searchParams.get("dagId");
+  const projectId = searchParams.get("projectId");
 
   console.log("Triggering DAG:", dagId, "for Project:", projectId);
 
