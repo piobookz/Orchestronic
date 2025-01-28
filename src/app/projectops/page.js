@@ -180,16 +180,15 @@ export default function ProjectOPS() {
 
     // Trigger the DAG
     try {
-      const response = await fetch("http://localhost:3000/api/triggerdag", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          dagId: "idp",
-          projectId: projectid,
-        }),
-      });
+      const response = await fetch(
+        `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
