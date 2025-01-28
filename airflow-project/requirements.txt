@@ -1,4 +1,0 @@
-pymongo
-apache-airflow-providers-mongo
-pika
-apache-airflow-providers-celery

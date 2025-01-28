@@ -1,0 +1,21 @@
+[2025-01-28T07:55:13.702+0000] {processor.py:186} INFO - Started process (PID=49) to work on /opt/airflow/dags/idp.py
+[2025-01-28T07:55:13.703+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/idp.py for tasks to queue
+[2025-01-28T07:55:13.705+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:13.705+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/idp.py
+[2025-01-28T07:55:13.770+0000] {processor.py:925} INFO - DAG(s) 'idp' retrieved from /opt/airflow/dags/idp.py
+[2025-01-28T07:55:13.852+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:13.852+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-01-28T07:55:13.867+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:13.866+0000] {dag.py:4180} INFO - Setting next_dagrun for idp to 2025-01-27 00:00:00+00:00, run_after=2025-01-28 00:00:00+00:00
+[2025-01-28T07:55:13.881+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/idp.py took 0.183 seconds
+[2025-01-28T07:55:44.723+0000] {processor.py:186} INFO - Started process (PID=115) to work on /opt/airflow/dags/idp.py
+[2025-01-28T07:55:44.724+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/idp.py for tasks to queue
+[2025-01-28T07:55:44.729+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:44.729+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/idp.py
+[2025-01-28T07:55:44.780+0000] {processor.py:925} INFO - DAG(s) 'idp' retrieved from /opt/airflow/dags/idp.py
+[2025-01-28T07:55:44.793+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:44.793+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-01-28T07:55:44.809+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:55:44.809+0000] {dag.py:4180} INFO - Setting next_dagrun for idp to 2025-01-27 00:00:00+00:00, run_after=2025-01-28 00:00:00+00:00
+[2025-01-28T07:55:44.835+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/idp.py took 0.117 seconds
+[2025-01-28T07:56:15.361+0000] {processor.py:186} INFO - Started process (PID=187) to work on /opt/airflow/dags/idp.py
+[2025-01-28T07:56:15.361+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/idp.py for tasks to queue
+[2025-01-28T07:56:15.363+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:56:15.363+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/idp.py
+[2025-01-28T07:56:15.400+0000] {processor.py:925} INFO - DAG(s) 'idp' retrieved from /opt/airflow/dags/idp.py
+[2025-01-28T07:56:15.410+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:56:15.410+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-01-28T07:56:15.421+0000] {logging_mixin.py:190} INFO - [2025-01-28T07:56:15.421+0000] {dag.py:4180} INFO - Setting next_dagrun for idp to 2025-01-27 00:00:00+00:00, run_after=2025-01-28 00:00:00+00:00
+[2025-01-28T07:56:15.428+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/idp.py took 0.071 seconds
