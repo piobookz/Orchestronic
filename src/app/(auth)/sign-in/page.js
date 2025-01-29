@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import logo from "../../../public/idp-logo.png";
-import gitlab from "../../../public/gitlab-logo-500.svg";
+import logo from "public/idp-logo.png";
+import gitlab from "public/gitlab-logo-500.svg";
+import { handleSignIn } from "orchestronic/components/actions";
 
-export default function Signin() {
+export default function SignIn() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Orchestronic Logo */}
@@ -15,7 +16,10 @@ export default function Signin() {
 
       {/* Sign in Button */}
       <div className="flex flex-grow flex-row items-center justify-center">
-        <button className="inline-flex items-center rounded-lg bg-slate-700 px-10 py-3 text-lg font-medium text-white shadow-md duration-300 hover:scale-105 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-500">
+        <button
+          className="inline-flex items-center rounded-lg bg-slate-700 px-10 py-3 text-lg font-medium text-white shadow-md duration-300 hover:scale-105 hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-500"
+          onClick={() => handleSignIn()}
+        >
           <span className="pl-3">Sign in with GitLab</span>
           <Image src={gitlab} width="45" height="45" alt="GitLab logo" />
         </button>
