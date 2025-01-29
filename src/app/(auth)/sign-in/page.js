@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import logo from "../../../../public/idp-logo.png";
-import gitlab from "../../../../public/gitlab-logo-500.svg";
-import { handleSignIn } from "../../components/actions";
+import logo from "public/idp-logo.png";
+import gitlab from "public/gitlab-logo-500.svg";
+import { handleSignIn } from "orchestronic/components/actions";
 
-export default function Signin() {
+export default function SignIn() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Orchestronic Logo */}
