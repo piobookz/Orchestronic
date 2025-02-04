@@ -181,7 +181,7 @@ export default function ProjectOPS() {
     // Trigger the DAG
     try {
       const response = await fetch(
-        `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
+        `http://localhost:3000/api/triggerdag?dagId=idp_fetch_mongo&projectId=${projectid}`,
         {
           method: "POST",
           headers: {

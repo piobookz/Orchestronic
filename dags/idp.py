@@ -1,41 +1,47 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
+from airflow.providers.mongo.hooks.mongo import MongoHook
+import pymongo
 from pymongo import MongoClient
-import pika
-import json
 import os
-from dotenv import load_dotenv  # Import dotenv
+from dotenv import load_dotenv
+from bson.json_util import dumps
 
-# Load environment variables from .env file
-load_dotenv()
-
-# MongoDB to RabbitMQ function
-def load_request_from_mongo(**kwargs):
+def fetch_from_mongo(**kwargs):
     try:
-        project_id = kwargs['dag_run'].conf.get('projectId')  # Fetch projectId from conf
+        load_dotenv('/opt/airflow/dags/.env')
+        uri = os.getenv("MONGODB_URI")
+        # print("MONGODB_URI:", uri)
+        if not uri:
+            raise Exception("MONGODB_URI is not set")
 
-        mongo_uri = os.getenv('MONGODB_URI')  # Load from .env
-        if not mongo_uri:
-            raise ValueError("MONGODB_URI is not set!")
+        # print("Connecting to MongoDB at:", uri)
 
-        mongo_client = MongoClient(mongo_uri)
-        db = mongo_client['test']
-        collection = db['resources']
+        client = MongoClient(uri)
+        database = client["test"]
+        collection = database["resources"]
 
-        mongo_client.admin.command('ping')
-        print("MongoDB connection successful")
+        dag_run = kwargs.get('dag_run')
+        if dag_run and dag_run.conf:
+            project_id = dag_run.conf.get('projectId')
+            # print("Fetched projectId:", project_id)
+        else:
+            print("No projectId provided in DAG run config.")
+            return "[]"  # Return empty list if no project ID
 
-        # Fetch requests specific to projectId
-        requests = collection.find({"projectid": project_id})
-        list_of_requests = list(requests)
-        print(f"Found {len(list_of_requests)} requests for project {project_id}")
-
-        return list_of_requests
+        # Fetch data from MongoDB
+        data = list(collection.find({"projectid": project_id}))  # Convert cursor to list
+        print("Fetched data:", data)
 
     except Exception as e:
-        print(f"MongoDB connection failed: {e}")
-        return []
+        raise Exception(f"The following error occurred: {str(e)}")
+    
+    finally:
+        client.close()  # Close client only after fetching data
+
+    return dumps(data)
+
 
 # Default args for DAG
 default_args = {
@@ -47,14 +53,13 @@ default_args = {
 
 # Define DAG
 with DAG(
-    dag_id='idp',
+    dag_id='idp_fetch_mongo',
     default_args=default_args,
-    schedule_interval='@daily',
+    schedule='@daily',  # Updated for Airflow 2+
     catchup=False,
 ) as dag:
 
-    load_requests = PythonOperator(
-        task_id='load_requests',
-        python_callable=load_request_from_mongo,
-        provide_context=True,
+    fetch_requests = PythonOperator(
+        task_id='fetch_from_mongo',
+        python_callable=fetch_from_mongo,
     )
