@@ -3659,3 +3659,17 @@
 [2025-02-07T09:41:58.441+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:41:58.441+0000] {dag.py:3239} INFO - Sync 1 DAGs
 [2025-02-07T09:41:58.458+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:41:58.457+0000] {dag.py:4180} INFO - Setting next_dagrun for idp_resource_provisioning to None, run_after=None
 [2025-02-07T09:41:58.480+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic_pipeline.py took 0.145 seconds
+[2025-02-07T09:42:28.804+0000] {processor.py:186} INFO - Started process (PID=17701) to work on /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:28.808+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic_pipeline.py for tasks to queue
+[2025-02-07T09:42:28.813+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.812+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:28.853+0000] {processor.py:925} INFO - DAG(s) 'idp_resource_provisioning' retrieved from /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:28.879+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.879+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-07T09:42:28.897+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.897+0000] {dag.py:4180} INFO - Setting next_dagrun for idp_resource_provisioning to None, run_after=None
+[2025-02-07T09:42:28.915+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic_pipeline.py took 0.121 seconds
+[2025-02-07T09:42:59.025+0000] {processor.py:186} INFO - Started process (PID=17767) to work on /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:59.027+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic_pipeline.py for tasks to queue
+[2025-02-07T09:42:59.030+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.030+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:59.065+0000] {processor.py:925} INFO - DAG(s) 'idp_resource_provisioning' retrieved from /opt/airflow/dags/orchestronic_pipeline.py
+[2025-02-07T09:42:59.095+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.095+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-07T09:42:59.118+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.117+0000] {dag.py:4180} INFO - Setting next_dagrun for idp_resource_provisioning to None, run_after=None
+[2025-02-07T09:42:59.138+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic_pipeline.py took 0.120 seconds

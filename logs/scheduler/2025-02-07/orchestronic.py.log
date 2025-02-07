@@ -3659,3 +3659,17 @@
 [2025-02-07T09:41:58.438+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:41:58.438+0000] {dag.py:3239} INFO - Sync 1 DAGs
 [2025-02-07T09:41:58.466+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:41:58.466+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-06 00:00:00+00:00, run_after=2025-02-07 00:00:00+00:00
 [2025-02-07T09:41:58.485+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.151 seconds
+[2025-02-07T09:42:28.804+0000] {processor.py:186} INFO - Started process (PID=17700) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:28.806+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-07T09:42:28.814+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.813+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:28.854+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:28.880+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.880+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-07T09:42:28.905+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:28.905+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-06 00:00:00+00:00, run_after=2025-02-07 00:00:00+00:00
+[2025-02-07T09:42:28.920+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.132 seconds
+[2025-02-07T09:42:59.021+0000] {processor.py:186} INFO - Started process (PID=17766) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:59.023+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-07T09:42:59.029+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.028+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:59.065+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-07T09:42:59.095+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.095+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-07T09:42:59.129+0000] {logging_mixin.py:190} INFO - [2025-02-07T09:42:59.129+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-06 00:00:00+00:00, run_after=2025-02-07 00:00:00+00:00
+[2025-02-07T09:42:59.142+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.130 seconds
