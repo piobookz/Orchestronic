@@ -146,10 +146,31 @@ export default function ProjectOPS() {
     if (pmApprove === event) {
       console.log(`PM and Ops approval matched. Sending message to queue.`);
 
+      // Trigger the DAG
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error triggering DAG:", errorData);
+        } else {
+          console.log("DAG triggered successfully");
+        }
+      } catch (error) {
+        console.log("Failed to trigger DAG:", error.message);
+      }
+
       //Produce Queue
       try {
-        await sendMessageToQueue("Create VM", projectid);
-        //console.log("Message:", "Create VM", "Queue:", projectid);
+        await sendMessageToQueue(projectid, "create-vm");
         console.log("Message sent to queue successfully.");
       } catch (error) {
         console.log("Failed to send message to RabbitMQ:", error.message);
@@ -177,28 +198,6 @@ export default function ProjectOPS() {
     // } else {
     //   console.log(`PM and Ops approval do not match. Skipping queue message.`);
     // }
-
-    // Trigger the DAG
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/triggerdag?dagId=idp_fetch_mongo&projectId=${projectid}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error triggering DAG:", errorData);
-      } else {
-        console.log("DAG triggered successfully");
-      }
-    } catch (error) {
-      console.log("Failed to trigger DAG:", error.message);
-    }
   };
 
   return (
