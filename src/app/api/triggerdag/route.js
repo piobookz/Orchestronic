@@ -1,6 +1,5 @@
 import axios from "axios";
 import { NextResponse } from "next/server";
-import { URLSearchParams } from "url";
 
 export async function POST(req, res) {
   const { searchParams } = new URL(req.url);
