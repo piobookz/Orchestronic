@@ -9,7 +9,7 @@ export async function GET() {
   // Retrieve all requests
   const requests = await Request.find({});
 
-  return NextResponse.json({ requests }, { status: 200 });
+  return NextResponse.json(requests, { status: 200 }); // return NextResponse.json({ requests }, { status: 200 });
 }
 
 export async function POST(req) {

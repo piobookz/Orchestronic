@@ -1,69 +1,68 @@
+"use client"
+
+import React, { useEffect, useState } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Typography } from "@material-tailwind/react";
 
 export default function RequestList() {
-  const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
+  const router = useRouter();
 
-  const TABLE_ROWS_REQ = [
-    {
-      id: "00001",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Request",
-    },
-    {
-      id: "00002",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Under Review",
-    },
-    {
-      id: "00003",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Approved",
-    },
-    {
-      id: "00004",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Rejected",
-    },
-    {
-      id: "00005",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Request",
-    },
-    {
-      id: "00006",
-      title: "Project Title",
-      describe: "Describe",
-      lastUpdate: "27/5/24",
-      status: "Request",
-    },
-  ];
-
-  // Custom orders for sorting
-  const order1 = ["Request", "Under Review", "Rejected", "Approved"];
-  const order2 = ["Approved", "Rejected", "Under Review", "Request"];
-
+  // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
+  const TABLE_HEAD_REQ = ["ID", "Title", "Status PM", "Status Ops"];
+  const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
+
+  useEffect(() => {
+    // Fetch request data from the API
+    const fetchRequests = async () => {
+      try {
+        const res = await fetch("/api/request", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("data", data)
+          const rows = data.map((element) => ({
+            id: element._id,
+            title: element.name,
+            statuspm: element.statuspm,
+            statusops: element.statusops,
+          }));
+          console.log("rows", rows)
+          setTableRowsReq(rows);
+        }
+      } catch (error) {
+        console.log("Failed to send request:", error.message);
+      }
+    };
+    fetchRequests();
+  }, []);
+
+  const sortOrder = ["Request", "Under Review", "Rejected", "Approved"];
+
+  // Sorting function
+  const sortRows = (rows, sortAsc) => {
+    return [...rows].sort((a, b) => {
+      const orderA = sortOrder.indexOf(a.statuspm);
+      const orderB = sortOrder.indexOf(b.statuspm);
+
+      return sortAsc ? orderA - orderB : orderB - orderA;
+    });
+  };
 
   const toggleSortOrder = () => {
     setSortAsc((prev) => !prev);
   };
 
-  const sortedRows = [...TABLE_ROWS_REQ].sort((a, b) => {
-    const currentOrder = sortAsc ? order1 : order2;
-    return currentOrder.indexOf(a.status) - currentOrder.indexOf(b.status);
-  });
+  const sortedRows = sortRows(TABLE_ROWS_REQ, sortAsc);
 
   return (
     <div>
@@ -82,9 +81,9 @@ export default function RequestList() {
                   <Typography
                     variant="small"
                     className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
-                    onClick={head === "Status" ? toggleSortOrder : undefined}
+                    onClick={["Status PM", "Status Ops"].includes(head) ? toggleSortOrder : undefined}
                   >
-                    {head === "Status" && (
+                    {["Status PM", "Status Ops"].includes(head) && (
                       <span className="mr-2">
                         <Image
                           src={sortAsc ? filter : unfilter}
@@ -101,31 +100,32 @@ export default function RequestList() {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map(
-              ({ id, title, describe, lastUpdate, status }, index) => {
-                const isOdd = index % 2 === 1;
-                const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
-                return (
-                  <tr key={id} className={`${rowBgColor}`}>
-                    <td className="p-4 border-b border-blue-gray-50">
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {id}
-                      </Typography>
-                    </td>
-                    <td className="p-4 border-b border-blue-gray-50">
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {title}
-                      </Typography>
-                    </td>
-                    <td className="p-4 border-b border-blue-gray-50">
+            {sortedRows.map(({ id, title, statuspm, statusops }, index) => {
+              const isOdd = index % 2 === 1;
+              const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+
+              return (
+                <tr key={id} className={`${rowBgColor}`}>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {id}
+                    </Typography>
+                  </td>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {title}
+                    </Typography>
+                  </td>
+
+                  {/* <td className="p-4 border-b border-blue-gray-50">
                       <Typography
                         variant="small"
                         color="blue-gray"
@@ -134,6 +134,7 @@ export default function RequestList() {
                         {describe}
                       </Typography>
                     </td>
+
                     <td className="p-4 border-b border-blue-gray-50">
                       <Typography
                         variant="small"
@@ -142,27 +143,47 @@ export default function RequestList() {
                       >
                         {lastUpdate}
                       </Typography>
-                    </td>
-                    <td className="p-4 border-b border-blue-gray-50">
-                      <Typography
-                        variant="small"
-                        className={`font-normal px-2 py-1 rounded-md 
-                                                ${
-                                                  status === "Approved"
-                                                    ? "text-green-600 bg-green-100 px-2"
-                                                    : status === "Under Review"
-                                                    ? "text-amber-600 bg-amber-100"
-                                                    : status === "Request"
-                                                    ? "text-gray-600 bg-gray-100"
-                                                    : "text-red-600 bg-red-100"
-                                                }`}
-                      >
-                        {status}
-                      </Typography>
-                    </td>
-                  </tr>
-                );
-              }
+                    </td> */}
+
+                  {/* Status PM */}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      className={`font-normal px-2 py-1 rounded-md 
+                          ${statuspm === "Approved"
+                          ? "text-green-600 bg-green-100 px-2"
+                          : statuspm === "Under Review"
+                            ? "text-amber-600 bg-amber-100"
+                            : statuspm === "Request"
+                              ? "text-gray-600 bg-gray-100"
+                              : "text-red-600 bg-red-100"
+                        }`}
+                    >
+                      {statuspm}
+                    </Typography>
+                  </td>
+
+                  {/* Status Ops */}
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      className={`font-normal px-2 py-1 rounded-md 
+                          ${statusops === "Approved"
+                          ? "text-green-600 bg-green-100 px-2"
+                          : statusops === "Under Review"
+                            ? "text-amber-600 bg-amber-100"
+                            : statusops === "Request"
+                              ? "text-gray-600 bg-gray-100"
+                              : "text-red-600 bg-red-100"
+                        }`}
+                    >
+                      {statusops}
+                    </Typography>
+                  </td>
+
+                </tr>
+              );
+            }
             )}
           </tbody>
         </table>
