@@ -9,40 +9,41 @@ export const startListening = async (queue) => {
   The purpose of the listenerInitialized guard is to ensure that the consumer (startListening) only starts listening for messages once per queue. This is to prevent multiple consumers from simultaneously consuming the same queue, which could cause unintended behavior, like consuming duplicate messages or locking the queue.
   */
 
+  //If the queue is not running, It'll add to queue
   if (listenerInitialized) {
     console.log("Listener is already running.");
     return;
-  }
+  } else {
+    try {
+      listenerInitialized = true; // Set the guard to true
 
-  try {
-    listenerInitialized = true; // Set the guard to true
+      const rabbitUrl = process.env.RABBITMQ_URL;
+      const connection = await amqp.connect(rabbitUrl);
+      const channel = await connection.createChannel();
 
-    const rabbitUrl = process.env.RABBITMQ_URL;
-    const connection = await amqp.connect(rabbitUrl);
-    const channel = await connection.createChannel();
+      await channel.assertQueue(queue, {
+        durable: true,
+        autoDelete: true, // The queue is deleted when the last consumer disconnects
+      });
+      console.log(`Listening for messages in queue: ${queue}`);
 
-    await channel.assertQueue(queue, {
-      durable: true,
-      autoDelete: true, // The queue is deleted when the last consumer disconnects
-    });
-    console.log(`Listening for messages in queue: ${queue}`);
-
-    // Consume messages from the queue
-    await channel.consume(
-      queue,
-      (msg) => {
-        if (msg !== null) {
-          const content = msg.content.toString();
-          console.log(`Received message: ${content}`);
-          channel.ack(msg); // Acknowledge the message
-        }
-      },
-      { noAck: false }
-    );
-    connection.close();
-  } catch (error) {
-    console.log("Error in listener:", error);
-    listenerInitialized = false; // Reset the guard on failure
+      // Consume messages from the queue
+      await channel.consume(
+        queue,
+        (msg) => {
+          if (msg !== null) {
+            const content = msg.content.toString();
+            console.log(`Received message: ${content}`);
+            channel.ack(msg); // Acknowledge the message
+          }
+        },
+        { noAck: false }
+      );
+      connection.close();
+    } catch (error) {
+      console.log("Error in listener:", error);
+      listenerInitialized = false; // Reset the guard on failure
+    }
   }
 };
 

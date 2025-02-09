@@ -13,6 +13,28 @@ export default function ProjectOPS() {
   const [selectedButton, setSelectedButton] = useState("Pending");
   const [pmApprove, setPMApprove] = useState("");
 
+  const sendMessageToQueue = async (message, queue) => {
+    //console.log("Message:", message, "Queue:", queue);
+    try {
+      const res = await fetch("http://localhost:3000/api/producer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: message, queue: queue }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      }
+
+      const result = await res.json();
+      console.log("Message sent to queue:", result.message);
+    } catch (error) {
+      console.log("Failed to send message to queue:", error.message);
+    }
+  };
+
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
@@ -124,58 +146,58 @@ export default function ProjectOPS() {
     if (pmApprove === event) {
       console.log(`PM and Ops approval matched. Sending message to queue.`);
 
-      //Produce Queue
+      // Trigger the DAG
       try {
-        await sendMessageToQueue("Create VM", projectid);
-        //console.log("Message:", "Create VM", "Queue:", projectid);
-        console.log("Message sent to queue successfully.");
-      } catch (error) {
-        console.log("Failed to send message to RabbitMQ:", error.message);
-      }
-
-      //Consume Queue
-      try {
-        const res = await fetch(
-          `http://localhost:3000/api/consumer?queue=${projectid}`,
+        const response = await fetch(
+          `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
           }
         );
 
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error triggering DAG:", errorData);
+        } else {
+          console.log("DAG triggered successfully");
         }
       } catch (error) {
-        console.log("Failed to consume message from RabbitMQ:", error.message);
-      }
-    } else {
-      console.log(`PM and Ops approval do not match. Skipping queue message.`);
-    }
-  };
-
-  const sendMessageToQueue = async (message, queue) => {
-    //console.log("Message:", message, "Queue:", queue);
-    try {
-      const res = await fetch("http://localhost:3000/api/producer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: message, queue: queue }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+        console.log("Failed to trigger DAG:", error.message);
       }
 
-      const result = await res.json();
-      console.log("Message sent to queue:", result.message);
-    } catch (error) {
-      console.log("Failed to send message to queue:", error.message);
+      //Produce Queue
+      try {
+        await sendMessageToQueue(projectid, "create-vm");
+        console.log("Message sent to queue successfully.");
+      } catch (error) {
+        console.log("Failed to send message to RabbitMQ:", error.message);
+      }
     }
+
+    //Consume Queue
+    //   try {
+    //     const res = await fetch(
+    //       `http://localhost:3000/api/consumer?queue=${projectid}`,
+    //       {
+    //         method: "GET",
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //       }
+    //     );
+
+    //     if (!res.ok) {
+    //       throw new Error(`Error: ${res.status} - ${res.statusText}`);
+    //     }
+    //   } catch (error) {
+    //     console.log("Failed to consume message from RabbitMQ:", error.message);
+    //   }
+    // } else {
+    //   console.log(`PM and Ops approval do not match. Skipping queue message.`);
+    // }
   };
 
   return (

@@ -11,20 +11,27 @@ const sendToQueue = async (queue, message) => {
 
     await channel.assertQueue(queue, {
       durable: true,
-      autoDelete: true, // Automatically delete the queue once all consumers disconnect
+      autoDelete: false,
     });
+
     console.log(`Sending message to queue: ${queue}`);
 
-    // Send the message to the queue
-    channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+    // Send the message with confirm mode
+    await channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)), {
+      persistent: true, // Ensures message is not lost on RabbitMQ restart
+    });
 
-    channel.close();
     console.log(`Message sent to queue: ${queue}`);
+
+    // Close channel and connection after a short delay
+    setTimeout(async () => {
+      await channel.close();
+      await connection.close();
+      console.log("RabbitMQ connection closed.");
+    }, 500); // Delay to ensure message is fully processed
   } catch (error) {
     console.error("Error in sendToQueue:", error);
     throw error;
-  } finally {
-    if (connection) await connection.close();
   }
 };
 
