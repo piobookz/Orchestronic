@@ -1,7 +1,6 @@
 import Image from "next/image";
-import logo from "public/idp-logo.png";
+import logo from "@/public/idp-logo.png";
 import gitlab from "@/public/gitlab-logo-500.svg";
-import { SignInButton } from "orchestronic/app/components/signin-button";
 import { signIn } from "auth";
 
 export default function Signin() {
