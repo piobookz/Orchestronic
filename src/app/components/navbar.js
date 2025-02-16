@@ -9,9 +9,9 @@ import { SignOutButton } from "./signout-button";
 export default async function Navbar() {
   const session = await auth();
 
+  if (!session?.user) return null
+
   return (
-    <>
-      {session && session?.user ? (
         <header>
           <nav className="bg-[#07032B] text-white p-5">
             <div className="flex flex-row justify-between items-center">
@@ -21,7 +21,7 @@ export default async function Navbar() {
                     src={logo}
                     width={70}
                     height="auto"
-                    alt="logo"
+                    alt="Orchestronic logo"
                     priority="true"
                     className="mr-5"
                   ></Image>
@@ -62,7 +62,5 @@ export default async function Navbar() {
             </div>
           </nav>
         </header>
-      ) : null}
-    </>
   );
 }

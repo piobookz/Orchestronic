@@ -1,5 +1,4 @@
 import { signIn } from "auth"
-import gitlablogo from "public/gitlab-logo-500.svg";
  
 export function SignInButton() {
   return (
