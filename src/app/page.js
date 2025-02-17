@@ -15,8 +15,6 @@ export default async function Home() {
         Updates
       </h1>
       {/* Updates will be shown here */}
-      {/* Test */}
-      
     </>
   );
 }
