@@ -53,7 +53,7 @@ export default async function Navbar() {
                   <UserAvatar />
                   <div className="flex flex-col">
                     <h3>
-                      <b>{session.user?.name}</b>
+                      <b>{session.user.name}</b>
                     </h3>
                     <p>Developer</p>
                   </div>
