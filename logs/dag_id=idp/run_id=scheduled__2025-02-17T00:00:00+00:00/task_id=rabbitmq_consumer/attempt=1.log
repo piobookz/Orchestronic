@@ -1,0 +1,49 @@
+[2025-02-18T00:03:18.865+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-02-18T00:03:18.879+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: idp.rabbitmq_consumer scheduled__2025-02-17T00:00:00+00:00 [queued]>
+[2025-02-18T00:03:18.883+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: idp.rabbitmq_consumer scheduled__2025-02-17T00:00:00+00:00 [queued]>
+[2025-02-18T00:03:18.883+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 2
+[2025-02-18T00:03:18.893+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): rabbitmq_consumer> on 2025-02-17 00:00:00+00:00
+[2025-02-18T00:03:18.907+0000] {warnings.py:112} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:70: DeprecationWarning: This process (pid=22649) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2025-02-18T00:03:18.909+0000] {standard_task_runner.py:72} INFO - Started process 22650 to run task
+[2025-02-18T00:03:18.909+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'idp', 'rabbitmq_consumer', 'scheduled__2025-02-17T00:00:00+00:00', '--job-id', '329', '--raw', '--subdir', 'DAGS_FOLDER/idp.py', '--cfg-path', '/tmp/tmpb4gr29g7']
+[2025-02-18T00:03:18.910+0000] {standard_task_runner.py:105} INFO - Job 329: Subtask rabbitmq_consumer
+[2025-02-18T00:03:18.952+0000] {task_command.py:467} INFO - Running <TaskInstance: idp.rabbitmq_consumer scheduled__2025-02-17T00:00:00+00:00 [running]> on host 3aa1f743f988
+[2025-02-18T00:03:19.005+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='idp' AIRFLOW_CTX_TASK_ID='rabbitmq_consumer' AIRFLOW_CTX_EXECUTION_DATE='2025-02-17T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-02-17T00:00:00+00:00'
+[2025-02-18T00:03:19.006+0000] {logging_mixin.py:190} INFO - Task instance is in running state
+[2025-02-18T00:03:19.007+0000] {logging_mixin.py:190} INFO -  Previous state of the Task instance: queued
+[2025-02-18T00:03:19.007+0000] {logging_mixin.py:190} INFO - Current task name:rabbitmq_consumer state:running start_date:2025-02-18 00:03:18.879833+00:00
+[2025-02-18T00:03:19.007+0000] {logging_mixin.py:190} INFO - Dag name:idp and current dag run status:running
+[2025-02-18T00:03:19.007+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2025-02-18T00:03:19.011+0000] {connection_workflow.py:179} INFO - Pika version 1.3.2 connecting to ('172.19.0.9', 5672)
+[2025-02-18T00:03:19.014+0000] {io_services_utils.py:345} INFO - Socket connected: <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.6', 59362), raddr=('172.19.0.9', 5672)>
+[2025-02-18T00:03:19.017+0000] {connection_workflow.py:428} INFO - Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff607d92b0>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff607d92b0> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>).
+[2025-02-18T00:03:19.041+0000] {connection_workflow.py:293} INFO - AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff607d92b0> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-18T00:03:19.042+0000] {connection_workflow.py:725} INFO - AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff607d92b0> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-18T00:03:19.042+0000] {blocking_connection.py:453} INFO - Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff607d92b0> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-18T00:03:19.043+0000] {blocking_connection.py:1264} INFO - Created channel=1
+[2025-02-18T00:03:19.056+0000] {logging_mixin.py:190} INFO - Queue create-vm has 0 messages
+[2025-02-18T00:03:19.061+0000] {logging_mixin.py:190} INFO - Listening for messages in queue: create-vm
+[2025-02-18T00:22:38.654+0000] {job.py:229} INFO - Heartbeat recovered after 1109.07 seconds
+[2025-02-18T00:38:09.605+0000] {job.py:229} INFO - Heartbeat recovered after 905.69 seconds
+[2025-02-18T00:54:05.632+0000] {job.py:229} INFO - Heartbeat recovered after 930.71 seconds
+[2025-02-18T01:08:32.683+0000] {job.py:229} INFO - Heartbeat recovered after 841.72 seconds
+[2025-02-18T01:24:27.873+0000] {job.py:229} INFO - Heartbeat recovered after 929.92 seconds
+[2025-02-18T01:40:23.169+0000] {job.py:229} INFO - Heartbeat recovered after 929.97 seconds
+[2025-02-18T01:56:49.529+0000] {job.py:229} INFO - Heartbeat recovered after 930.77 seconds
+[2025-02-18T02:09:19.718+0000] {job.py:229} INFO - Heartbeat recovered after 724.94 seconds
+[2025-02-18T02:29:17.282+0000] {job.py:229} INFO - Heartbeat recovered after 1172.29 seconds
+[2025-02-18T02:42:45.584+0000] {job.py:229} INFO - Heartbeat recovered after 752.65 seconds
+[2025-02-18T03:12:47.336+0000] {job.py:229} INFO - Heartbeat recovered after 1781.37 seconds
+[2025-02-18T04:02:52.513+0000] {job.py:229} INFO - Heartbeat recovered after 2979.84 seconds
+[2025-02-18T04:36:46.922+0000] {job.py:229} INFO - Heartbeat recovered after 2008.98 seconds
+[2025-02-18T05:12:57.112+0000] {job.py:229} INFO - Heartbeat recovered after 2144.91 seconds
+[2025-02-18T05:15:46.371+0000] {job.py:229} INFO - Heartbeat recovered after 143.71 seconds
+[2025-02-18T06:00:16.221+0000] {job.py:229} INFO - Heartbeat recovered after 2644.39 seconds
+[2025-02-18T06:27:55.199+0000] {job.py:229} INFO - Heartbeat recovered after 1633.24 seconds
+[2025-02-18T06:35:50.010+0000] {job.py:229} INFO - Heartbeat recovered after 241.73 seconds
+[2025-02-18T06:37:49.011+0000] {job.py:229} INFO - Heartbeat recovered after 93.55 seconds
+[2025-02-18T06:39:23.948+0000] {job.py:229} INFO - Heartbeat recovered after 69.44 seconds
+[2025-02-18T06:41:34.355+0000] {job.py:229} INFO - Heartbeat recovered after 104.94 seconds
+[2025-02-18T06:42:53.155+0000] {job.py:229} INFO - Heartbeat recovered after 53.45 seconds

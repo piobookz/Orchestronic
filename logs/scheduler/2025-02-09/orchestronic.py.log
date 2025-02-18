@@ -1,0 +1,42 @@
+[2025-02-09T13:56:09.047+0000] {processor.py:186} INFO - Started process (PID=54) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:09.049+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:56:09.057+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:09.056+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:09.307+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:09.362+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:09.361+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:56:09.436+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:09.435+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:56:09.487+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.454 seconds
+[2025-02-09T13:56:40.046+0000] {processor.py:186} INFO - Started process (PID=124) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:40.050+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:56:40.056+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:40.055+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:40.165+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:56:40.203+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:40.203+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:56:40.229+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:56:40.229+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:56:40.247+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.208 seconds
+[2025-02-09T13:57:10.391+0000] {processor.py:186} INFO - Started process (PID=190) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:10.395+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:57:10.402+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:10.401+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:10.527+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:10.562+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:10.562+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:57:10.622+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:10.622+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:57:10.644+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.272 seconds
+[2025-02-09T13:57:40.995+0000] {processor.py:186} INFO - Started process (PID=256) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:40.996+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:57:41.000+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:40.999+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:41.060+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:57:41.083+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:41.083+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:57:41.100+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:57:41.100+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:57:41.114+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.123 seconds
+[2025-02-09T13:58:11.527+0000] {processor.py:186} INFO - Started process (PID=322) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:11.532+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:58:11.537+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:11.537+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:11.643+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:11.681+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:11.681+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:58:11.712+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:11.712+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:58:11.735+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.222 seconds
+[2025-02-09T13:58:42.128+0000] {processor.py:186} INFO - Started process (PID=387) to work on /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:42.130+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/orchestronic.py for tasks to queue
+[2025-02-09T13:58:42.144+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:42.140+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:42.253+0000] {processor.py:925} INFO - DAG(s) 'mongo_to_rabbitmq' retrieved from /opt/airflow/dags/orchestronic.py
+[2025-02-09T13:58:42.295+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:42.295+0000] {dag.py:3239} INFO - Sync 1 DAGs
+[2025-02-09T13:58:42.318+0000] {logging_mixin.py:190} INFO - [2025-02-09T13:58:42.318+0000] {dag.py:4180} INFO - Setting next_dagrun for mongo_to_rabbitmq to 2025-02-08 00:00:00+00:00, run_after=2025-02-09 00:00:00+00:00
+[2025-02-09T13:58:42.333+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/orchestronic.py took 0.219 seconds
