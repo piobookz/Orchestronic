@@ -1,6 +1,9 @@
+"use client";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { Card, Typography } from "@material-tailwind/react";
 
 export default function RequestList() {
   const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
