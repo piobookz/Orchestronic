@@ -6,6 +6,7 @@ import { Card, Typography } from "@material-tailwind/react";
 import React, { useState, useEffect, use } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
+import { toast } from "react-hot-toast";
 
 export default function ProjectOPS() {
   const TABLE_HEAD_CR = ["Name", "Type"];
@@ -124,6 +125,18 @@ export default function ProjectOPS() {
 
   const handleChange = async (event) => {
     setSelectedButton(event);
+
+    if (event === "Rejected") {
+      toast.error("Request rejected");
+      return;
+    } else if (event === "Approved") {
+      toast.success("Request approved");
+    } else {
+      toast.error("Request under review", {
+        icon: "🟡",
+      });
+    }
+
     // console.log(event);
     const projectid = TABLE_ROWS_CR[0].projectid;
 
