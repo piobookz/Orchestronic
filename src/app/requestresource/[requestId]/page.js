@@ -4,6 +4,8 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Azure from "../../../../public/azure-logo.png";
+import toast from "react-hot-toast";
 
 export default function RequestDetails({ params }) {
   const [requestId, setRequestId] = useState(null);
@@ -16,221 +18,7 @@ export default function RequestDetails({ params }) {
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
-  const [userID, setUserID] = useState("12345");
   const [type, setType] = useState("Virtual Machine");
-
-  const regions = [
-    {
-      title: "Asia-Pacific",
-      options: [{ value: "East Asia", label: "East Asia" }],
-    },
-    {
-      title: "United States",
-      options: [
-        { value: "East US", label: "East US" },
-        { value: "East US 2", label: "East US 2" },
-        { value: "North Central US", label: "North Central US" },
-        { value: "West US 2", label: "West US 2" },
-        { value: "West US 3", label: "West US 3" },
-      ],
-    },
-    {
-      title: "Europe",
-      options: [
-        { value: "North Europe (Ireland)", label: "North Europe (Ireland)" },
-      ],
-    },
-    {
-      title: "France",
-      options: [{ value: "France Central", label: "France Central" }],
-    },
-    {
-      title: "Germany",
-      options: [
-        { value: "Germany West Central", label: "Germany West Central" },
-      ],
-    },
-  ];
-
-  const vmSizeOptions = [
-    {
-      title: "Family A (Av2-series)",
-      options: [
-        {
-          value: "Standard_A1_v2",
-          label: "Standard_A1_v2",
-          cpu: "1",
-          memory: "2GB",
-        },
-        {
-          value: "Standard_A2_v2",
-          label: "Standard_A2_v2",
-          cpu: "2",
-          memory: "4GB",
-        },
-        {
-          value: "Standard_A4_v2",
-          label: "Standard_A4_v2",
-          cpu: "4",
-          memory: "8GB",
-        },
-        {
-          value: "Standard_A8_v2",
-          label: "Standard_A8_v2",
-          cpu: "8",
-          memory: "16GB",
-        },
-        {
-          value: "Standard_A2m_v2",
-          label: "Standard_A2m_v2",
-          cpu: "2",
-          memory: "16GB",
-        },
-        {
-          value: "Standard_A4m_v2",
-          label: "Standard_A4m_v2",
-          cpu: "4",
-          memory: "32GB",
-        },
-        {
-          value: "Standard_A8m_v2",
-          label: "Standard_A8m_v2",
-          cpu: "8",
-          memory: "64GB",
-        },
-      ],
-    },
-    {
-      title: "Family B (Basv2-series)",
-      options: [
-        {
-          value: "Standard_B2ts_v2",
-          label: "Standard_B2ts_v2",
-          cpu: "2",
-          memory: "1GB",
-        },
-        {
-          value: "Standard_B2ls_v2",
-          label: "Standard_B2ls_v2",
-          cpu: "2",
-          memory: "4GB",
-        },
-        {
-          value: "Standard_B2s_v2",
-          label: "Standard_B2s_v2",
-          cpu: "2",
-          memory: "8GB",
-        },
-        {
-          value: "Standard_B4ls_v2",
-          label: "Standard_B4ls_v2",
-          cpu: "4",
-          memory: "8GB",
-        },
-        {
-          value: "Standard_B4s_v2",
-          label: "Standard_B4s_v2",
-          cpu: "4",
-          memory: "16GB",
-        },
-        {
-          value: "Standard_B8ls_v2",
-          label: "Standard_B8ls_v2",
-          cpu: "8",
-          memory: "16GB",
-        },
-        {
-          value: "Standard_B8s_v2",
-          label: "Standard_B8s_v2",
-          cpu: "8",
-          memory: "32GB",
-        },
-        {
-          value: "Standard_B16ls_v2",
-          label: "Standard_B16ls_v2",
-          cpu: "16",
-          memory: "32GB",
-        },
-        {
-          value: "Standard_B16s_v2",
-          label: "Standard_B16s_v2",
-          cpu: "16",
-          memory: "64GB",
-        },
-        {
-          value: "Standard_B32ls_v2",
-          label: "Standard_B32ls_v2",
-          cpu: "32",
-          memory: "64GB",
-        },
-        {
-          value: "Standard_B32s_v2",
-          label: "Standard_B32s_v2",
-          cpu: "32",
-          memory: "128GB",
-        },
-      ],
-    },
-    {
-      title: "Family D (Dsv6 sizes)",
-      options: [
-        {
-          value: "Standard_D2s_v6",
-          label: "Standard_D2s_v6",
-          cpu: "2",
-          memory: "8GB",
-        },
-        {
-          value: "Standard_D4s_v6",
-          label: "Standard_D4s_v6",
-          cpu: "4",
-          memory: "16GB",
-        },
-        {
-          value: "Standard_D8s_v6",
-          label: "Standard_D8s_v6",
-          cpu: "8",
-          memory: "32GB",
-        },
-        {
-          value: "Standard_D16s_v6",
-          label: "Standard_D16s_v6",
-          cpu: "16",
-          memory: "64GB",
-        },
-        {
-          value: "Standard_D32s_v6",
-          label: "Standard_D32s_v6",
-          cpu: "32",
-          memory: "128GB",
-        },
-        {
-          value: "Standard_D48s_v6",
-          label: "Standard_D48s_v6",
-          cpu: "48",
-          memory: "192GB",
-        },
-        {
-          value: "Standard_D64s_v6",
-          label: "Standard_D64s_v6",
-          cpu: "64",
-          memory: "256GB",
-        },
-        {
-          value: "Standard_D96s_v6",
-          label: "Standard_D96s_v6",
-          cpu: "96",
-          memory: "384GB",
-        },
-        {
-          value: "Standard_D128s_v6",
-          label: "Standard_D128s_v6",
-          cpu: "128",
-          memory: "512GB",
-        },
-      ],
-    },
-  ];
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -270,25 +58,30 @@ export default function RequestDetails({ params }) {
         setAdminPassword(resource.password);
         setVMSize(resource.vmsize);
         setAllocation(resource.allocationip);
-        setUserID(resource.userid);
         setType(resource.type);
       }
-
-      //   console.log(
-      //     "Resource data fetched successfully:",
-      //     resourceName,
-      //     region,
-      //     os,
-      //     adminUser,
-      //     adminPassword,
-      //     vmSize,
-      //     allocation,
-      //     userID,
-      //     type
-      //   );
     } catch (error) {
       console.log("Error while fetching resource data:", error);
     }
+  };
+
+  const handleDelete = () => {
+    toast.success("Resource deleted successfully");
+
+    try {
+      fetch(`http://localhost:3000/api/resource/?requestId=${requestId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (error) {
+      console.log("Error while deleting resource:", error);
+    }
+  };
+
+  const handleCancel = () => {
+    router.push("/requestresource");
   };
 
   return (
@@ -318,7 +111,7 @@ export default function RequestDetails({ params }) {
               Cloud Provider
             </label>
             <div className="flex items-center space-x-2 ml-2">
-              {/* <Image src={Azure} width={84} height={"auto"} alt="Azure Logo" /> */}
+              <Image src={Azure} width={84} height={"auto"} alt="Azure Logo" />
             </div>
           </div>
 
@@ -394,16 +187,17 @@ export default function RequestDetails({ params }) {
 
         {/* Buttons */}
         <div className="flex justify-between items-center mt-8">
-          <Link href={"/homepage"}>
-            <button className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400">
-              Cancel
-            </button>
-          </Link>
           <button
-            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-            // onClick={}
+            className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+            onClick={handleCancel}
           >
-            Save
+            Cancel
+          </button>
+          <button
+            className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
+            onClick={handleDelete}
+          >
+            Delete
           </button>
         </div>
       </div>
