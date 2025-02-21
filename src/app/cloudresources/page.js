@@ -13,7 +13,7 @@ export default function CloudResources() {
   const [os, setOS] = useState("Ubuntu");
   const [adminUser, setAdminUser] = useState("Admin");
   const [adminPassword, setAdminPassword] = useState("");
-  const [vmSize, setVMSize] = useState("Standard_A1_v2");
+  const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
   const [availableVM, setAvailableVM] = useState([]);
@@ -272,7 +272,7 @@ export default function CloudResources() {
       if (!res.ok) {
         throw new Error(`Failed to save: ${res.statusText}`);
       } else {
-        router.push("/projectdetails");
+        router.push("/requestresource");
       }
     } catch (error) {
       console.log("Error while saving resource:", error);
