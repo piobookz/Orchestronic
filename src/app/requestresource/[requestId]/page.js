@@ -17,7 +17,6 @@ export default function RequestDetails({ params }) {
   const [adminPassword, setAdminPassword] = useState("");
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
-  const [alert, setAlert] = useState("");
   const [type, setType] = useState("Virtual Machine");
 
   useEffect(() => {
@@ -93,11 +92,6 @@ export default function RequestDetails({ params }) {
           Create Cloud Resource → Todo List
         </h2>
       </div>
-      {alert && (
-        <div className="bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md ml-16">
-          {alert}
-        </div>
-      )}
       {/* Form Container */}
       <div className="bg-white text-black mx-16 my-8 p-8 rounded-lg shadow-lg">
         {/* Section Title */}
