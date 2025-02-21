@@ -7,6 +7,7 @@ import React, { useState, useEffect, use } from "react";
 import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
 
 export default function ProjectOPS() {
   const TABLE_HEAD_CR = ["Name", "Type"];
@@ -312,29 +313,33 @@ export default function ProjectOPS() {
                 </tr>
               </thead>
               <tbody>
-                {TABLE_ROWS_CR.map(({ name, type }, index) => {
+                {TABLE_ROWS_CR.map(({ id, name, type }, index) => {
                   const isOdd = index % 2 === 1;
                   const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
                   // console.log(TABLE_ROWS_CR);
                   return (
-                    <tr key={`${name}-${index}`} className={`${rowBgColor}`}>
+                    <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {name}
-                        </Typography>
+                        <Link href={`/projectops/${id}`}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {name}
+                          </Typography>
+                        </Link>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="font-normal"
-                        >
-                          {type}
-                        </Typography>
+                        <Link href={`/projectops/${id}`}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {type}
+                          </Typography>
+                        </Link>
                       </td>
                     </tr>
                   );
