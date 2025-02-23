@@ -2,6 +2,13 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "orchestronic/app/components/navbar";
 import { Toaster } from "react-hot-toast";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,14 +28,30 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Navbar />
-        <Toaster position="top-right" />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <header>
+            <SignedOut>
+              <p className="text-center text-5xl font-bold text-white mt-16">
+                Welcome to Orchestronic!
+              </p>
+              {/* Show login button only when the user is signed out */}
+              <div className="flex justify-center items-center w-full mt-20">
+                <SignInButton className="font-semibold text-xl" />
+              </div>
+            </SignedOut>
+            <SignedIn>
+              {/* Show UserButton and Navbar when the user is signed in */}
+              <Navbar />
+              <Toaster position="top-right" />
+              {children}
+            </SignedIn>
+          </header>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
