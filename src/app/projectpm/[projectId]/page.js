@@ -5,10 +5,13 @@
 import Link from "next/link";
 // import { Card, Typography } from "@material-tailwind/react";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 // import unfilter from "../../../public/filter-circle.svg";
 // import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetails({ params }) {
+  const router = useRouter();
   const [requestId, setRequestId] = useState(null);
   const [resourceName, setResourceName] = useState("");
   const [region, setRegion] = useState("");
@@ -64,6 +67,31 @@ export default function Projectdetails({ params }) {
       }
     } catch (error) {
       console.log("Error while fetching resource data:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    toast.success("Resource deleted successfully");
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/resource/?requestId=${requestId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete resource: ${response.statusText}`);
+      }
+
+      router.push("/projectops");
+    } catch (error) {
+      console.error("Error while deleting resource:", error);
+      toast.error("Failed to delete resource");
     }
   };
 
@@ -127,8 +155,8 @@ export default function Projectdetails({ params }) {
               Configure
             </button>  */}
             <button
-              className="ml-4 text-sm text-black bg-[#E3E3E3] rounded py-3 px-5"
-              // onClick={}
+              className="ml-4 text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600"
+              onClick={handleDelete}
             >
               Destroy
             </button>
