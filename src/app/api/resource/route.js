@@ -65,11 +65,12 @@ export async function GET(req) {
 }
 
 export async function DELETE(req) {
-  // Parse JSON
-  const { requestId } = await req.json();
-
   // Connect to MongoDB
   await connectMongoDB();
+
+  // Parse JSON
+  const url = new URL(req.url);
+  const requestId = url.searchParams.get("requestId");
 
   // Delete resource
   await Resource.deleteOne({ _id: requestId });
