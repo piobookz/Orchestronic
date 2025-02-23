@@ -2,3 +2,9 @@ pymongo
 apache-airflow-providers-mongo
 pika
 apache-airflow-providers-celery
+azure-identity
+azure-mgmt-compute
+azure-mgmt-network
+azure-mgmt-resource
+dotenv
+apache-airflow-providers-hashicorp
