@@ -1,7 +1,11 @@
 import mongoose, { Schema } from "mongoose";
 
 const resourceSchema = new Schema({
-  userid: { type: String },
+  userid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
   vmname: { type: String },
   vmsize: { type: String },
   region: { type: String },
@@ -10,7 +14,19 @@ const resourceSchema = new Schema({
   username: { type: String },
   password: { type: String },
   allocationip: { type: String },
-  projectid: { type: String },
+  projectid: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project',
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Resource =

@@ -35,12 +35,13 @@ export default function RootLayout({ children }) {
         >
           <header>
             <SignedOut>
+              <Navbar />
               <p className="text-center text-5xl font-bold text-white mt-16">
                 Welcome to Orchestronic!
               </p>
               {/* Show login button only when the user is signed out */}
               <div className="flex justify-center items-center w-full mt-20">
-                <SignInButton className="font-semibold text-xl" />
+                <SignInButton mode="modal" className="font-semibold text-xl bg-white text-blue-500 px-6 py-3 rounded-lg shadow-lg hover:bg-blue-500 hover:text-white transition duration-300" />
               </div>
             </SignedOut>
             <SignedIn>

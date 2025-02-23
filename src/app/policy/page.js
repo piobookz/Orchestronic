@@ -73,7 +73,7 @@ export default function PolicyDetails() {
           </div>
           <Link
             className="mr-4 py-2 px-10 text-sm text-black bg-[#E3E3E3] rounded"
-            href="/policyedit"
+            href="/policy/edit"
           >
             Edit
           </Link>
