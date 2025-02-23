@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
 import { useRouter } from "next/navigation";
@@ -13,9 +13,10 @@ export default function CloudResources() {
   const [os, setOS] = useState("Ubuntu");
   const [adminUser, setAdminUser] = useState("Admin");
   const [adminPassword, setAdminPassword] = useState("");
-  const [vmSize, setVMSize] = useState("Standard_A1_v2");
+  const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
+  const [availableVM, setAvailableVM] = useState([]);
   /* 
   UserID may refer to the email or ID 
   indicating the specified user owns the project.
@@ -271,12 +272,67 @@ export default function CloudResources() {
       if (!res.ok) {
         throw new Error(`Failed to save: ${res.statusText}`);
       } else {
-        router.push("/projectdetails");
+        router.push("/requestresource");
       }
     } catch (error) {
       console.log("Error while saving resource:", error);
     }
   };
+
+  const filterVMSize = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/policy", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch policy: ${res.statusText}`);
+      }
+
+      const responseData = await res.json();
+      const { data } = responseData;
+
+      const {
+        memory,
+        memoryMes,
+        hdd,
+        hddMes,
+        ssd,
+        ssdMes,
+        cpu,
+        cpuMes,
+        netBand,
+        netBandMes,
+        env,
+        envMes,
+        apelMes,
+        noteMes,
+      } = data;
+
+      const availableVM = vmSizeOptions.flatMap((family) =>
+        family.options.filter((size) => {
+          const policyMemory = parseInt(memory.replace(/\D/g, ""), 10);
+          const policyCPU = parseInt(cpu.replace(/\D/g, ""), 10);
+          const vmMemoryProvide = parseInt(size.memory.replace(/\D/g, ""), 10);
+
+          return (
+            Number(size.cpu) <= policyCPU && policyMemory <= vmMemoryProvide
+          );
+        })
+      );
+
+      setAvailableVM(availableVM);
+    } catch (error) {
+      console.log("Error while filtering VM size:", error);
+    }
+  };
+
+  useEffect(() => {
+    filterVMSize();
+  }, []);
 
   return (
     <div className="min-h-screen text-white">
@@ -410,18 +466,10 @@ export default function CloudResources() {
               <option value="" disabled>
                 Select a VM Size
               </option>
-              {vmSizeOptions.map((section, index) => (
-                <optgroup key={index} label={section.title}>
-                  {section.options.map((option) => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      className={option.className || ""}
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </optgroup>
+              {availableVM.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
@@ -439,7 +487,6 @@ export default function CloudResources() {
               onChange={(e) => setOS(e.target.value)}
             >
               <option value="Ubuntu">Ubuntu</option>
-              <option value="Windows">Windows</option>
             </select>
           </div>
 

@@ -1,6 +1,7 @@
 import { connectMongoDB } from "../../../../lib/mongodb";
 import Resource from "../../../../models/resource";
 import { NextResponse } from "next/server";
+import { URL } from "url";
 
 export async function POST(req) {
   // Parse JSON
@@ -16,23 +17,11 @@ export async function POST(req) {
     allocation,
     projectID,
   } = await req.json();
-  /* console.log(
-    userID,
-    resourceName,
-    region,
-    os,
-    type,
-    adminUser,
-    adminPassword,
-    vmSize,
-    allocation,
-    projectID
-  ); */
 
   // Connect to MongoDB
   await connectMongoDB();
 
-  //Create environment details
+  // Create environment details
   await Resource.create({
     userid: userID,
     vmname: resourceName,
@@ -52,12 +41,16 @@ export async function POST(req) {
   );
 }
 
-export async function GET() {
+export async function GET(req) {
   try {
     await connectMongoDB();
-    console.log("Connected to MongoDB");
+    // console.log("Connected to MongoDB");
 
-    const resources = await Resource.find({});
+    const url = new URL(req.url);
+    const requestId = url.searchParams.get("requestId");
+
+    const query = requestId ? { _id: requestId } : {};
+    const resources = await Resource.find(query);
     // console.log("Fetched resources:", resources);
 
     return NextResponse.json(resources, { status: 200 });
@@ -69,4 +62,21 @@ export async function GET() {
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(req) {
+  // Connect to MongoDB
+  await connectMongoDB();
+
+  // Parse JSON
+  const url = new URL(req.url);
+  const requestId = url.searchParams.get("requestId");
+
+  // Delete resource
+  await Resource.deleteOne({ _id: requestId });
+
+  return NextResponse.json(
+    { message: "Successfully deleted resource" },
+    { status: 200 }
+  );
 }
