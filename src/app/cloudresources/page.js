@@ -487,7 +487,6 @@ export default function CloudResources() {
               onChange={(e) => setOS(e.target.value)}
             >
               <option value="Ubuntu">Ubuntu</option>
-              <option value="Windows">Windows</option>
             </select>
           </div>
 
