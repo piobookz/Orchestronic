@@ -47,3 +47,4 @@ next-env.d.ts
 logs/
 dags/terraform
 dags/__pycache__/
+/dags/__pycache__
