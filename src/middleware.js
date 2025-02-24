@@ -7,17 +7,16 @@ const isOpsRoute = createRouteMatcher(["/ops(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth();
-  
-  if(
-    isOpsRoute(req) && 
+
+  if (
+    isOpsRoute(req) &&
     (await auth()).sessionClaims?.metadata?.role !== "ops"
   ) {
     const url = ("/", req.url);
     return NextResponse.redirect(url);
   }
-  
-  if (!userId && !isPublicRoute(req)) {
 
+  if (!userId && !isPublicRoute(req)) {
     return redirectToSignIn();
   }
 });
