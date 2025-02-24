@@ -12,7 +12,7 @@ export default function RequestList() {
   const router = useRouter();
 
   // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
-  const TABLE_HEAD_REQ = ["ID", "Title", "Status PM", "Status Ops"];
+  const TABLE_HEAD_REQ = ["Project ID", "Request", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -31,8 +31,10 @@ export default function RequestList() {
           const data = await res.json();
           console.log("data", data)
           const rows = data.map((element) => ({
-            id: element._id,
-            title: element.name,
+            id: element.requestid,
+            projectid: element.projectid,
+            requestname: element.name,
+            type: element.type,
             statuspm: element.statuspm,
             statusops: element.statusops,
           }));
@@ -100,7 +102,7 @@ export default function RequestList() {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map(({ id, title, statuspm, statusops }, index) => {
+            {sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
               const isOdd = index % 2 === 1;
               const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
 
@@ -112,7 +114,7 @@ export default function RequestList() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {id}
+                      {projectid}
                     </Typography>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
@@ -121,7 +123,17 @@ export default function RequestList() {
                       color="blue-gray"
                       className="font-normal"
                     >
-                      {title}
+                      {requestname}
+                    </Typography>
+                  </td>
+
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {type}
                     </Typography>
                   </td>
 
@@ -144,7 +156,7 @@ export default function RequestList() {
                         {lastUpdate}
                       </Typography>
                     </td> */}
-
+                  
                   {/* Status PM */}
                   <td className="p-4 border-b border-blue-gray-50">
                     <Typography

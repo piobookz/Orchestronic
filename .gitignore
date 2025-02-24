@@ -44,5 +44,5 @@ next-env.d.ts
 /.clerk/
 
 # Airflow
-airflow/logs/
-airflow/dags/terraform
+logs/
+dags/terraform

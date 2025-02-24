@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "orchestronic/app/components/navbar";
+import Navbar from "../app/components/navbar";
 import { Toaster } from "react-hot-toast";
 import {
   ClerkProvider,

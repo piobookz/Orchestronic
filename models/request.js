@@ -5,7 +5,10 @@ const requestSchema = new Schema({
   name: { type: String },
   type: { type: String },
   userid: { type: String },
-  projectid: { type: String },
+  projectid: { 
+    type: String,
+    ref: "Project"
+  },
   statuspm: { type: String },
   statusops: { type: String },
   createdAt: {
