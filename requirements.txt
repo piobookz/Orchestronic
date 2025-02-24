@@ -8,3 +8,4 @@ azure-mgmt-network
 azure-mgmt-resource
 dotenv
 apache-airflow-providers-hashicorp
+python-socketio

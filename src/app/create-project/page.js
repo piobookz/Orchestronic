@@ -1,8 +1,94 @@
+"use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import gitlab from "../../../public/gitlab-logo-500.svg";
 
 export default function CreateProject() {
+  const { user } = useUser();
+  const [projectList, setProjectList] = useState([]);
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [branch, setBranch] = useState("");
+  const [rootPath, setRootPath] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (!user.externalAccounts || user.externalAccounts.length === 0) {
+      console.log("No external accounts found.");
+      return;
+    }
+
+    const gitlabAccount = user.externalAccounts.find(
+      (account) => account.provider === "gitlab"
+    );
+
+    if (!gitlabAccount) {
+      console.log("No GitLab account linked.");
+      return;
+    }
+
+    const gitlabToken = user.externalAccounts?.[0]?.providerUserId;
+
+    if (!gitlabToken) {
+      console.log("GitLab token is missing.");
+      return;
+    }
+
+    const fetchProjects = async () => {
+      try {
+        const res = await fetch(
+          `https://gitlab.com/api/v4/users/${gitlabToken}/projects`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch projects: ${res.statusText}`);
+        }
+
+        const projects = await res.json();
+        setProjectList(projects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchProjects();
+  }, [user]);
+
+  if (!user) {
+    return <div>Sign in to view this page</div>;
+  }
+
+  const handleProjectChange = (e) => {
+    const selectedRepo = e.target.value;
+    if (!selectedRepo) {
+      setProjectName("");
+      setProjectDescription("");
+      setBranch("");
+      setRootPath("");
+      return;
+    }
+
+    const project = projectList.find(
+      (project) => project.path_with_namespace === selectedRepo
+    );
+
+    if (project) {
+      setProjectName(project.name || "");
+      setProjectDescription(project.description || "");
+      setBranch(project.default_branch || "");
+      setRootPath(project.http_url_to_repo || "");
+    }
+  };
+
   return (
     <>
       <h1 className="mx-16 my-10 text-4xl font-bold dark:text-white">
@@ -18,16 +104,15 @@ export default function CreateProject() {
           {/* Git Repository Section */}
           <div>
             <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="flex flex-col items-center space-x-4">
+              <div className="flex flex-col items-left space-x-4">
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Git Repository
                 </label>
-                {/* GitLab Logo */}
-                <div className="inline-flex justify-center items-center">
+                <div className="inline-flex justify-left items-center">
                   <Image
                     src={gitlab}
-                    width="45"
-                    height="45"
+                    width="60"
+                    height="60"
                     alt="GitLab logo"
                   />
                   <span className="text-black">GitLab</span>
@@ -45,10 +130,17 @@ export default function CreateProject() {
                 <select
                   id="repository"
                   className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                  onChange={handleProjectChange}
                 >
                   <option value="">Please select</option>
-                  <option value="repo1">Repo 1</option>
-                  <option value="repo2">Repo 2</option>
+                  {projectList.map((project) => (
+                    <option
+                      key={project.id}
+                      value={project.path_with_namespace}
+                    >
+                      {project.path_with_namespace}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -56,25 +148,22 @@ export default function CreateProject() {
 
           {/* Branch and Root Application Path Section */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {/* Branch Selection */}
             <div>
               <label
                 htmlFor="branch"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-200"
               >
-                Branch
+                Default Branch
               </label>
-              <select
+              <input
                 id="branch"
+                type="text"
+                value={branch}
+                readOnly
                 className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              >
-                <option value="main">Main</option>
-                <option value="develop">Develop</option>
-                <option value="feature">Feature</option>
-              </select>
+              />
             </div>
 
-            {/* Root Application Path */}
             <div>
               <label
                 htmlFor="rootPath"
@@ -85,7 +174,8 @@ export default function CreateProject() {
               <input
                 id="rootPath"
                 type="text"
-                placeholder="/"
+                value={rootPath}
+                readOnly
                 className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
               />
             </div>
@@ -102,7 +192,8 @@ export default function CreateProject() {
             <input
               id="applicationName"
               type="text"
-              placeholder="Example-Application"
+              value={projectName}
+              readOnly
               className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
             />
           </div>
@@ -116,7 +207,8 @@ export default function CreateProject() {
             </label>
             <textarea
               id="description"
-              placeholder="Example application"
+              value={projectDescription}
+              readOnly
               className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
               rows="4"
             ></textarea>
@@ -124,14 +216,12 @@ export default function CreateProject() {
 
           {/* Buttons */}
           <div className="flex justify-end space-x-4">
-            {/* Cancel Button */}
             <button
               type="button"
               className="rounded-md bg-gray-200 px-7 py-2 text-sm font-medium text-black transition hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-200 dark:hover:bg-gray-500"
             >
               Cancel
             </button>
-            {/* Save Button */}
             <button
               type="submit"
               className="rounded-md bg-green-500 px-8 py-2 text-sm font-medium text-white transition hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-400"
