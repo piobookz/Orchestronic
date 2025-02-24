@@ -46,5 +46,4 @@ next-env.d.ts
 # Airflow
 logs/
 dags/terraform
-dags/__pycache__/
 /dags/__pycache__
