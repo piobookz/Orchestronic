@@ -1,23 +1,19 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+"use client";
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
 
-export default async function Home() {
-  const { userId } = await auth();
-
-  if (!userId) {
+export default function Home() {
+  const { user } = useUser();
+  if (!user) {
     return <div>Sign in to view this page</div>;
   }
 
-  const user = await currentUser();
-
   return (
     <>
-      <p className="mx-16 my-5 text-balance text-center text-5xl font-bold text-white">
+      <p className="mx-16 my-5 text-center text-5xl font-bold text-white">
         Welcome Back, {user.firstName}!
       </p>
-      <h1 className="mx-16 my-5 text-balance text-4xl font-bold text-white">
-        Updates
-      </h1>
-      {/* Updates will be shown here */}
+      <h1 className="mx-16 my-5 text-4xl font-bold text-white">Updates</h1>
     </>
   );
 }
