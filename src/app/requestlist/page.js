@@ -12,7 +12,7 @@ export default function RequestList() {
   const router = useRouter();
 
   // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
-  const TABLE_HEAD_REQ = ["ID", "Title", "Status PM", "Status Ops"];
+  const TABLE_HEAD_REQ = ["Project ID", "Request", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -31,8 +31,10 @@ export default function RequestList() {
           const data = await res.json();
           console.log("data", data)
           const rows = data.map((element) => ({
-            id: element._id,
-            title: element.name,
+            id: element.requestid,
+            projectid: element.projectid,
+            requestname: element.name,
+            type: element.type,
             statuspm: element.statuspm,
             statusops: element.statusops,
           }));
@@ -100,87 +102,81 @@ export default function RequestList() {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map(({ id, title, statuspm, statusops }, index) => {
+            {sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
               const isOdd = index % 2 === 1;
               const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
 
               return (
-                <tr key={id} className={`${rowBgColor}`}>
+                <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {id}
-                    </Typography>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="font-normal"
-                    >
-                      {title}
-                    </Typography>
-                  </td>
-
-                  {/* <td className="p-4 border-b border-blue-gray-50">
+                    <Link href={`/projectpm/${projectid}`}>
                       <Typography
                         variant="small"
                         color="blue-gray"
                         className="font-normal"
                       >
-                        {describe}
+                        {projectid}
                       </Typography>
-                    </td>
-
-                    <td className="p-4 border-b border-blue-gray-50">
+                    </Link>
+                  </td>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Link href={`/projectpm/${projectid}`}>
                       <Typography
                         variant="small"
                         color="blue-gray"
                         className="font-normal"
                       >
-                        {lastUpdate}
+                        {requestname}
                       </Typography>
-                    </td> */}
-
-                  {/* Status PM */}
+                    </Link>
+                  </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      className={`font-normal px-2 py-1 rounded-md 
+                    <Link href={`/projectpm/${projectid}`}>
+                      <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-normal"
+                      >
+                        {type}
+                      </Typography>
+                    </Link>
+                  </td>
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Link href={`/projectpm/${projectid}`}>
+                      <Typography
+                        variant="small"
+                        className={`font-normal px-2 py-1 rounded-md 
                           ${statuspm === "Approved"
-                          ? "text-green-600 bg-green-100 px-2"
-                          : statuspm === "Under Review"
-                            ? "text-amber-600 bg-amber-100"
-                            : statuspm === "Request"
-                              ? "text-gray-600 bg-gray-100"
-                              : "text-red-600 bg-red-100"
-                        }`}
-                    >
-                      {statuspm}
-                    </Typography>
+                            ? "text-green-600 bg-green-100 px-2"
+                            : statuspm === "Under Review"
+                              ? "text-amber-600 bg-amber-100"
+                              : statuspm === "Request"
+                                ? "text-gray-600 bg-gray-100"
+                                : "text-red-600 bg-red-100"
+                          }`}
+                      >
+                        {statuspm}
+                      </Typography>
+                    </Link>
                   </td>
-
-                  {/* Status Ops */}
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Typography
-                      variant="small"
-                      className={`font-normal px-2 py-1 rounded-md 
+                    <Link href={`/projectpm/${projectid}`}>
+                      <Typography
+                        variant="small"
+                        className={`font-normal px-2 py-1 rounded-md 
                           ${statusops === "Approved"
-                          ? "text-green-600 bg-green-100 px-2"
-                          : statusops === "Under Review"
-                            ? "text-amber-600 bg-amber-100"
-                            : statusops === "Request"
-                              ? "text-gray-600 bg-gray-100"
-                              : "text-red-600 bg-red-100"
-                        }`}
-                    >
-                      {statusops}
-                    </Typography>
+                            ? "text-green-600 bg-green-100 px-2"
+                            : statusops === "Under Review"
+                              ? "text-amber-600 bg-amber-100"
+                              : statusops === "Request"
+                                ? "text-gray-600 bg-gray-100"
+                                : "text-red-600 bg-red-100"
+                          }`}
+                      >
+                        {statusops}
+                      </Typography>
+                    </Link>
                   </td>
-
                 </tr>
               );
             }

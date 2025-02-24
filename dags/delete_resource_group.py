@@ -1,18 +1,33 @@
 from airflow import DAG
+from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
-from datetime import datetime
-from pymongo import MongoClient
-import os
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from bson.json_util import dumps
-import pika
 from urllib.parse import urlparse
+import os
+import pika
+import shutil
+
+# Load environment variables from .env file
+load_dotenv('/opt/airflow/dags/.env')
+
+# Default args for DAG
+default_args = {
+    'owner': 'airflow',
+    'depends_on_past': False,
+    'start_date': datetime(2025, 1, 19),
+    'retries': 3,
+    'retry_delay': timedelta(minutes=5),
+}
 
 # Global Variables
 listener_initialized = False
 received_message = None
 
 def rabbitmq_consumer():
+    """
+    Consumes a message from RabbitMQ containing the project_id.
+    """
     global listener_initialized, received_message
 
     # Load environment variables
@@ -52,7 +67,7 @@ def rabbitmq_consumer():
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
 
-        queue_name = "create-vm"
+        queue_name = "delete-vm"
         # Get queue info
         queue_info = channel.queue_declare(queue=queue_name, durable=True, exclusive=False, auto_delete=False)
         message_count = queue_info.method.message_count
@@ -101,61 +116,71 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else ""
-
-def fetch_from_mongo(received_message):
-    print(f"Received message from XCom: {received_message}")
-    project_id = received_message
-        
-    try:
-        load_dotenv('/opt/airflow/dags/.env')
-        uri = os.getenv("MONGODB_URI")
-        if not uri:
-            raise Exception("MONGODB_URI is not set")
-
-        client = MongoClient(uri)
-        database = client["test"]
-        collection = database["resources"]
-
-        data = list(collection.find({"projectid": project_id}))
-        print("Fetched data:", data)
-
-    except Exception as e:
-        raise Exception(f"The following error occurred: {str(e)}")
+        return received_message if received_message is not None else "675266f7b8c017a58d31feaf"
     
-    finally:
-        client.close()
+# def create_terraform_directory(project_id):
+#     """
+#     Creates a unique Terraform directory for the project.
+#     """
+#     directory_path = f"/opt/airflow/dags/terraform/{project_id}"
+#     os.makedirs(directory_path, exist_ok=True)
+#     return directory_path
 
-    return dumps(data)
-
-# Default args for DAG
-default_args = {
-    'owner': 'airflow',
-    'depends_on_past': False,
-    'start_date': datetime(2025, 1, 19),
-    'retries': 1,
-}
+def cleanup_directory(project_id):
+    """
+    Cleans up the Terraform directory after execution.
+    """
+    directory_path = f"/opt/airflow/dags/terraform/{project_id}"
+    if os.path.exists(directory_path):
+        shutil.rmtree(directory_path)
 
 # Define DAG
 with DAG(
-    dag_id='idp',
+    dag_id='delete_resource_group',
     default_args=default_args,
-    schedule='@daily',
+    schedule=None,
     catchup=False,
+    max_active_runs=1,
 ) as dag:
-
+    
+    # Task to consume a message from RabbitMQ
     consume_rabbitmq = PythonOperator(
         task_id='rabbitmq_consumer',
         python_callable=rabbitmq_consumer,
         provide_context=True,
     )
 
-    fetch_requests = PythonOperator(
-    task_id='fetch_from_mongo',
-    python_callable=fetch_from_mongo,
-    op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Remove extra quotes
-    provide_context=True,
-)
+    # # Task to create Terraform directory
+    # create_directory = PythonOperator(
+    #     task_id='create_directory',
+    #     python_callable=create_terraform_directory,
+    #     op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') }}"],  # Use project_id from RabbitMQ
+    # )
 
+    # Task to run `terraform destroy`
+    terraform_destroy = BashOperator(
+        task_id='terraform_destroy',
+        bash_command='terraform init && terraform destroy -auto-approve',
+        cwd="/opt/airflow/dags/terraform/{{ ti.xcom_pull(task_ids='rabbitmq_consumer') }}",  # Use project_id from RabbitMQ
+        # op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') }}"],
+        # cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",  # Use the Terraform directory created earlier
+        env={
+            "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
+            "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
+            "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
+            "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
+        },
+        retries=3,
+        retry_delay=timedelta(minutes=5),
+        do_xcom_push=True
+    )
 
-consume_rabbitmq >> fetch_requests
+    # Task to clean up the Terraform directory
+    cleanup_task = PythonOperator(
+        task_id='cleanup_directory',
+        python_callable=cleanup_directory,
+        op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') }}"],
+    )
+
+    # Define task dependencies
+    consume_rabbitmq >> terraform_destroy >> cleanup_task
