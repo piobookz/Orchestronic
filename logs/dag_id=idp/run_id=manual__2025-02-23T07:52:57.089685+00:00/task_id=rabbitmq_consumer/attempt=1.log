@@ -1,0 +1,51 @@
+[2025-02-23T07:52:59.793+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-02-23T07:52:59.804+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: idp.rabbitmq_consumer manual__2025-02-23T07:52:57.089685+00:00 [queued]>
+[2025-02-23T07:52:59.810+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: idp.rabbitmq_consumer manual__2025-02-23T07:52:57.089685+00:00 [queued]>
+[2025-02-23T07:52:59.810+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 2
+[2025-02-23T07:52:59.820+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): rabbitmq_consumer> on 2025-02-23 07:52:57.089685+00:00
+[2025-02-23T07:52:59.826+0000] {warnings.py:112} WARNING - /home/***/.local/lib/python3.12/site-packages/***/task/task_runner/standard_task_runner.py:70: DeprecationWarning: This process (pid=432) is multi-threaded, use of fork() may lead to deadlocks in the child.
+  pid = os.fork()
+
+[2025-02-23T07:52:59.828+0000] {standard_task_runner.py:72} INFO - Started process 433 to run task
+[2025-02-23T07:52:59.829+0000] {standard_task_runner.py:104} INFO - Running: ['***', 'tasks', 'run', 'idp', 'rabbitmq_consumer', 'manual__2025-02-23T07:52:57.089685+00:00', '--job-id', '373', '--raw', '--subdir', 'DAGS_FOLDER/idp.py', '--cfg-path', '/tmp/tmpwoi9lwu6']
+[2025-02-23T07:52:59.831+0000] {standard_task_runner.py:105} INFO - Job 373: Subtask rabbitmq_consumer
+[2025-02-23T07:52:59.898+0000] {task_command.py:467} INFO - Running <TaskInstance: idp.rabbitmq_consumer manual__2025-02-23T07:52:57.089685+00:00 [running]> on host 9d363d0f65d2
+[2025-02-23T07:52:59.964+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='idp' AIRFLOW_CTX_TASK_ID='rabbitmq_consumer' AIRFLOW_CTX_EXECUTION_DATE='2025-02-23T07:52:57.089685+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-02-23T07:52:57.089685+00:00'
+[2025-02-23T07:52:59.968+0000] {logging_mixin.py:190} INFO - Task instance is in running state
+[2025-02-23T07:52:59.968+0000] {logging_mixin.py:190} INFO -  Previous state of the Task instance: queued
+[2025-02-23T07:52:59.968+0000] {logging_mixin.py:190} INFO - Current task name:rabbitmq_consumer state:running start_date:2025-02-23 07:52:59.804687+00:00
+[2025-02-23T07:52:59.969+0000] {logging_mixin.py:190} INFO - Dag name:idp and current dag run status:running
+[2025-02-23T07:52:59.969+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2025-02-23T07:52:59.973+0000] {connection_workflow.py:179} INFO - Pika version 1.3.2 connecting to ('172.19.0.9', 5672)
+[2025-02-23T07:52:59.974+0000] {io_services_utils.py:345} INFO - Socket connected: <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.5', 57980), raddr=('172.19.0.9', 5672)>
+[2025-02-23T07:52:59.977+0000] {connection_workflow.py:428} INFO - Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>).
+[2025-02-23T07:52:59.981+0000] {connection_workflow.py:293} INFO - AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-23T07:52:59.982+0000] {connection_workflow.py:725} INFO - AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-23T07:52:59.983+0000] {blocking_connection.py:453} INFO - Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>
+[2025-02-23T07:52:59.983+0000] {blocking_connection.py:1264} INFO - Created channel=1
+[2025-02-23T07:52:59.985+0000] {logging_mixin.py:190} INFO - Queue create-vm has 1 messages
+[2025-02-23T07:52:59.987+0000] {logging_mixin.py:190} INFO - Listening for messages in queue: create-vm
+[2025-02-23T07:52:59.987+0000] {logging_mixin.py:190} INFO -  [x] Received "675266f7b8c017a58d30feaf"
+[2025-02-23T07:52:59.997+0000] {logging_mixin.py:190} INFO - Error in listener: HTTPConnectionPool(host='localhost', port=4000): Max retries exceeded with url: /socket.io/?transport=polling&EIO=4&t=1740297179.9936404 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0xffff62885eb0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[2025-02-23T07:52:59.997+0000] {channel.py:536} INFO - Closing channel (0): 'Normal shutdown' on <Channel number=1 OPEN conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>>
+[2025-02-23T07:53:00.002+0000] {channel.py:1133} INFO - Received <Channel.CloseOk> on <Channel number=1 CLOSING conn=<SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0xffff62c67500> params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>>
+[2025-02-23T07:53:00.002+0000] {blocking_connection.py:802} INFO - Closing connection (200): Normal shutdown
+[2025-02-23T07:53:00.003+0000] {connection.py:1316} INFO - Closing connection (200): 'Normal shutdown'
+[2025-02-23T07:53:00.003+0000] {io_services_utils.py:731} INFO - Aborting transport connection: state=1; <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.5', 57980), raddr=('172.19.0.9', 5672)>
+[2025-02-23T07:53:00.004+0000] {io_services_utils.py:904} INFO - _AsyncTransportBase._initate_abort(): Initiating abrupt asynchronous transport shutdown: state=1; error=None; <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.5', 57980), raddr=('172.19.0.9', 5672)>
+[2025-02-23T07:53:00.004+0000] {io_services_utils.py:869} INFO - Deactivating transport: state=1; <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.5', 57980), raddr=('172.19.0.9', 5672)>
+[2025-02-23T07:53:00.004+0000] {connection.py:2017} INFO - AMQP stack terminated, failed to connect, or aborted: opened=True, error-arg=None; pending-error=ConnectionClosedByClient: (200) 'Normal shutdown'
+[2025-02-23T07:53:00.004+0000] {connection.py:2086} INFO - Stack terminated due to ConnectionClosedByClient: (200) 'Normal shutdown'
+[2025-02-23T07:53:00.005+0000] {io_services_utils.py:882} INFO - Closing transport socket and unlinking: state=3; <socket.socket fd=93, family=2, type=1, proto=6, laddr=('172.19.0.5', 57980), raddr=('172.19.0.9', 5672)>
+[2025-02-23T07:53:00.006+0000] {blocking_connection.py:525} INFO - User-initiated close: result=(<SelectConnection CLOSED transport=None params=<ConnectionParameters host=rabbitmq port=5672 virtual_host=/ ssl=False>>, ConnectionClosedByClient: (200) 'Normal shutdown')
+[2025-02-23T07:53:00.007+0000] {logging_mixin.py:190} INFO - Listener stopped.
+[2025-02-23T07:53:00.007+0000] {python.py:240} INFO - Done. Returned value was: "675266f7b8c017a58d30feaf"
+[2025-02-23T07:53:00.033+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2025-02-23T07:53:00.034+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=idp, task_id=rabbitmq_consumer, run_id=manual__2025-02-23T07:52:57.089685+00:00, execution_date=20250223T075257, start_date=20250223T075259, end_date=20250223T075300
+[2025-02-23T07:53:00.047+0000] {logging_mixin.py:190} INFO - Task instance in success state
+[2025-02-23T07:53:00.048+0000] {logging_mixin.py:190} INFO -  Previous state of the Task instance: running
+[2025-02-23T07:53:00.049+0000] {logging_mixin.py:190} INFO - Dag name:idp queued_at:2025-02-23 07:52:57.099053+00:00
+[2025-02-23T07:53:00.050+0000] {logging_mixin.py:190} INFO - Task hostname:9d363d0f65d2 operator:PythonOperator
+[2025-02-23T07:53:00.095+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-02-23T07:53:00.113+0000] {taskinstance.py:3895} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-02-23T07:53:00.115+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
