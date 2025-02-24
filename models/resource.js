@@ -14,11 +14,7 @@ const resourceSchema = new Schema({
   username: { type: String },
   password: { type: String },
   allocationip: { type: String },
-  projectid: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project',
-    required: true,
-  },
+  projectid: { type: String },
   createdAt: {
     type: Date,
     default: Date.now,

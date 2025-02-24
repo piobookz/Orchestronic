@@ -117,7 +117,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "675266f7b8c017a58d31feaf"
+        return received_message if received_message is not None else "675266f7b8c017a58d37feaf"
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")

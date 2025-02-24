@@ -52,6 +52,7 @@ export default function ProjectOPS() {
         }
 
         const data = await res.json();
+        console.log("data", data);
         const rows = data.map((element) => ({
           id: element._id,
           name: element.vmname,
@@ -118,7 +119,7 @@ export default function ProjectOPS() {
           );
         }
       } catch (error) {
-        console.error("Failed to retrieve request:", error);
+        console.log("Failed to retrieve request:", error.message);
       }
     };
 
