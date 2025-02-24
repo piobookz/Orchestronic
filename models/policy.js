@@ -22,7 +22,7 @@ const policySchema = new Schema(
 
         apelMes: { type: String },
 
-        noteMes: { type: String },
+        noteMes: { type: String },   
     }
 )
 
@@ -33,3 +33,44 @@ const policySchema = new Schema(
 
 const Policy = mongoose.models.Policy || mongoose.model("Policy", policySchema);
 export default Policy;
+
+
+// const policySchema = new mongoose.Schema({
+//     memory: {
+//       type: String,
+//       required: true,
+//     },
+//     hdd: {
+//       type: String,
+//       required: true,
+//     },
+//     ssd: {
+//       type: String,
+//       required: true,
+//     },
+//     cpu: {
+//       type: String,
+//       required: true,
+//     },
+//     netBand: {
+//       type: String,
+//       required: true,
+//     },
+//     env: {
+//       type: String,
+//       required: true,
+//     },
+//     projectId: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: 'Project',
+//       required: true,
+//     },
+//     createdAt: {
+//       type: Date,
+//       default: Date.now,
+//     },
+//     updatedAt: {
+//       type: Date,
+//       default: Date.now,
+//     },
+//   });
