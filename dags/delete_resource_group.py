@@ -116,7 +116,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "675266f7b8c017a58d31feaf"
+        return received_message if received_message is not None else "675266f7b8c017a58d37feaf"
     
 # def create_terraform_directory(project_id):
 #     """

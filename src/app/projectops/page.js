@@ -52,6 +52,7 @@ export default function ProjectOPS() {
         }
 
         const data = await res.json();
+        console.log("data", data);
         const rows = data.map((element) => ({
           id: element._id,
           name: element.vmname,
@@ -96,6 +97,7 @@ export default function ProjectOPS() {
           setPMApprove("Approved");
         }
         // console.log("API Response for /api/request:", requests);
+        console.log("projectid", projectid);
 
         if (Array.isArray(requests)) {
           const matchingRequest = requests.find(
@@ -117,7 +119,7 @@ export default function ProjectOPS() {
           );
         }
       } catch (error) {
-        console.error("Failed to retrieve request:", error.message);
+        console.log("Failed to retrieve request:", error.message);
       }
     };
 
