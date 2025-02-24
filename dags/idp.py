@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from bson.json_util import dumps
 import pika
 from urllib.parse import urlparse
+import socketio
+import time
 
 # Global Variables
 listener_initialized = False
@@ -128,6 +130,22 @@ def fetch_from_mongo(received_message):
 
     return dumps(data)
 
+def send_vm_notification():
+    sio = socketio.Client()
+    try:
+        sio.connect('http://localhost:4000', namespaces=[""])  # Use default namespace
+        time.sleep(2)  # Give time to connect
+
+        if sio.connected:
+            sio.emit('notification', {'message': 'Your virtual machine is being created now'})
+            sio.disconnect()
+            return "Notification sent successfully"
+        else:
+            return "Failed to establish a Socket.IO connection"
+
+    except Exception as e:
+        return f"Failed to send notification: {str(e)}"
+
 # Default args for DAG
 default_args = {
     'owner': 'airflow',
@@ -155,7 +173,12 @@ with DAG(
     python_callable=fetch_from_mongo,
     op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Remove extra quotes
     provide_context=True,
-)
+    )
+
+    send_notification = PythonOperator(
+        task_id='send_notification',
+        python_callable=send_vm_notification,
+    )
 
 
-consume_rabbitmq >> fetch_requests
+consume_rabbitmq >> fetch_requests >> send_notification

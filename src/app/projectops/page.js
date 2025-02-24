@@ -87,35 +87,35 @@ export default function ProjectOPS() {
           throw new Error(`Error: ${res.status} - ${res.statusText}`);
         }
 
-        const { requests } = await res.json();
+        const data = await res.json();
+        console.log("API Response:", data); // Debugging log
+
+        if (!Array.isArray(data)) {
+          console.error(
+            "Invalid API response format. Expected an array but received:",
+            data
+          );
+          return;
+        }
+
+        const requests = data; // Now correctly assigning the array
+
         const hasRejected = requests.some(
           (request) => request.statusops === "Rejected"
         );
-        if (hasRejected) {
-          setPMApprove("Rejected");
-        } else {
-          setPMApprove("Approved");
-        }
-        // console.log("API Response for /api/request:", requests);
-        console.log("projectid", projectid);
 
-        if (Array.isArray(requests)) {
-          const matchingRequest = requests.find(
-            (item) => item.projectid === TABLE_ROWS_CR[0].projectid
-          );
+        setPMApprove(hasRejected ? "Rejected" : "Approved");
 
-          if (matchingRequest) {
-            setSelectedButton(matchingRequest.statusops);
-          } else {
-            console.warn(
-              "No matching request found for project ID:",
-              TABLE_ROWS_CR[0].projectid
-            );
-          }
+        const matchingRequest = requests.find(
+          (item) => item.projectid === TABLE_ROWS_CR[0]?.projectid
+        );
+
+        if (matchingRequest) {
+          setSelectedButton(matchingRequest.statusops);
         } else {
-          console.log(
-            "Unexpected API response format. Expected an array but received:",
-            requests
+          console.warn(
+            "No matching request found for project ID:",
+            TABLE_ROWS_CR[0]?.projectid
           );
         }
       } catch (error) {
