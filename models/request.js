@@ -8,6 +8,14 @@ const requestSchema = new Schema({
   projectid: { type: String },
   statuspm: { type: String },
   statusops: { type: String },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Request =

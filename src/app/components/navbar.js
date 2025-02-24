@@ -5,7 +5,13 @@ import person from "../../../public/image.png";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { UserButton } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 
 export default function Navbar() {
   return (
@@ -19,30 +25,37 @@ export default function Navbar() {
             alt="logo"
             priority="true"
             className="mr-5"
-          ></Image>
-          <ul className="flex flex-row space-x-6 text-center items-center">
-            <Link
-              href="/"
-              className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-            >
-              <li>Home</li>
-            </Link>
-            <Link
-              href="/projects"
-              className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-            >
-              <li>Projects</li>
-            </Link>
-            <Link
-              href="/policy"
-              className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-            >
-              <li>Policy</li>
-            </Link>
-          </ul>
+          />
+          <SignedIn>
+            <ul className="flex flex-row space-x-6 text-center items-center">
+              <Link
+                href="/"
+                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
+              >
+                <li>Home</li>
+              </Link>
+              <Link
+                href="/projects"
+                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
+              >
+                <li>Projects</li>
+              </Link>
+              <Link
+                href="/policy"
+                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
+              >
+                <li>Policy</li>
+              </Link>
+            </ul>
+          </SignedIn>
         </div>
         <div>
-          <UserButton />
+          <SignedOut>
+            <SignInButton mode="modal" className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300" />
+          </SignedOut>
+          <SignedIn>
+            <UserButton className="p-2 hover:bg-[rgba(255,255,255,0.15)] rounded transition duration-300" />
+          </SignedIn>
         </div>
       </div>
     </nav>
