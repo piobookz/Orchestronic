@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import gitlab from "../../../public/gitlab-logo-500.svg";
+import { useRouter } from "next/navigation";
 
 export default function CreateProject() {
+  const router = useRouter();
   const { user } = useUser();
   const [projectList, setProjectList] = useState([]);
   const [projectName, setProjectName] = useState("");
@@ -38,6 +40,7 @@ export default function CreateProject() {
     }
 
     const fetchProjects = async () => {
+      console.log(user);
       try {
         const res = await fetch(
           `https://gitlab.com/api/v4/users/${gitlabToken}/projects`,
@@ -89,76 +92,145 @@ export default function CreateProject() {
     }
   };
 
-  return (
-    <>
-      <h1 className="mx-16 my-10 text-4xl font-bold dark:text-white">
-        Create a New Project
-      </h1>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      <section className="mx-16 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
-        <h2 className="mb-4 text-xl font-semibold capitalize text-gray-700 dark:text-white">
-          General Information
-        </h2>
+    const projectDetails = {
+      projectName,
+      projectDescription,
+      branch,
+      rootPath,
+      userId: user.id, // Include the user ID
+    };
 
-        <form className="space-y-8">
-          {/* Git Repository Section */}
-          <div>
-            <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="flex flex-col items-left space-x-4">
-                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
-                  Git Repository
-                </label>
-                <div className="inline-flex justify-left items-center">
-                  <Image
-                    src={gitlab}
-                    width="60"
-                    height="60"
-                    alt="GitLab logo"
-                  />
-                  <span className="text-black">GitLab</span>
+    try {
+      const res = await fetch("/api/project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(projectDetails),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to save project");
+      }
+
+      const data = await res.json();
+      const projectId = data.projectId; // Get the inserted project ID from the response
+
+      // Redirect to projectdetails/[projectid] page
+      router.push(`/projectdetails/${projectId}`);
+    } catch (error) {
+      console.error("Error saving project:", error);
+      alert("Failed to save project. Please try again.");
+    }
+  };
+
+    return (
+      <>
+        <h1 className="mx-16 my-10 text-4xl font-bold dark:text-white">
+          Create a New Project
+        </h1>
+
+        <section className="mx-16 rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-semibold capitalize text-gray-700 dark:text-white">
+            General Information
+          </h2>
+
+          <form className="space-y-8" onSubmit={handleSubmit}>
+            {/* Git Repository Section */}
+            <div>
+              <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="flex flex-col items-left space-x-4">
+                  <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Git Repository
+                  </label>
+                  <div className="inline-flex justify-left items-center">
+                    <Image
+                      src={gitlab}
+                      width="60"
+                      height="60"
+                      alt="GitLab logo"
+                    />
+                    <span className="text-black">GitLab</span>
+                  </div>
+                </div>
+
+                {/* Repository Selection */}
+                <div>
+                  <label
+                    htmlFor="repository"
+                    className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+                  >
+                    Select Repository
+                  </label>
+                  <select
+                    id="repository"
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                    onChange={handleProjectChange}
+                  >
+                    <option value="">Please select</option>
+                    {projectList.map((project) => (
+                      <option
+                        key={project.id}
+                        value={project.path_with_namespace}
+                      >
+                        {project.path_with_namespace}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
+            </div>
 
-              {/* Repository Selection */}
+            {/* Branch and Root Application Path Section */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label
-                  htmlFor="repository"
-                  className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+                  htmlFor="branch"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
-                  Select Repository
+                  Default Branch
                 </label>
-                <select
-                  id="repository"
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                  onChange={handleProjectChange}
+                <input
+                  id="branch"
+                  type="text"
+                  value={branch}
+                  readOnly
+                  className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="rootPath"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                 >
-                  <option value="">Please select</option>
-                  {projectList.map((project) => (
-                    <option
-                      key={project.id}
-                      value={project.path_with_namespace}
-                    >
-                      {project.path_with_namespace}
-                    </option>
-                  ))}
-                </select>
+                  Root Application Path
+                </label>
+                <input
+                  id="rootPath"
+                  type="text"
+                  value={rootPath}
+                  readOnly
+                  className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                />
               </div>
             </div>
-          </div>
 
-          {/* Branch and Root Application Path Section */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Application Details Section */}
             <div>
               <label
-                htmlFor="branch"
+                htmlFor="applicationName"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-200"
               >
-                Default Branch
+                Application Name
               </label>
               <input
-                id="branch"
+                id="applicationName"
                 type="text"
-                value={branch}
+                value={projectName}
                 readOnly
                 className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
               />
@@ -166,71 +238,37 @@ export default function CreateProject() {
 
             <div>
               <label
-                htmlFor="rootPath"
+                htmlFor="description"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-200"
               >
-                Root Application Path
+                Description
               </label>
-              <input
-                id="rootPath"
-                type="text"
-                value={rootPath}
+              <textarea
+                id="description"
+                value={projectDescription}
                 readOnly
                 className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              />
+                rows="4"
+              ></textarea>
             </div>
-          </div>
 
-          {/* Application Details Section */}
-          <div>
-            <label
-              htmlFor="applicationName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Application Name
-            </label>
-            <input
-              id="applicationName"
-              type="text"
-              value={projectName}
-              readOnly
-              className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={projectDescription}
-              readOnly
-              className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              rows="4"
-            ></textarea>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              className="rounded-md bg-gray-200 px-7 py-2 text-sm font-medium text-black transition hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-200 dark:hover:bg-gray-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="rounded-md bg-green-500 px-8 py-2 text-sm font-medium text-white transition hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-400"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </section>
-    </>
-  );
-}
+            {/* Buttons */}
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                className="rounded-md bg-gray-200 px-7 py-2 text-sm font-medium text-black transition hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-200 dark:hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-md bg-green-500 px-8 py-2 text-sm font-medium text-white transition hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-400"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </section>
+      </>
+    );
+  }
