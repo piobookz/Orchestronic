@@ -15,7 +15,7 @@ import socketio
 import time
 
 # Load environment variables from .env file
-load_dotenv('/opt/airflow/dags/.env')
+# load_dotenv('/opt/airflow/dags/.env')
 
 # Default args for DAG
 default_args = {
@@ -119,7 +119,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "675266f7b8c017a58d37feaf"
+        return received_message if received_message is not None else ""
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")
@@ -127,7 +127,8 @@ def fetch_from_mongo(received_message):
         
     try:
         load_dotenv('/opt/airflow/dags/.env')
-        uri = os.getenv("MONGODB_URI", "")
+        uri = os.getenv("MONGODB_URI")
+        print(f"MongoDB URI: {uri}")
         if not uri:
             raise Exception("MONGODB_URI is not set")
 
@@ -138,21 +139,13 @@ def fetch_from_mongo(received_message):
         data = list(collection.find({"projectid": project_id}))
         print("Fetched data:", data)
 
-        # if not data:
-        #     raise Exception(f"No resources found for project ID {resource_id}")
-
-        # # Convert all ObjectId fields to strings
-        # for resource in data:
-        #     resource["_id"] = str(resource["_id"])
-
-        # Return the resources as a list of dictionaries
-        return dumps(data)
-
     except Exception as e:
         raise Exception(f"The following error occurred: {str(e)}")
     
     finally:
         client.close()
+
+    return dumps(data)
 
 def create_terraform_directory(project_id):
     """

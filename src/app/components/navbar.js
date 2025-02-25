@@ -51,7 +51,12 @@ export default function Navbar() {
         </div>
         <div>
           <SignedOut>
-            <SignInButton mode="modal" className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300" />
+            <SignInButton
+              mode="modal"
+              className="font-light text-lg text-white px-4 py-2 border rounded-lg shadow-lg hover:bg-white hover:text-[#07032B] transition duration-300"
+            >
+              Sign In
+            </SignInButton>
           </SignedOut>
           <SignedIn>
             <UserButton className="p-2 hover:bg-[rgba(255,255,255,0.15)] rounded transition duration-300" />

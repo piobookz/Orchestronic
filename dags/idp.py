@@ -1,14 +1,20 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
-from datetime import datetime
+from airflow.operators.bash import BashOperator
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
 from pymongo import MongoClient
-import os
 from dotenv import load_dotenv
 from bson.json_util import dumps
 import pika
 from urllib.parse import urlparse
+import os
+import json
 import socketio
 import time
+
+# Load environment variables
+load_dotenv('/opt/airflow/dags/.env')
 
 # Global Variables
 listener_initialized = False
@@ -130,6 +136,247 @@ def fetch_from_mongo(received_message):
 
     return dumps(data)
 
+def create_terraform_directory(project_id):
+    """
+    Creates a Terraform directory for a specific project.
+    """
+    print(f"Creating Terraform directory for project: {project_id}")
+    terraform_dir = f"/opt/airflow/dags/terraform/{project_id}"
+    os.makedirs(terraform_dir, exist_ok=True)
+    print(f"Created Terraform directory: {terraform_dir}")
+    return terraform_dir
+
+def generate_tfvars(resources):
+    """
+    Generate the terraform.auto.tfvars file from the fetched resources.
+    """
+    
+    resources = json.loads(resources)
+    
+    vm_resources = []
+    storage_resources = []
+    database_resources = []
+
+    project_id = resources[0]["projectid"]
+    project_location = resources[0]["region"]
+    
+    for resource in resources:
+        if resource["type"] == "Virtual Machine":
+            vm_resources.append({
+                "name": resource["vmname"],
+                "size": resource["vmsize"],
+                "os_image": resource["os"],
+                "username": resource["username"],
+                "password": resource["password"]
+            })
+        elif resource["type"] == "Storage":
+            storage_resources.append({
+                "name": resource["name"]
+            })
+        elif resource["type"] == "Database":
+            database_resources.append({
+                "name": resource["name"],
+                "username": resource["username"],
+                "password": resource["password"]
+            })
+
+    tfvars_content = f'''
+project_id = "{project_id}"
+project_location = "{project_location}"
+
+vm_resources = {json.dumps(vm_resources, indent=4)}
+storage_resources = {json.dumps(storage_resources, indent=4)}
+database_resources = {json.dumps(database_resources, indent=4)}
+'''
+
+    # Ensure the Terraform directory exists
+    terraform_dir = f"/opt/airflow/dags/terraform/{project_id}"
+    os.makedirs(terraform_dir, exist_ok=True)
+
+    # Write the terraform.auto.tfvars file
+    try:
+        with open(f"{terraform_dir}/terraform.auto.tfvars", "w") as tf_file:
+            tf_file.write(tfvars_content)
+        print("terraform.auto.tfvars file generated successfully.")
+    except Exception as e:
+        print(f"Error writing terraform.auto.tfvars file: {e}")
+        raise
+
+def generate_main_tf(project_id):
+    """
+    Generate the main.tf file for Terraform.
+    """
+    main_tf_content = f'''
+terraform {{
+  required_providers {{
+    azurerm = {{
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"  # Pin the provider version
+    }}
+  }}
+}}
+
+provider "azurerm" {{
+  features {{
+    resource_group {{
+      prevent_deletion_if_contains_resources = false
+    }}
+  }}
+}}
+
+resource "azurerm_resource_group" "project_rg" {{
+    name     = "rg-{project_id}"
+    location = var.project_location
+}}
+
+# Virtual Network
+resource "azurerm_virtual_network" "project_vnet" {{
+    name                = "${{var.project_id}}-vnet"
+    location            = azurerm_resource_group.project_rg.location
+    resource_group_name = azurerm_resource_group.project_rg.name
+    address_space       = ["10.0.0.0/16"]
+}}
+
+# Subnet
+resource "azurerm_subnet" "project_subnet" {{
+    name                 = "${{var.project_id}}-subnet"
+    resource_group_name  = azurerm_resource_group.project_rg.name
+    virtual_network_name = azurerm_virtual_network.project_vnet.name
+    address_prefixes     = ["10.0.1.0/24"]
+}}
+
+# Network Interfaces
+resource "azurerm_network_interface" "vm_nic" {{
+    for_each = {{ for vm in var.vm_resources : vm.name => vm }}
+
+    name                = "${{each.value.name}}-nic"
+    location            = azurerm_resource_group.project_rg.location
+    resource_group_name = azurerm_resource_group.project_rg.name
+
+    ip_configuration {{
+        name                          = "internal"
+        subnet_id                     = azurerm_subnet.project_subnet.id
+        private_ip_address_allocation = "Dynamic"
+    }}
+}}
+
+# Virtual Machines
+resource "azurerm_virtual_machine" "vm" {{
+    for_each = {{ for vm in var.vm_resources : vm.name => vm }}
+
+    name                  = each.value.name
+    location              = azurerm_resource_group.project_rg.location
+    resource_group_name   = azurerm_resource_group.project_rg.name
+    vm_size               = each.value.size
+    network_interface_ids = [azurerm_network_interface.vm_nic[each.key].id]
+
+    storage_image_reference {{
+        publisher = "Canonical"
+        offer     = "UbuntuServer"
+        sku       = "18.04-LTS"
+        version   = "latest"
+    }}
+
+    storage_os_disk {{
+        name              = "${{each.value.name}}-os-disk"
+        caching           = "ReadWrite"
+        create_option     = "FromImage"
+        managed_disk_type = "Standard_LRS"
+    }}
+
+    os_profile {{
+        computer_name  = each.value.name
+        admin_username = each.value.username
+        admin_password = each.value.password
+    }}
+
+    os_profile_linux_config {{
+        disable_password_authentication = false
+    }}
+}}
+
+# Storage Accounts
+resource "azurerm_storage_account" "storage" {{
+    for_each = {{ for st in var.storage_resources : st.name => st }}
+
+    name                     = each.value.name
+    resource_group_name      = azurerm_resource_group.project_rg.name
+    location                 = azurerm_resource_group.project_rg.location
+    account_tier             = "Standard"
+    account_replication_type = "LRS"
+}}
+
+# Databases (Azure SQL Server)
+resource "azurerm_mssql_server" "sql_server" {{
+    for_each = {{ for db in var.database_resources : db.name => db }}
+
+    name                         = each.value.name
+    resource_group_name          = azurerm_resource_group.project_rg.name
+    location                     = azurerm_resource_group.project_rg.location
+    administrator_login          = each.value.username
+    administrator_login_password = each.value.password
+    version                      = "12.0"
+}}
+'''
+
+    # Write the main.tf file
+    terraform_dir = f"/opt/airflow/dags/terraform/{project_id}"
+    try:
+        with open(f"{terraform_dir}/main.tf", "w") as main_tf_file:
+            main_tf_file.write(main_tf_content)
+        print("main.tf file generated successfully.")
+    except Exception as e:
+        print(f"Error writing main.tf file: {e}")
+        raise
+
+def generate_variables_tf(project_id):
+    """
+    Generate the variables.tf file for Terraform.
+    """
+    variables_tf_content = '''
+variable "project_id" {
+    type = string
+}
+
+variable "project_location" {
+    type = string
+}
+
+variable "vm_resources" {
+    type = list(object({
+        name     = string
+        size     = string
+        os_image = string
+        username = string
+        password = string
+    }))
+}
+
+variable "storage_resources" {
+    type = list(object({
+        name = string
+    }))
+}
+
+variable "database_resources" {
+    type = list(object({
+        name     = string
+        username = string
+        password = string
+    }))
+}
+'''
+
+    # Write the variables.tf file
+    terraform_dir = f"/opt/airflow/dags/terraform/{project_id}"
+    try:
+        with open(f"{terraform_dir}/variables.tf", "w") as variables_tf_file:
+            variables_tf_file.write(variables_tf_content)
+        print("variables.tf file generated successfully.")
+    except Exception as e:
+        print(f"Error writing variables.tf file: {e}")
+        raise
+
 def send_vm_notification():
     sio = socketio.Client()
     try:
@@ -175,10 +422,69 @@ with DAG(
     provide_context=True,
     )
 
+# Task to create Terraform directory
+    create_directory = PythonOperator(
+        task_id='create_directory',
+        python_callable=create_terraform_directory,
+         op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Use project_id from RabbitMQ
+    )
+
+    # Task to generate terraform.auto.tfvars
+    generate_tfvars_task = PythonOperator(
+        task_id='generate_tfvars',
+        python_callable=generate_tfvars,
+        op_args=["{{ ti.xcom_pull(task_ids='fetch_from_mongo') }}"],  # Use resources from MongoDB
+    )
+
+    # Task to generate main.tf
+    generate_main_tf_task = PythonOperator(
+        task_id='generate_main_tf',
+        python_callable=generate_main_tf,
+        op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Use project_id from RabbitMQ
+    )
+
+    # Task to generate variables.tf
+    generate_variables_tf_task = PythonOperator(
+        task_id='generate_variables_tf',
+        python_callable=generate_variables_tf,
+        op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Use project_id from RabbitMQ
+    )
+
+    # Task to run `terraform apply`
+    terraform_apply = BashOperator(
+    task_id='terraform_apply',
+    bash_command='terraform init && terraform apply -auto-approve',
+    cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",
+    env={
+        "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
+        "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
+        "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
+        "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
+    },
+    retries=3,
+    retry_delay=timedelta(minutes=5),
+)
+
+
     send_notification = PythonOperator(
         task_id='send_notification',
         python_callable=send_vm_notification,
     )
 
+    terraform_rollback = BashOperator(
+        task_id='terraform_destroy',
+        bash_command='terraform destroy -auto-approve',
+        cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",
+        env={
+            "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
+            "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
+            "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
+            "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
+        },
+        trigger_rule="all_failed",  # Run only if the previous task fails
+    )
 
-consume_rabbitmq >> fetch_requests >> send_notification
+
+
+
+consume_rabbitmq >> fetch_requests >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> send_notification >> terraform_rollback
