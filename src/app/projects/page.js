@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import useUser from "@clerk/nextjs";
 
 export default function Projects() {
+  const { user } = useUser();
   return (
     <>
       <p className="mx-16 my-5 text-balance text-center text-5xl font-bold text-white">
-        Welcome Back, Alex!
+        Welcome Back, {user.firstname}!
       </p>
 
       <div className="mx-16 my-5 flex items-center justify-between gap-x-16">
