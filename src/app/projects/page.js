@@ -1,5 +1,6 @@
+"use client";
+
 import Link from "next/link";
-import { Container } from "postcss";
 
 export default function Projects() {
   return (
