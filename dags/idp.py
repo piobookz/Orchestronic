@@ -13,20 +13,20 @@ import time
 # Global Variables
 listener_initialized = False
 received_message = None
-
+ 
 def rabbitmq_consumer():
     global listener_initialized, received_message
-
+ 
     # Load environment variables
     load_dotenv('/opt/airflow/dags/.env')
-
+ 
     if listener_initialized:
         print("Listener is already running.")
         return
-
+ 
     connection = None
     channel = None
-
+ 
     try:
         listener_initialized = True
         rabbit_url = os.getenv("RABBITMQ_URL")
@@ -44,7 +44,7 @@ def rabbitmq_consumer():
         credentials = None
         if parsed_url.username and parsed_url.password:
             credentials = pika.PlainCredentials(parsed_url.username, parsed_url.password)
-
+ 
         parameters = pika.ConnectionParameters(
             host=rabbit_host,
             port=rabbit_port,
@@ -53,13 +53,13 @@ def rabbitmq_consumer():
         
         connection = pika.BlockingConnection(parameters)
         channel = connection.channel()
-
+ 
         queue_name = "create-vm"
         # Get queue info
         queue_info = channel.queue_declare(queue=queue_name, durable=True, exclusive=False, auto_delete=False)
         message_count = queue_info.method.message_count
         print(f"Queue {queue_name} has {message_count} messages")
-
+ 
         def callback(ch, method, properties, body):
             try:
                 global received_message
@@ -68,20 +68,20 @@ def rabbitmq_consumer():
                 
                 # Acknowledge the message
                 ch.basic_ack(delivery_tag=method.delivery_tag)
-
+ 
                 # Stop consuming after receiving the message
                 ch.stop_consuming()
                 
             except Exception as e:
                 print(f"Error processing message: {e}")
-
+ 
         # Configure consumer
         channel.basic_consume(
             queue=queue_name,
             on_message_callback=callback,
-            auto_ack=False 
+            auto_ack=False
         )
-
+ 
         print(f"Listening for messages in queue: {queue_name}")
         
         # Start consuming with a timeout
@@ -89,12 +89,12 @@ def rabbitmq_consumer():
             channel.start_consuming()
         except KeyboardInterrupt:
             channel.stop_consuming()
-
+ 
         channel.queue_delete(queue=queue_name)
     except Exception as error:
         print("Error in listener:", error)
         raise
-
+ 
     finally:
         listener_initialized = False
         if channel and not channel.is_closed:

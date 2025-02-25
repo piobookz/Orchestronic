@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 import os
 import json
 import shutil
+import socketio
+import time
 
 # Load environment variables from .env file
 load_dotenv('/opt/airflow/dags/.env')
@@ -125,7 +127,7 @@ def fetch_from_mongo(received_message):
         
     try:
         load_dotenv('/opt/airflow/dags/.env')
-        uri = os.getenv("MONGODB_URI")
+        uri = os.getenv("MONGODB_URI", "")
         if not uri:
             raise Exception("MONGODB_URI is not set")
 
@@ -392,6 +394,22 @@ variable "database_resources" {
         print(f"Error writing variables.tf file: {e}")
         raise
 
+def send_vm_notification():
+    sio = socketio.Client()
+    try:
+        sio.connect('http://localhost:4000', namespaces=[""])  # Use default namespace
+        time.sleep(2)  # Give time to connect
+
+        if sio.connected:
+            sio.emit('notification', {'message': 'Your virtual machine is being created now'})
+            sio.disconnect()
+            return "Notification sent successfully"
+        else:
+            return "Failed to establish a Socket.IO connection"
+
+    except Exception as e:
+        return f"Failed to send notification: {str(e)}"
+
 # def cleanup_directory(project_id):
 #     """
 #     Cleans up the Terraform directory after execution.
@@ -467,6 +485,11 @@ with DAG(
         retry_delay=timedelta(minutes=5),  # Wait 5 minutes between retries
     )
 
+    send_notification = PythonOperator(
+        task_id='send_notification',
+        python_callable=send_vm_notification,
+    )
+
     terraform_rollback = BashOperator(
         task_id='terraform_destroy',
         bash_command='terraform destroy -auto-approve',
@@ -488,4 +511,13 @@ with DAG(
     # )
 
     # Define task dependencies
-    consume_rabbitmq >> fetch_requests >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> terraform_rollback
+    # consume_rabbitmq >> fetch_requests >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> terraform_rollback
+    (
+        consume_rabbitmq
+        >> fetch_requests
+        >> create_directory
+        >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task]
+        >> terraform_apply
+        >> send_notification
+        >> terraform_rollback
+    )

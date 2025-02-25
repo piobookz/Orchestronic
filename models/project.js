@@ -1,40 +1,19 @@
 import mongoose, { Schema } from 'mongoose';
 
-const projectSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
+const projectSchema = new Schema(
+  {
+    projectName: { type: String },
+    projectDescription: { type: String },
+    branch: { type: String },
+    rootPath: { type: String },
+    userId: { type: String },
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  members: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
-  environments: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Environment',
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: true, // Automatically adds `createdAt` and `updatedAt` fields
+  }
+);
 
-const Project = mongoose.models.Project || mongoose.model('Project', projectSchema);
+// Check if the model already exists to avoid redefining it
+const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
+
 export default Project;
