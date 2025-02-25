@@ -30,7 +30,8 @@
     "react-hot-toast": "^2.5.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "terraform-generator": "^6.4.2"
+    "terraform-generator": "^6.4.2",
+    "typewriter-effect": "^2.21.0"
   },
   "devDependencies": {
     "@types/react": "19.0.10",
