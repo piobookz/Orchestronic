@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import azure from "../../public/new-azure-logo.png";
-import gitlab from "../../public/gitlab-logo.png";
-import orchestronic from "../../public/idp-logo.png";
-import Navbar from "../app/components/navbar";
-import Image from "next/image";
-import { Toaster } from "react-hot-toast";
-import Typewriter from "typewriter-effect";
+//import azure from "../../public/new-azure-logo.png";
+// import gitlab from "../../public/gitlab-logo.png";
+// import orchestronic from "../../public/idp-logo.png";
+// import Navbar from "../app/components/navbar";
+// import Image from "next/image";
+// import { Toaster } from "react-hot-toast";
+// import Typewriter from "typewriter-effect";
 import {
   ClerkProvider,
   SignInButton,
