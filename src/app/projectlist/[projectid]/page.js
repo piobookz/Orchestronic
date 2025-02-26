@@ -7,10 +7,12 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useProvider } from "../../components/ConText";
 // import unfilter from "../../../public/filter-circle.svg";
 // import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetails({ params }) {
+  const data = useProvider();
   const router = useRouter();
   const [requestId, setRequestId] = useState(null);
   const [resourceName, setResourceName] = useState("");
@@ -21,11 +23,14 @@ export default function Projectdetails({ params }) {
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [type, setType] = useState("Virtual Machine");
+  const projectName = data?.projectData?.projectName;
+  const projectDescription = data?.projectData?.projectDescription;
+  const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
   useEffect(() => {
-    if (params?.projectId) {
-      setRequestId(params.projectId);
-    }
+    params.then((resolvedParams) => {
+      setRequestId(resolvedParams.projectId);
+    });
   }, [params]);
 
   useEffect(() => {
@@ -127,20 +132,22 @@ export default function Projectdetails({ params }) {
             <p className="text-xl font-medium ml-5 -16 mt-5">
               Application name
             </p>
-            <p className="text-lg font-normal ml-5 mt-2">Todo list</p>
+            <p className="text-lg font-normal ml-5 mt-2">{projectName}</p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">Todo Application</p>
+            <p className="text-lg font-normal ml-16 mt-2">
+              {projectDescription}
+            </p>
           </div>
-          <div>
+          {/* <div>
             <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
             <p className="text-lg font-normal ml-16 mt-2">Today</p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Team</p>
             <p className="text-lg font-normal ml-16 mt-2">group of people</p>
-          </div>
+          </div> */}
         </div>
       </div>
 
