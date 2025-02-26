@@ -49,7 +49,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const requestId = url.searchParams.get("requestId");
 
-    const query = requestId ? { _id: requestId } : {};
+    const query = requestId ? { projectid: requestId } : {};
     const resources = await Resource.find(query);
     // console.log("Fetched resources:", resources);
 
