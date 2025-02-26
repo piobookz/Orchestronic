@@ -119,7 +119,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else ""
+        return received_message if received_message is not None else "67be6c7a49bb7121f5dab8fe"
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")
@@ -387,6 +387,25 @@ variable "database_resources" {
         print(f"Error writing variables.tf file: {e}")
         raise
 
+def validate_and_log_env_vars():
+    load_dotenv('/opt/airflow/dags/.env')
+    env_vars = {
+        "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
+        "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
+        "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
+        "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
+    }
+    print("Environment Variables:")
+    for key, value in env_vars.items():
+        print(f"{key}: {value}")
+    
+    # Validate that none of the variables are None
+    for key, value in env_vars.items():
+        if value is None:
+            raise ValueError(f"Environment variable {key} is not set or is None")
+    
+    return env_vars
+
 def send_vm_notification():
     sio = socketio.Client()
     try:
@@ -468,12 +487,7 @@ with DAG(
         task_id='terraform_apply',
         bash_command='terraform init && terraform apply -auto-approve',
         cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",  # Use the Terraform directory created earlier
-        env={
-            "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
-            "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
-            "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
-            "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
-        },
+        env=validate_and_log_env_vars(),
         retries=3,  # Retry up to 3 times
         retry_delay=timedelta(minutes=5),  # Wait 5 minutes between retries
     )
@@ -484,7 +498,7 @@ with DAG(
     )
 
     terraform_rollback = BashOperator(
-        task_id='terraform_destroy',
+        task_id='terraform_rollback',
         bash_command='terraform destroy -auto-approve',
         cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",
         env={

@@ -10,13 +10,14 @@ export async function GET(req) {
     // Extract query parameters from the URL
     const url = new URL(req.url, `http://${req.headers.get("host")}`);
     const pathWithNamespace = url.searchParams.get("pathWithNamespace");
+    const userId = url.searchParams.get("userId");
 
-    // Fetch projects based on the query parameter
-    const projects = pathWithNamespace
-      ? await Project.find({ pathWithNamespace }) // Fetch specific project
-      : await Project.find(); // Fetch all projects
+    let query = { userId };
+    if (pathWithNamespace) {
+      query.pathWithNamespace = pathWithNamespace;
+    }
 
-    // console.log("Projects fetched:", projects);
+    const projects = await Project.find(query);
 
     return NextResponse.json(projects, { status: 200 });
   } catch (error) {

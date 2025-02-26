@@ -4,7 +4,7 @@ import Navbar from "../app/components/navbar";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Provider } from "../app/components/ConText";
-import { homePage } from "../app/page.js";
+import { homePage as HomePage } from "../app/page.js";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
