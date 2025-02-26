@@ -8,6 +8,8 @@ const projectSchema = new Schema(
     branch: { type: String },
     rootPath: { type: String },
     userId: { type: String },
+    statuspm: { type: String },
+    statusops: { type: String },
   },
   {
     timestamps: true, // Automatically adds `createdAt` and `updatedAt` fields

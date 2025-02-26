@@ -12,6 +12,7 @@ export default function CreateProject() {
   const router = useRouter();
   const { user } = useUser();
   const [projectList, setProjectList] = useState([]);
+  const [createdProjects, setCreatedProjects] = useState([]);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [branch, setBranch] = useState("");
@@ -20,6 +21,29 @@ export default function CreateProject() {
 
   useEffect(() => {
     if (!user) return;
+
+    // Fetch already created projects
+    const fetchCreatedProjects = async () => {
+      try {
+        const res = await fetch(`/api/project?userId=${user.id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const result = await res.json();
+        if (Array.isArray(result)) {
+          setCreatedProjects(result);
+        } else {
+          console.error("Expected array, but received:", result);
+          setCreatedProjects([]);
+        }
+      } catch (error) {
+        console.error("Error fetching created projects:", error);
+      }
+    };
+
+    fetchCreatedProjects();
 
     if (!user.externalAccounts || user.externalAccounts.length === 0) {
       console.log("No external accounts found.");
@@ -69,6 +93,15 @@ export default function CreateProject() {
     fetchProjects();
   }, [user]);
 
+  // Filter out already created repositories
+  const filteredProjectList = projectList.filter(
+    (project) =>
+      !createdProjects.some(
+        (createdProject) =>
+          createdProject.pathWithNamespace === project.path_with_namespace
+      )
+  );
+
   if (!user) {
     return <div>Sign in to view this page</div>;
   }
@@ -107,6 +140,8 @@ export default function CreateProject() {
       branch,
       rootPath,
       userId: user.id, // Include the user ID
+      statuspm: "Pending",
+      statusops: "Pending",
     };
     // console.log(projectDetails);
     try {
@@ -174,7 +209,7 @@ export default function CreateProject() {
                   onChange={handleProjectChange}
                 >
                   <option value="">Please select</option>
-                  {projectList.map((project) => (
+                  {filteredProjectList.map((project) => (
                     <option
                       key={project.id}
                       value={project.path_with_namespace}
@@ -249,7 +284,7 @@ export default function CreateProject() {
             <textarea
               id="description"
               value={projectDescription}
-              readOnly
+              onChange={(e) => setProjectDescription(e.target.value)} // Add this line
               className="mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-400 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
               rows="4"
             ></textarea>

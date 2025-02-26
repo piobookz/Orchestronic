@@ -8,8 +8,10 @@ import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProvider } from "../components/ConText";
+import { useAuth } from "@clerk/nextjs";
 
 export default function RequestResource() {
+  const { userId } = useAuth();
   const [project, setProject] = useState(null);
   const data = useProvider();
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
@@ -25,7 +27,7 @@ export default function RequestResource() {
     console.log("pathWithNamespace", pathWithNamespace);
     const fetchResources = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/resource", {
+        const res = await fetch(`/api/resource?userId=${userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

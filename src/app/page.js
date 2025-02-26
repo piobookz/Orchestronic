@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-//import azure from "../../public/new-azure-logo.png";
+// import azure from "../../public/new-azure-logo.png";
 // import gitlab from "../../public/gitlab-logo.png";
 // import orchestronic from "../../public/idp-logo.png";
 // import Navbar from "../app/components/navbar";
@@ -37,7 +37,7 @@ export default function HomePage() {
             </span>
             <br />
             <span className="text-[2vw] md:text-[2vw] font-extralight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
-              <Typewriter
+              {/* <Typewriter
                 onInit={(typewriter) => {
                   typewriter
                     .typeString("Streamline your development workflow with us!")
@@ -45,7 +45,7 @@ export default function HomePage() {
                     .deleteAll()
                     .start();
                 }}
-              />
+              /> */}
             </span>
             <br />
           </div>

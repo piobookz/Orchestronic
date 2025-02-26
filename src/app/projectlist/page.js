@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Card, Typography } from "@material-tailwind/react";
 
 export default function Projectlist() {
+  const { userId } = useAuth();
   const { user } = useUser();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,7 @@ export default function Projectlist() {
     // Fetch project data from the API
     const fetchProject = async () => {
       try {
-        const res = await fetch("/api/project", {
+        const res = await fetch(`/api/project?userId=${userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -33,16 +34,18 @@ export default function Projectlist() {
         console.log("Fetched projects:", result);
       } catch (error) {
         console.error("Error fetching project:", error);
+      } finally {
+        setLoading(false); // Set loading to false when fetch completes
       }
     };
     fetchProject();
-  }, []);
+  }, [userId]);
 
   // For search
   const filteredProjects = Array.isArray(projects)
     ? projects.filter((project) =>
-        project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   return (
@@ -109,53 +112,67 @@ export default function Projectlist() {
         </div>
       </div>
 
-      {/* Project Grid */}
-      <Card className="mx-16 my-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredProjects.map((project) => (
-          <div
-            key={project._id} // Use _id as the key
-            className="rounded-lg bg-white border p-6 shadow-md"
-          >
-            <h2 className="text-xl font-bold text-gray-900">
-              {project.projectName}
-            </h2>
-            <p className="mt-2 text-gray-600">{project.projectDescription}</p>
-            <div className="mt-4 space-y-2">
-              <p className="text-sm text-gray-500">
-                <strong>Branch:</strong> {project.branch}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Root Path:</strong>{" "}
-                <a
-                  href={project.rootPath}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:underline"
-                >
-                  {project.rootPath}
-                </a>
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>User ID:</strong> {project.userId}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Created At:</strong>{" "}
-                {new Date(project.createdAt).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Updated At:</strong>{" "}
-                {new Date(project.updatedAt).toLocaleDateString()}
-              </p>
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-red-500">{error}</p>
+        </div>
+      ) : (
+        /* Project Grid */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8 py-6">
+          {filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => (
+              <Card key={project._id} className="hover:shadow-lg transition-shadow duration-300">
+                <div className="rounded-lg bg-white border p-6 shadow-md">
+                  <h2 className="text-xl font-bold text-gray-900">
+                    {project.projectName}
+                  </h2>
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm text-gray-500">
+                      <strong>Description:</strong> {project.projectDescription}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Root Path:</strong>{" "}
+                      <a
+                        href={project.rootPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {project.rootPath}
+                      </a>
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Created At:</strong>{" "}
+                      {new Date(project.createdAt).toLocaleDateString()}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Updated At:</strong>{" "}
+                      {new Date(project.updatedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/projectlist/${project._id}`}
+                    className="mt-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
+                    aria-label="View project details"
+                  >
+                    View Project
+                  </Link>
+                </div>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-2 flex items-center justify-center h-64">
+              <p className="text-white-600">No Projects Found</p>
             </div>
-            <Link
-              href={`/projectlist/${project._id}`} // Use _id for dynamic routing
-              className="mt-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
-            >
-              View Project
-            </Link>
-          </div>
-        ))}
-      </Card>
+          )}
+        </div>
+      )}
     </div>
   );
 }

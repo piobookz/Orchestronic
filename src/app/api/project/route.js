@@ -40,6 +40,8 @@ export async function POST(req) {
       branch = "",
       rootPath = "",
       userId = "",
+      statuspm = "Pending",
+      statusops = "Pending",
     } = body;
 
     // Validate required fields
@@ -72,6 +74,8 @@ export async function POST(req) {
       branch: branch.trim(),
       rootPath: rootPath.trim(),
       userId: userId.trim(),
+      statuspm: statuspm.trim(),
+      statusops: statusops.trim(),
     });
 
     // Save the new project
