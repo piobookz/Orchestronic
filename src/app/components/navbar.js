@@ -35,7 +35,7 @@ export default function Navbar() {
                 <li>Home</li>
               </Link>
               <Link
-                href="/projects"
+                href="/projectlist"
                 className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
               >
                 <li>Projects</li>

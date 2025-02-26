@@ -1,9 +1,10 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
 const projectSchema = new Schema(
   {
     projectName: { type: String },
     projectDescription: { type: String },
+    pathWithNamespace: { type: String },
     branch: { type: String },
     rootPath: { type: String },
     userId: { type: String },
@@ -14,6 +15,7 @@ const projectSchema = new Schema(
 );
 
 // Check if the model already exists to avoid redefining it
-const Project = mongoose.models.Project || mongoose.model("Project", projectSchema);
+const Project =
+  mongoose.models.Project || mongoose.model("Project", projectSchema);
 
 export default Project;

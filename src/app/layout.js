@@ -3,7 +3,8 @@ import "./globals.css";
 import Navbar from "../app/components/navbar";
 import { Toaster } from "react-hot-toast";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
-import HomePage from "../app/page.js";
+import { Provider } from "../app/components/ConText";
+import { homePage } from "../app/page.js";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,21 +33,23 @@ export default function RootLayout({ children }) {
             content="width=device-width, initial-scale=1.0"
           />
         </head>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          {/* Signed-In Users */}
-          <SignedIn>
-            <Navbar />
-            <Toaster position="top-right" />
-            {children}
-          </SignedIn>
+        <Provider>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            {/* Signed-In Users */}
+            <SignedIn>
+              <Navbar />
+              <Toaster position="top-right" />
+              {children}
+            </SignedIn>
 
-          {/* Signed-Out Users */}
-          <SignedOut>
-            <HomePage />
-          </SignedOut>
-        </body>
+            {/* Signed-Out Users */}
+            <SignedOut>
+              <homePage />
+            </SignedOut>
+          </body>
+        </Provider>
       </html>
     </ClerkProvider>
   );
