@@ -5,8 +5,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Azure from "../../../public/azure-logo.png";
 import { useRouter } from "next/navigation";
+import { useProvider } from "../components/ConText";
 
-export default function CloudResources() {
+export default function CloudResources({ params }) {
+  const { projectData } = useProvider();
   const router = useRouter();
   const [resourceName, setResourceName] = useState("");
   const [region, setRegion] = useState("East Asia");
@@ -17,17 +19,20 @@ export default function CloudResources() {
   const [allocation, setAllocation] = useState("");
   const [alert, setAlert] = useState("");
   const [availableVM, setAvailableVM] = useState([]);
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [pathWithNamespace, setPathWithNamespace] = useState("");
   /* 
   UserID may refer to the email or ID 
   indicating the specified user owns the project.
   */
-  const [userID, setUserID] = useState("12345");
+  const [userID, setUserID] = useState("");
   const [type, setType] = useState("Virtual Machine");
   /*
   Project ID will be based on the created project.  
   For example, a to-do list, the ID will correspond to the to-do list to indicate that the resources come from the specified project.
   */
-  const [projectID, setProjectID] = useState("675266f7b8c017a58d37feaf");
+  const [projectID, setProjectID] = useState("");
 
   const regions = [
     {
@@ -280,6 +285,7 @@ export default function CloudResources() {
   };
 
   const filterVMSize = async () => {
+    // console.log(projectData);
     try {
       const res = await fetch("http://localhost:3000/api/policy", {
         method: "GET",
@@ -325,22 +331,80 @@ export default function CloudResources() {
       );
 
       setAvailableVM(availableVM);
+      setVMSize(availableVM[0].value);
     } catch (error) {
       console.log("Error while filtering VM size:", error);
     }
   };
 
   useEffect(() => {
-    filterVMSize();
-  }, []);
+    const fetchProject = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/project?pathWithNamespace=${projectData.pathWithNamespace}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
+        if (!res.ok) {
+          throw new Error(`Failed to fetch project: ${res.statusText}`);
+        }
+
+        const result = await res.json();
+        console.log("Fetched projects:", result);
+
+        const [project] = result; // Destructure the first object in the array
+
+        // Destructure the properties
+        const {
+          _id: projectId,
+          projectName,
+          projectDescription,
+          pathWithNamespace,
+          branch,
+          rootPath,
+          userId,
+          createdAt,
+          updatedAt,
+        } = project;
+
+        // console.log("Project ID:", projectId);
+        // console.log("Project Name:", projectName);
+        // console.log("Path with Namespace:", pathWithNamespace);
+        // Handle the API response
+        if (Array.isArray(result) && result.length > 0) {
+          setProjectID(projectId);
+          setUserID(userId);
+        } else if (result && result.projectId) {
+          // Handle case where response is an object
+          setProjectID(projectId);
+          setUserID(userId);
+        } else {
+          console.error("Unexpected API response structure:", result);
+          setProjectID(""); // Reset projectID if no data is found
+          setUserID(""); // Reset userID if no data is found
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        setProjectID(""); // Reset projectID on error
+        setUserID(""); // Reset userID on error
+      }
+    };
+
+    fetchProject();
+    filterVMSize();
+  }, [projectData]); // Re-run when projectData changes
   return (
     <div className="min-h-screen text-white">
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>
         <h2 className="text-lg text-gray-400 ml-1 mt-4">
-          Create Cloud Resource → Todo List
+          Create Cloud Resource → {projectData.projectName}
         </h2>
       </div>
       {alert && (
@@ -560,11 +624,12 @@ export default function CloudResources() {
 
         {/* Buttons */}
         <div className="flex justify-between items-center mt-8">
-          <Link href={"/homepage"}>
-            <button className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400">
-              Cancel
-            </button>
-          </Link>
+          <button
+            className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+            onClick={() => router.back()}
+          >
+            Cancel
+          </button>
           <button
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
             onClick={handleSave}

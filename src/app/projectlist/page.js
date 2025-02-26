@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Card, Typography } from "@material-tailwind/react";
 
 export default function Projectlist() {
+  const { user } = useUser();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,11 +24,13 @@ export default function Projectlist() {
           },
         });
         const result = await res.json();
-        if (result) {
-          setProjects(result);
+        if (Array.isArray(result)) {
+          setProjects(result); // Only set if it's an array
+        } else {
+          console.error("Expected array, but received:", result);
+          setProjects([]); // Default to an empty array if result isn't an array
         }
-        console.log("test");
-        console.log(result);
+        console.log("Fetched projects:", result);
       } catch (error) {
         console.error("Error fetching project:", error);
       }
@@ -35,16 +39,17 @@ export default function Projectlist() {
   }, []);
 
   // For search
-  const filteredProjects = projects.filter((project) =>
-    project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
+  const filteredProjects = Array.isArray(projects)
+    ? projects.filter((project) =>
+        project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   return (
     <div>
       {/* Welcome Message */}
       <p className="mx-16 my-5 text-balance text-center text-5xl font-bold text-white">
-        Welcome Back, Alex!
+        Welcome Back, {user ? user.firstName : "User"}!
       </p>
 
       {/* Header with Projects Title and New Project Button */}
@@ -109,9 +114,11 @@ export default function Projectlist() {
         {filteredProjects.map((project) => (
           <div
             key={project._id} // Use _id as the key
-            className="rounded-lg bg-white p-6 shadow-md"
+            className="rounded-lg bg-white border p-6 shadow-md"
           >
-            <h2 className="text-xl font-bold text-gray-900">{project.projectName}</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {project.projectName}
+            </h2>
             <p className="mt-2 text-gray-600">{project.projectDescription}</p>
             <div className="mt-4 space-y-2">
               <p className="text-sm text-gray-500">
@@ -141,7 +148,7 @@ export default function Projectlist() {
               </p>
             </div>
             <Link
-              href={`/projects/${project._id}`} // Use _id for dynamic routing
+              href={`/projectlist/${project._id}`} // Use _id for dynamic routing
               className="mt-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
             >
               View Project

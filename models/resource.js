@@ -2,8 +2,8 @@ import mongoose, { Schema } from "mongoose";
 
 const resourceSchema = new Schema({
   userid: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
+    ref: "User",
     required: true,
   },
   vmname: { type: String },
