@@ -204,7 +204,7 @@ export default function Projectlist() {
                     </p>
                   </div>
                   <Link
-                    href={`/projectlist/${project._id}`}
+                    href={{ pathname: `/project`, query: { projectId: project._id }}}
                     className="mt-4 inline-block rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600"
                     aria-label="View project details"
                   >
