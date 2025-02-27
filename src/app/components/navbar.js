@@ -24,13 +24,16 @@ export default function Navbar() {
     ],
     pm: [
       { href: "/", label: "Home" },
+      { href: "/projectlist", label: "Projects" },
       { href: "/requestlist", label: "Request List" },
       { href: "/policy", label: "Policy" },
     ],
     ops: [
       { href: "/", label: "Home" },
+      { href: "/projectlist", label: "Projects" },
       { href: "/requestlist", label: "Request List" },
       { href: "/policy", label: "Policy" },
+      { href: "/manage-user", label: "Manage User" },
     ],
   };
 
