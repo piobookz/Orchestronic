@@ -1,40 +1,76 @@
 "use client";
 
-// import gitlab from "../../../public/gitlab-logo-500.svg";
+// import gitlab from "../../../../public/gitlab-logo-500.svg";
 // import Image from "next/image";
 import Link from "next/link";
 // import { Card, Typography } from "@material-tailwind/react";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 // import unfilter from "../../../public/filter-circle.svg";
 // import filter from "../../../public/filter-circle-fill.svg";
 
 export default function Projectdetails({ params }) {
+  const resolvedParams = use(params);
+  const projectId = resolvedParams.projectId;
+  const requestId = resolvedParams.projectId;
+  console.log("projectId", projectId);
+  console.log("requestId", requestId);
   const router = useRouter();
-  const [requestId, setRequestId] = useState(null);
-  const [resourceName, setResourceName] = useState("");
-  const [region, setRegion] = useState("");
-  const [os, setOS] = useState("");
-  const [adminUser, setAdminUser] = useState("");
-  const [adminPassword, setAdminPassword] = useState("");
-  const [vmSize, setVMSize] = useState("");
-  const [allocation, setAllocation] = useState("");
-  const [type, setType] = useState("Virtual Machine");
 
-  useEffect(() => {
-    params.then((resolvedParams) => {
-      setRequestId(resolvedParams.projectId);
-    });
-  }, [params]);
+  const [projectDetails, setProjectDetails] = useState({
+    projectName: "",
+    projectDescription: "",
+    lastUpdate: "",
+  });
+
+  const [resource, setResource] = useState({
+    resourceName: "",
+    region: "",
+    os: "",
+    adminUser: "",
+    adminPassword: "",
+    vmSize: "",
+    allocation: "",
+    type: "Virtual Machine",
+  });
+
+  const fetchProjectDetails = async () => {
+    try {
+      const res = await fetch(`/api/project/?projectId=${projectId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch project: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+
+      if (data.length > 0) {
+        const project = data[0];
+        setProjectDetails({
+          projectName: project.projectName, // Fixed field names
+          projectDescription: project.projectDescription,
+          lastUpdate: project.lastUpdate,
+          pathWithNamespace: project.pathWithNamespace,
+        });
+      } else {
+        console.log("No project found for this projectId.");
+      }
+    } catch (error) {
+      console.error("Error fetching project details:", error);
+      toast.error("Failed to load project details.");
+    }
+  };
 
   const fetchResource = async () => {
     try {
+
       const res = await fetch(`/api/resource/?requestId=${requestId}`, {
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) {
@@ -42,16 +78,24 @@ export default function Projectdetails({ params }) {
       }
 
       const data = await res.json();
+      console.log("data", data);
+
       if (data.length > 0) {
         const resource = data[0];
-        setResourceName(resource.vmname);
-        setRegion(resource.region);
-        setOS(resource.os);
-        setAdminUser(resource.username);
-        setAdminPassword(resource.password);
-        setVMSize(resource.vmsize);
-        setAllocation(resource.allocationip);
-        setType(resource.type);
+        setResource({
+          resourceName: resource.vmname,
+          region: resource.region,
+          os: resource.os,
+          adminUser: resource.username,
+          adminPassword: resource.password,
+          vmSize: resource.vmsize,
+          allocation: resource.allocationip,
+          type: resource.type,
+        });
+
+        // console.log("Fetched Data:", data);
+      } else {
+        console.log("No resource found for this requestId.");
       }
     } catch (error) {
       console.log("Error while fetching resource data:", error);
@@ -59,10 +103,16 @@ export default function Projectdetails({ params }) {
   };
 
   useEffect(() => {
+    if (projectId) {
+      fetchProjectDetails();
+    }
+  }, [projectId]);
+
+  useEffect(() => {
     if (requestId) {
       fetchResource();
     }
-  });
+  }, [requestId]);
 
   const handleDelete = async () => {
     toast.success("Resource deleted successfully");
@@ -79,7 +129,7 @@ export default function Projectdetails({ params }) {
         throw new Error(`Failed to delete resource: ${response.statusText}`);
       }
 
-      router.push("/projectops");
+      router.push("/projectpm");
     } catch (error) {
       console.error("Error while deleting resource:", error);
       toast.error("Failed to delete resource");
@@ -90,7 +140,7 @@ export default function Projectdetails({ params }) {
     <div>
       {/* Details Box */}
       <div className="flex flex-row items-center">
-        <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
+        <h1 className="text-5xl font-bold mx-16 my-5">{projectDetails.projectName}</h1>
         {/* <span
           className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
             selectedButton === "Approved"
@@ -117,19 +167,19 @@ export default function Projectdetails({ params }) {
             <p className="text-xl font-medium ml-5 -16 mt-5">
               Application name
             </p>
-            <p className="text-lg font-normal ml-5 mt-2">Todo list</p>
+            <p className="text-lg font-normal ml-5 mt-2">{projectDetails.projectName}</p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">Todo Application</p>
+            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.projectDescription}</p>
           </div>
-          <div>
+          {/* <div>
             <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
-            <p className="text-lg font-normal ml-16 mt-2">Today</p>
-          </div>
+            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.lastUpdate}</p>
+          </div> */}
           <div>
-            <p className="text-xl font-medium mx-16 mt-5">Team</p>
-            <p className="text-lg font-normal ml-16 mt-2">group of people</p>
+            <p className="text-xl font-medium mx-16 mt-5">Create By</p>
+            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.pathWithNamespace}</p>
           </div>
         </div>
       </div>
@@ -159,12 +209,12 @@ export default function Projectdetails({ params }) {
           <div className="flex flex-col space-y-4 mt-4">
             <div className="flex flex-row">
               <p className="text-lg font-semibold w-32">Name</p>
-              <p className="text-lg font-light items-center">{resourceName}</p>
+              <p className="text-lg font-light items-center">{resource.resourceName}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">VM Type</p>
-              <p className="text-lg font-light">{type}</p>
+              <p className="text-lg font-light">{resource.type}</p>
             </div>
 
             <div className="flex flex-row items-center">
@@ -173,34 +223,34 @@ export default function Projectdetails({ params }) {
                   VM Size
                 </p>
               </Link>
-              <p className="text-lg font-light">{vmSize}</p>
+              <p className="text-lg font-light">{resource.vmSize}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Region</p>
-              <p className="text-lg font-light">{region}</p>
+              <p className="text-lg font-light">{resource.region}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Username</p>
-              <p className="text-lg font-light">{adminUser}</p>
+              <p className="text-lg font-light">{resource.adminUser}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Password</p>
-              <p className="text-lg font-light">{adminPassword}</p>
+              <p className="text-lg font-light">{resource.adminPassword}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Operating System</p>
-              <p className="text-lg font-light">{os}</p>
+              <p className="text-lg font-light">{resource.os}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">
                 Private IP Allocation
               </p>
-              <p className="text-lg font-light">{allocation}</p>
+              <p className="text-lg font-light">{resource.allocation}</p>
             </div>
           </div>
         </div>

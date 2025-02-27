@@ -117,3 +117,29 @@ export async function DELETE(req) {
     { status: 200 }
   );
 }
+
+export async function PUT(req) {
+  const { projectid, ...updates } = await req.json(); // Destructure the project JSON
+
+  // Check if there is a valid `projectid` and update fields are not empty
+  if (!projectid || Object.keys(updates).length === 0) {
+    return NextResponse.json(
+      { message: "Invalid input, project ID and updates are required" },
+      { status: 400 }
+    );
+  }
+
+  // Connect to MongoDB
+  await connectMongoDB();
+
+  // Perform the update
+  const updatedProjects = await Project.updateMany(
+    { projectid },
+    { $set: updates } // Only update fields provided in the body
+  );
+
+  return NextResponse.json(
+    { message: "Successfully updated requests", updatedProjects },
+    { status: 200 }
+  );
+}

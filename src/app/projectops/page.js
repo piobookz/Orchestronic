@@ -4,76 +4,81 @@ import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
 import React, { useState, useEffect, use } from "react";
-import unfilter from "../../../public/filter-circle.svg";
-import filter from "../../../public/filter-circle-fill.svg";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
+import { redirect, useSearchParams } from "next/navigation";
 
-export default function ProjectOPS() {
+export default function ProjectMG() {
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectid");
+
+  const [projectName, setProjectName] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [rootPath, setRootPath] = useState("");
+  const [statuspm, setStatuspm] = useState("Pending");
+
   const TABLE_HEAD_CR = ["Name", "Type"];
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const [selectedButton, setSelectedButton] = useState("Pending");
-  const [pmApprove, setPMApprove] = useState("");
 
-  const sendMessageToQueue = async (message, queue) => {
-    //console.log("Message:", message, "Queue:", queue);
-    try {
-      const res = await fetch("/api/producer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: message, queue: queue }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+  useEffect(() => {
+    const fetchProjectDetails = async () => {
+      try {
+        const res = await fetch(`/api/project`);
+        const data = await res.json();
+        const project = data.find((proj) => proj._id === projectId);
+        if (project) {
+          setProjectName(project.projectName);
+          setProjectDescription(project.projectDescription);
+          setRootPath(project.rootPath);
+          setStatuspm(project.statusops); // Set the project status
+        } else {
+          console.error("Project not found");
+          // Optionally, handle the case where the project is not found
+        }
+      } catch (error) {
+        console.error("Failed to fetch project details:", error.message);
       }
+    };
 
-      const result = await res.json();
-      console.log("Message sent to queue:", result.message);
-    } catch (error) {
-      console.log("Failed to send message to queue:", error.message);
-    }
-  };
+    fetchProjectDetails();
+  }, [projectId]);
 
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch("/api/resource", {
+        const res = await fetch(`/api/resourcelist`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} - ${res.statusText}`);
-        }
-
         const data = await res.json();
-        console.log("data", data);
-        const rows = data.map((element) => ({
+        console.log("API Response for /api/resourcelist:", data);
+        // Find the resources matching the projectId
+        const resources = data.filter((resource) => resource.projectid === projectId); // corrected line
+
+        // Map the data to table rows
+        const rows = resources.map((element) => ({
           id: element._id,
           name: element.vmname,
           type: element.type,
           userid: element.userid,
-          projectid: element.projectid,
-          statusops: "Pending",
+          statuspm: "Pending",
         }));
 
+        // Update the state with the fetched rows
         setTableRowsCR(rows);
       } catch (error) {
-        console.error("Failed to send request:", error.message);
+        console.error("Failed to fetch resources:", error.message);
       }
     };
 
     fetchTableRows();
-  }, []); // Runs once on component mount
+  }, [projectId]);
+
 
   useEffect(() => {
-    if (TABLE_ROWS_CR.length === 0) return; // Prevent running when TABLE_ROWS_CR is empty
-
     const fetchProjectStatus = async () => {
       try {
         const res = await fetch("/api/request", {
@@ -88,26 +93,22 @@ export default function ProjectOPS() {
         }
 
         const data = await res.json();
-        console.log("API Response:", data); // Debugging log
+        console.log("API Response:", data);
 
-        if (!Array.isArray(data)) {
-          console.error(
-            "Invalid API response format. Expected an array but received:",
-            data
-          );
+        if (!Array.isArray(data)) { // Check if data is an array directly
+          console.error("Unexpected API response format. Expected an array but received:", data);
           return;
         }
 
-        const requests = data; // Now correctly assigning the array
+        const requests = data; // data is already the array
 
-        const hasRejected = requests.some(
-          (request) => request.statusops === "Rejected"
-        );
-
-        setPMApprove(hasRejected ? "Rejected" : "Approved");
+        if (TABLE_ROWS_CR.length === 0 || !TABLE_ROWS_CR[0]) {
+          console.warn("No resources found for the project.");
+          return;
+        }
 
         const matchingRequest = requests.find(
-          (item) => item.projectid === TABLE_ROWS_CR[0]?.projectid
+          (item) => item.projectid === TABLE_ROWS_CR[0].projectid
         );
 
         if (matchingRequest) {
@@ -115,11 +116,11 @@ export default function ProjectOPS() {
         } else {
           console.warn(
             "No matching request found for project ID:",
-            TABLE_ROWS_CR[0]?.projectid
+            TABLE_ROWS_CR[0].projectid
           );
         }
       } catch (error) {
-        console.log("Failed to retrieve request:", error.message);
+        console.error("Failed to retrieve request:", error.message);
       }
     };
 
@@ -140,97 +141,50 @@ export default function ProjectOPS() {
       });
     }
 
-    // console.log(event);
-    const projectid = TABLE_ROWS_CR[0].projectid;
-
     try {
-      await fetch("/api/request", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          statusops: event,
-          projectid: projectid,
+      await Promise.all([
+        fetch("/api/request", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statusops: event,
+            projectid: projectId,
+          }),
         }),
-      });
+        fetch("/api/project", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statusops: event,
+            projectid: projectId,
+          }),
+        }),
+      ]);
+      redirect("/requestlist");
     } catch (error) {
-      console.log("Failed to send request:", error.message);
+      console.error("Failed to send request:", error);
     }
-
-    // Compare PM approve and Ops approve before sending the message
-    if (pmApprove === event) {
-      console.log(`PM and Ops approval matched. Sending message to queue.`);
-
-      // Trigger the DAG
-      try {
-        const response = await fetch(
-          `/api/triggerdag?dagId=idp&projectId=${projectid}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Error triggering DAG:", errorData);
-        } else {
-          console.log("DAG triggered successfully");
-        }
-      } catch (error) {
-        console.log("Failed to trigger DAG:", error.message);
-      }
-
-      //Produce Queue
-      try {
-        await sendMessageToQueue(projectid, "create-vm");
-        console.log("Message sent to queue successfully.");
-      } catch (error) {
-        console.log("Failed to send message to RabbitMQ:", error.message);
-      }
-    }
-
-    //Consume Queue
-    //   try {
-    //     const res = await fetch(
-    //       `http://localhost:3000/api/consumer?queue=${projectid}`,
-    //       {
-    //         method: "GET",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //       }
-    //     );
-
-    //     if (!res.ok) {
-    //       throw new Error(`Error: ${res.status} - ${res.statusText}`);
-    //     }
-    //   } catch (error) {
-    //     console.log("Failed to consume message from RabbitMQ:", error.message);
-    //   }
-    // } else {
-    //   console.log(`PM and Ops approval do not match. Skipping queue message.`);
-    // }
   };
 
   return (
     <div>
+      {/* Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
-          <p className="text-5xl font-bold ml-16 my-5">Todo List</p>
+          <p className="text-5xl font-bold ml-16 my-5">{projectName}</p>
           <span
-            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
-              selectedButton === "Approved"
-                ? "bg-green-500"
-                : selectedButton === "Rejected"
+            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${selectedButton === "Approved"
+              ? "bg-green-500"
+              : selectedButton === "Rejected"
                 ? "bg-red-500"
                 : selectedButton === "Under Review"
-                ? "bg-amber-500"
-                : "bg-gray-500"
-            }`}
+                  ? "bg-amber-500"
+                  : "bg-gray-500"
+              }`}
           >
             {selectedButton}
           </span>
@@ -270,22 +224,23 @@ export default function ProjectOPS() {
         <div className="grid grid-rows-1 grid-flow-col gap-3 items-top mt-10">
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Application name</p>
-            <p className="text-lg font-normal ml-16 mt-2">Todo list</p>
+            <p className="text-lg font-normal ml-16 mt-2">{projectName}</p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">Todo Application</p>
+            <p className="text-lg font-normal ml-16 mt-2">{projectDescription}</p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Repository</p>
             <div className="flex flex-row mx-16">
               <Image src={gitlab} width="45" height="45" alt="logo" />
               <p className="text-lg font-normal flex items-center">
-                example/todo-list
+                {rootPath}
               </p>
             </div>
           </div>
         </div>
+
         {/* Cloud Resources */}
         <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
           <div className="flex flex-row items-center h-12">
@@ -319,7 +274,7 @@ export default function ProjectOPS() {
                   return (
                     <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={`/projectops/${id}`}>
+                        <Link href={{ pathname: `/projectops/${id}`, query: { id } }}>
                           <Typography
                             variant="small"
                             color="blue-gray"
@@ -330,7 +285,7 @@ export default function ProjectOPS() {
                         </Link>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={`/projectops/${id}`}>
+                        <Link href={{ pathname: `/projectops/${id}`, query: { id } }}>
                           <Typography
                             variant="small"
                             color="blue-gray"
