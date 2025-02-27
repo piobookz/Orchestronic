@@ -8,9 +8,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 export default function Projectdetails() {
     const searchParams = useSearchParams();
     const requestId = searchParams.get("requestId"); // Get the requestId from the query
-    console.log("requestId", requestId);
 
     const [projectDetails, setProjectDetails] = useState({
+        _id: "",
         projectName: "",
         projectDescription: "",
         lastUpdate: "",
@@ -26,6 +26,13 @@ export default function Projectdetails() {
         allocation: "",
         type: "Virtual Machine",
     });
+
+    const [rg, setRG] = useState({
+        rgName: "",
+    });
+
+    const [connectionStatus, setConnectionStatus] = useState("idle");
+    const [showPassword, setShowPassword] = useState(false);
 
     const fetchProjectDetails = async () => {
         try {
@@ -43,6 +50,7 @@ export default function Projectdetails() {
             if (data.length > 0) {
                 const project = data[0];
                 setProjectDetails({
+                    _id: project._id,
                     projectName: project.projectName, // Fixed field names
                     projectDescription: project.projectDescription,
                     lastUpdate: project.lastUpdate,
@@ -56,6 +64,32 @@ export default function Projectdetails() {
             toast.error("Failed to load project details.");
         }
     };
+
+    // const fetchRequestStatus = async () => {
+    //     try {
+    //         const res = await fetch(`/api/request/?projectId=${requestId}`, {
+    //             method: "GET",
+    //             headers: { "Content-Type": "application/json" },
+    //         });
+
+    //         if (!res.ok) {
+    //             throw new Error(`Failed to fetch request: ${res.statusText}`);
+    //         }
+
+    //         const data = await res.json();
+    //         console.log("Request Data:", data);
+
+    //         if (data.length > 0) {
+    //             const request = data[0];
+    //             setRequestStatus(request.status);
+    //         } else {
+    //             console.log("No request found for this projectId.");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching request details:", error);
+    //         toast.error("Failed to load request details.");
+    //     }
+    // };
 
     const fetchResource = async () => {
         try {
@@ -106,46 +140,108 @@ export default function Projectdetails() {
         }
     }, [requestId]);
 
-    const handleDelete = async () => {
-        toast.success("Resource deleted successfully");
+    // useEffect(() => {
+    //     if (requestId) {
+    //         fetchRequestStatus();
+    //     }
+    // }, [requestId]);
+
+    useEffect(() => {
+        if (projectDetails._id) {
+            setRG({
+                rgName: `rg-${projectDetails._id}`, // Format: rg-<projectId>
+            });
+        }
+    }, [projectDetails._id]);
+
+    const handleConnectVM = async () => {
+        const { resourceName, os, adminUser, adminPassword } = resource;
+        const { rgName } = rg;
 
         try {
-            const response = await fetch(`/api/resource/?requestId=${requestId}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            // Show loading toast
+            const loadingToast = toast.loading("Checking resources in Azure...");
+
+            // Call your API endpoint
+            const response = await fetch('/api/connect-vm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resourceName, rgName, os })
             });
 
+            // Parse the response first
+            const data = await response.json();
+            toast.dismiss(loadingToast);
+
+            // Handle resource not found scenarios
             if (!response.ok) {
-                throw new Error(`Failed to delete resource: ${response.statusText}`);
+                if (response.status === 404) {
+                    if (data.resourceGroupExists === false) {
+                        toast.error(`Resource group '${rgName}' doesn't exist in Azure`);
+                    } else if (data.vmExists === false) {
+                        toast.error(`VM '${resourceName}' doesn't exist in resource group '${rgName}'`);
+                    } else {
+                        toast.error(data.message || "Resource not found");
+                    }
+                    return;
+                }
+
+                // Other errors
+                throw new Error(data.message || "Failed to connect to VM");
             }
 
-            router.push("/projectops");
+            if (data.success) {
+                toast.success(`VM '${resourceName}' found in Azure and ready to connect`);
+                const { publicIP } = data.vmDetails;
+
+                // For Linux VMs, provide SSH command
+                if (os.toLowerCase().includes("linux")) {
+                    const sshCommand = `ssh ${adminUser}@${publicIP}`;
+                    toast.success(`Run this command to connect: ${sshCommand}`);
+
+                    // Copy to clipboard
+                    navigator.clipboard.writeText(sshCommand)
+                        .then(() => toast.success("SSH command copied to clipboard"))
+                        .catch(() => console.error("Failed to copy command"));
+                }
+
+                // For Windows VMs, generate RDP file
+                else if (os.toLowerCase().includes("windows")) {
+                    const rdpContent = `
+                full address:s:${publicIP}
+                username:s:${adminUser}
+                password:s:${adminPassword}
+              `;
+
+                    // Download RDP file
+                    const blob = new Blob([rdpContent], { type: "application/rdp" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `${resourceName}.rdp`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    toast.success("RDP file downloaded. Open it to connect to the VM.");
+                } else {
+                    toast.error("Unsupported OS for connection.");
+                }
+            } else {
+                toast.error("Failed to get VM connection details.");
+            }
         } catch (error) {
-            console.error("Error while deleting resource:", error);
-            toast.error("Failed to delete resource");
+            console.error("Error connecting to VM:", error);
+            toast.error(error.message || "Failed to connect to VM.");
         }
     };
-
+    
     return (
         <div>
             {/* Details Box */}
             <div className="flex flex-row items-center">
                 <h1 className="text-5xl font-bold mx-16 my-5">{projectDetails.projectName}</h1>
-                {/* <span
-          className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
-            selectedButton === "Approved"
-              ? "bg-green-500"
-              : selectedButton === "Rejected"
-              ? "bg-red-500"
-              : selectedButton === "Under Review"
-              ? "bg-amber-500"
-              : "bg-gray-500"
-          }`}
-        >
-          {selectedButton}
-        </span> */}
             </div>
             {/* Project Details box */}
             <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
@@ -188,10 +284,24 @@ export default function Projectdetails() {
               Configure
             </button>  */}
                         <button
-                            className="ml-4 text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600"
-                            onClick={handleDelete}
+                            className={`ml-4 text-sm text-white rounded py-3 px-5 ${connectionStatus === "connecting"
+                                ? "bg-blue-400"
+                                : connectionStatus === "connected"
+                                    ? "bg-green-500"
+                                    : connectionStatus === "failed"
+                                        ? "bg-red-500"
+                                        : "bg-blue-500 hover:bg-blue-600"
+                                }`}
+                            onClick={handleConnectVM}
+                            disabled={connectionStatus === "connecting"}
                         >
-                            Destroy
+                            {connectionStatus === "connecting"
+                                ? "Connecting..."
+                                : connectionStatus === "connected"
+                                    ? "Connected"
+                                    : connectionStatus === "failed"
+                                        ? "Connection Failed"
+                                        : "Connect"}
                         </button>
                     </div>
                 </div>
@@ -230,7 +340,23 @@ export default function Projectdetails() {
 
                         <div className="flex flex-row items-center">
                             <p className="text-lg font-semibold w-32">Admin Password</p>
-                            <p className="text-lg font-light">{resource.adminPassword}</p>
+                            <div className="flex items-center">
+                                <p className="text-lg font-light mr-2">
+                                    {showPassword ? resource.adminPassword : "••••••••••••"}
+                                </p>
+                                <button
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(resource.adminPassword)}
+                                    className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 ml-2"
+                                >
+                                    Copy
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex flex-row items-center">
@@ -249,4 +375,4 @@ export default function Projectdetails() {
             </div>
         </div>
     );
-}
+};

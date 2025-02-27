@@ -10,6 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/arm-compute": "^22.3.0",
+    "@azure/arm-resources": "^5.2.0",
+    "@azure/identity": "^4.7.0",
     "@clerk/nextjs": "^6.12.0",
     "@heroicons/react": "^2.1.5",
     "@material-tailwind/react": "^2.1.10",
