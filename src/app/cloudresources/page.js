@@ -338,6 +338,8 @@ export default function CloudResources({ params }) {
   };
 
   useEffect(() => {
+    console.log("Project Data:", projectData.pathWithNamespace);
+    console.log("Project Data:", projectData);
     const fetchProject = async () => {
       try {
         const res = await fetch(

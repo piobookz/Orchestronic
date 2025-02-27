@@ -7,7 +7,7 @@ import { useUser } from "@clerk/nextjs";
 // import Navbar from "../app/components/navbar";
 // import Image from "next/image";
 // import { Toaster } from "react-hot-toast";
-// import Typewriter from "typewriter-effect";
+import Typewriter from "typewriter-effect";
 import {
   ClerkProvider,
   SignInButton,
@@ -37,7 +37,7 @@ export default function HomePage() {
             </span>
             <br />
             <span className="text-[2vw] md:text-[2vw] font-extralight text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.6)]">
-              {/* <Typewriter
+              <Typewriter
                 onInit={(typewriter) => {
                   typewriter
                     .typeString("Streamline your development workflow with us!")
@@ -45,7 +45,7 @@ export default function HomePage() {
                     .deleteAll()
                     .start();
                 }}
-              /> */}
+              />
             </span>
             <br />
           </div>

@@ -7,14 +7,18 @@ export async function GET(req) {
     // Connect to MongoDB
     await connectMongoDB();
 
-    // Extract query parameters from the URL
-    const url = new URL(req.url, `http://${req.headers.get("host")}`);
+    const url = new URL(req.url);
     const pathWithNamespace = url.searchParams.get("pathWithNamespace");
     const userId = url.searchParams.get("userId");
 
-    let query = { userId };
+    let query = {};
+
     if (pathWithNamespace) {
       query.pathWithNamespace = pathWithNamespace;
+    }
+
+    if (userId) {
+      query.userId = userId;
     }
 
     const projects = await Project.find(query);
@@ -92,4 +96,24 @@ export async function POST(req) {
       { status: 500 }
     );
   }
+}
+
+export async function DELETE(req) {
+  await connectMongoDB();
+
+  const url = new URL(req.url);
+  const projectId = url.searchParams.get("projectId");
+
+  if (!projectId) {
+    return NextResponse.json(
+      { message: "Missing required fields" },
+      { status: 400 }
+    );
+  }
+
+  await Project.deleteOne({ _id: projectId });
+  return NextResponse.json(
+    { message: "Project deleted successfully" },
+    { status: 200 }
+  );
 }

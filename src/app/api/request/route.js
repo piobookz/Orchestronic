@@ -2,12 +2,17 @@ import { connectMongoDB } from "../../../../lib/mongodb";
 import Request from "../../../../models/request";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req) {
   // Connect to MongoDB
   await connectMongoDB();
 
+  const url = new URL(req.url);
+  const projectid = url.searchParams.get("projectid");
+
+  const query = projectid ? { projectid } : {};
+
   // Retrieve all requests
-  const requests = await Request.find({});
+  const requests = await Request.find(query);
 
   return NextResponse.json(requests, { status: 200 }); // return NextResponse.json({ requests }, { status: 200 });
 }
