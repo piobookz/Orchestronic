@@ -67,7 +67,7 @@ export default function RequestResource() {
     toast.success("Request sent successfully");
 
     try {
-      const res = await fetch("http://localhost:3000/api/request", {
+      const res = await fetch("/api/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

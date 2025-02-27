@@ -29,7 +29,7 @@ export default function Environment() {
         environmentType,
         region,
       });
-      const res = await fetch("http://localhost:3000/api/environment", {
+      const res = await fetch("/api/environment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

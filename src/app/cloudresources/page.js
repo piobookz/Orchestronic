@@ -255,7 +255,7 @@ export default function CloudResources({ params }) {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/resource", {
+      const res = await fetch("/api/resource", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export default function CloudResources({ params }) {
     const fetchProject = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/project?pathWithNamespace=${projectData.pathWithNamespace}`,
+          `/api/project?pathWithNamespace=${projectData.pathWithNamespace}`,
           {
             method: "GET",
             headers: {

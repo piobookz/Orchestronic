@@ -33,15 +33,12 @@ export default function RequestDetails({ params }) {
 
   const fetchResource = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) {
         throw new Error(`Failed to fetch resource: ${res.statusText}`);
@@ -68,7 +65,7 @@ export default function RequestDetails({ params }) {
     toast.success("Resource deleted successfully");
 
     try {
-      fetch(`http://localhost:3000/api/resource/?requestId=${requestId}`, {
+      fetch(`/api/resource/?requestId=${requestId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

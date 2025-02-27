@@ -18,7 +18,7 @@ export default function ProjectOPS() {
   const sendMessageToQueue = async (message, queue) => {
     //console.log("Message:", message, "Queue:", queue);
     try {
-      const res = await fetch("http://localhost:3000/api/producer", {
+      const res = await fetch("/api/producer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function ProjectOPS() {
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/resource", {
+        const res = await fetch("/api/resource", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export default function ProjectOPS() {
 
     const fetchProjectStatus = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/request", {
+        const res = await fetch("/api/request", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export default function ProjectOPS() {
     const projectid = TABLE_ROWS_CR[0].projectid;
 
     try {
-      await fetch("http://localhost:3000/api/request", {
+      await fetch("/api/request", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export default function ProjectOPS() {
       // Trigger the DAG
       try {
         const response = await fetch(
-          `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
+          `/api/triggerdag?dagId=idp&projectId=${projectid}`,
           {
             method: "POST",
             headers: {

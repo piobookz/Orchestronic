@@ -18,7 +18,7 @@ export default function ProjectMG() {
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/resource", {
+        const res = await fetch("/api/resource", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function ProjectMG() {
 
     const fetchProjectStatus = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/request", {
+        const res = await fetch("/api/request", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -111,7 +111,7 @@ export default function ProjectMG() {
     const projectid = TABLE_ROWS_CR[0].projectid;
 
     try {
-      await fetch("http://localhost:3000/api/request", {
+      await fetch("/api/request", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
