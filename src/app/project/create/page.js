@@ -3,9 +3,9 @@ import Link from "next/link";
 import { React, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
-import gitlab from "../../../public/gitlab-logo-500.svg";
+import gitlab from "../../../../public/gitlab-logo-500.svg";
 import { useRouter } from "next/navigation";
-import { useProvider } from "../components/ConText";
+import { useProvider } from "../../components/ConText";
 
 export default function CreateProject() {
   const { setProjectData } = useProvider();
@@ -158,7 +158,7 @@ export default function CreateProject() {
       }
 
       setProjectData(projectDetails);
-      router.push(`/requestresource`);
+      router.push(`/project/create/request`);
     } catch (error) {
       console.error("Error saving project:", error);
       alert("Failed to save project. Please try again.");

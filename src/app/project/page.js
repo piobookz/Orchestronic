@@ -64,7 +64,7 @@ export default function Projectlist() {
           <Link
             type="button"
             className="inline-flex flex-none items-center rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-            href={"/create-project"}
+            href={"/project/create"}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

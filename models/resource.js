@@ -15,14 +15,6 @@ const resourceSchema = new Schema({
   password: { type: String },
   allocationip: { type: String },
   projectid: { type: String },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
 });
 
 const Resource =

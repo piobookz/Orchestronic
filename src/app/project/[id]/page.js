@@ -1,17 +1,15 @@
 "use client";
 
-import gitlab from "../../../public/gitlab-logo-500.svg";
+import gitlab from "../../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
 import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useProvider } from "../components/ConText";
-import { useAuth } from "@clerk/nextjs";
+import { useProvider } from "../../components/ConText";
 
 export default function RequestResource() {
-  const { userId } = useAuth();
   const [project, setProject] = useState(null);
   const data = useProvider();
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
@@ -27,7 +25,7 @@ export default function RequestResource() {
     console.log("pathWithNamespace", pathWithNamespace);
     const fetchResources = async () => {
       try {
-        const res = await fetch(`/api/resource?userId=${userId}`, {
+        const res = await fetch("http://localhost:3000/api/resource", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

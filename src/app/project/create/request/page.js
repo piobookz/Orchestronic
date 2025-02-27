@@ -1,13 +1,13 @@
 "use client";
 
-import gitlab from "../../../public/gitlab-logo-500.svg";
+import gitlab from "../../../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
 import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useProvider } from "../components/ConText";
+import { useProvider } from "../../../components/ConText";
 import { useAuth } from "@clerk/nextjs";
 
 export default function RequestResource() {
@@ -72,7 +72,7 @@ export default function RequestResource() {
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
       } else {
-        router.push("/projectlist");
+        router.push("/project");
       }
     } catch (error) {
       console.log("Error while saving request:", error.message);

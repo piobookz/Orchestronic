@@ -6,8 +6,6 @@ azure-mgmt-compute
 azure-mgmt-network
 azure-mgmt-resource
 apache-airflow-providers-hashicorp
-
-# Local install
 pika
 dotenv
 python-socketio
