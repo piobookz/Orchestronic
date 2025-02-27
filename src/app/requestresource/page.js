@@ -19,12 +19,6 @@ export default function RequestResource() {
   const projectDescription = data?.projectData?.projectDescription;
   const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
-  useEffect(() => {
-    if (pathWithNamespace) {
-      fetchResources();
-    }
-  }, [pathWithNamespace]);
-
   const fetchResources = async () => {
     try {
       const projectRes = await fetch(
@@ -56,18 +50,24 @@ export default function RequestResource() {
           statusops: "Pending",
         }));
 
-        setTableRowsCR(rows); // 🔑 This should be the last action
+        setTableRowsCR(rows);
       }
     } catch (error) {
       console.log(error.message);
     }
   };
 
+  useEffect(() => {
+    if (pathWithNamespace) {
+      fetchResources();
+    }
+  });
+
   const handleRequest = async () => {
     toast.success("Request sent successfully");
 
     try {
-      const res = await fetch("http://localhost:3000/api/request", {
+      const res = await fetch("/api/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

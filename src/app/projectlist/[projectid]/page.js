@@ -23,9 +23,6 @@ export default function Projectdetails({ params }) {
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [type, setType] = useState("Virtual Machine");
-  const projectName = data?.projectData?.projectName;
-  const projectDescription = data?.projectData?.projectDescription;
-  const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -33,22 +30,13 @@ export default function Projectdetails({ params }) {
     });
   }, [params]);
 
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId]);
-
   const fetchResource = async () => {
     try {
       // console.log("Fetching data for requestId:", requestId);
-      const res = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (!res.ok) {
         throw new Error(`Failed to fetch resource: ${res.statusText}`);
@@ -76,19 +64,22 @@ export default function Projectdetails({ params }) {
     }
   };
 
+  useEffect(() => {
+    if (requestId) {
+      fetchResource();
+    }
+  });
+
   const handleDelete = async () => {
     toast.success("Resource deleted successfully");
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to delete resource: ${response.statusText}`);
@@ -103,54 +94,6 @@ export default function Projectdetails({ params }) {
 
   return (
     <div>
-      {/* Details Box */}
-      <div className="flex flex-row items-center">
-        <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
-        {/* <span
-          className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
-            selectedButton === "Approved"
-              ? "bg-green-500"
-              : selectedButton === "Rejected"
-              ? "bg-red-500"
-              : selectedButton === "Under Review"
-              ? "bg-amber-500"
-              : "bg-gray-500"
-          }`}
-        >
-          {selectedButton}
-        </span> */}
-      </div>
-      {/* Project Details box */}
-      <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
-        {/* subtitle */}
-        <div className="flex flex-row justify-between items-center">
-          <h1 className="text-3xl font-semibold ml-4">Details</h1>
-        </div>
-        {/* Project name, description and source */}
-        <div className="grid grid-rows-1 grid-flow-col gap-3 items-top mx-2">
-          <div>
-            <p className="text-xl font-medium ml-5 -16 mt-5">
-              Application name
-            </p>
-            <p className="text-lg font-normal ml-5 mt-2">{projectName}</p>
-          </div>
-          <div>
-            <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">
-              {projectDescription}
-            </p>
-          </div>
-          {/* <div>
-            <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
-            <p className="text-lg font-normal ml-16 mt-2">Today</p>
-          </div>
-          <div>
-            <p className="text-xl font-medium mx-16 mt-5">Team</p>
-            <p className="text-lg font-normal ml-16 mt-2">group of people</p>
-          </div> */}
-        </div>
-      </div>
-
       {/* Cloud Resources Box */}
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
         <div className="flex flex-row justify-between items-center">

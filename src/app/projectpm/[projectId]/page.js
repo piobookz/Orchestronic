@@ -27,22 +27,15 @@ export default function Projectdetails({ params }) {
       setRequestId(resolvedParams.projectId);
     });
   }, [params]);
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId]);
 
   const fetchResource = async () => {
     try {
       // console.log("Fetching data for requestId:", requestId);
-      const res = await fetch(
-        `/api/resource/?requestId=${requestId}`,
-        {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+
+      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (!res.ok) {
         throw new Error(`Failed to fetch resource: ${res.statusText}`);
@@ -70,19 +63,22 @@ export default function Projectdetails({ params }) {
     }
   };
 
+  useEffect(() => {
+    if (requestId) {
+      fetchResource();
+    }
+  });
+
   const handleDelete = async () => {
     toast.success("Resource deleted successfully");
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to delete resource: ${response.statusText}`);

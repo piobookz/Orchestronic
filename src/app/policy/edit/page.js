@@ -79,7 +79,7 @@ export default function PolicyEdit() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/policy", {
+      const res = await fetch("/api/policy", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

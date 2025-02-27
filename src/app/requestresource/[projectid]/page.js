@@ -25,23 +25,14 @@ export default function RequestDetails({ params }) {
     });
   }, [params]);
 
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId]);
-
   const fetchResource = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) {
         throw new Error(`Failed to fetch resource: ${res.statusText}`);
@@ -64,11 +55,17 @@ export default function RequestDetails({ params }) {
     }
   };
 
+  useEffect(() => {
+    if (requestId) {
+      fetchResource();
+    }
+  });
+
   const handleDelete = () => {
     toast.success("Resource deleted successfully");
 
     try {
-      fetch(`http://localhost:3000/api/resource/?requestId=${requestId}`, {
+      fetch(`/api/resource/?requestId=${requestId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

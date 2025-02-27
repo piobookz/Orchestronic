@@ -255,7 +255,7 @@ export default function CloudResources({ params }) {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/resource", {
+      const res = await fetch("/api/resource", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -287,7 +287,7 @@ export default function CloudResources({ params }) {
   const filterVMSize = async () => {
     // console.log(projectData);
     try {
-      const res = await fetch("http://localhost:3000/api/policy", {
+      const res = await fetch("/api/policy", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -343,7 +343,7 @@ export default function CloudResources({ params }) {
     const fetchProject = async () => {
       try {
         const res = await fetch(
-          `http://localhost:3000/api/project?pathWithNamespace=${projectData.pathWithNamespace}`,
+          `/api/project?pathWithNamespace=${projectData.pathWithNamespace}`,
           {
             method: "GET",
             headers: {
@@ -399,7 +399,7 @@ export default function CloudResources({ params }) {
 
     fetchProject();
     filterVMSize();
-  }, [projectData]); // Re-run when projectData changes
+  });
   return (
     <div className="min-h-screen text-white">
       {/* Header */}

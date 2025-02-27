@@ -18,7 +18,7 @@ export default function ProjectOPS() {
   const sendMessageToQueue = async (message, queue) => {
     //console.log("Message:", message, "Queue:", queue);
     try {
-      const res = await fetch("http://localhost:3000/api/producer", {
+      const res = await fetch("/api/producer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function ProjectOPS() {
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/resource", {
+        const res = await fetch("/api/resource", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export default function ProjectOPS() {
 
     const fetchProjectStatus = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/request", {
+        const res = await fetch("/api/request", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export default function ProjectOPS() {
     const projectid = TABLE_ROWS_CR[0].projectid;
 
     try {
-      await fetch("http://localhost:3000/api/request", {
+      await fetch("/api/request", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +165,7 @@ export default function ProjectOPS() {
       // Trigger the DAG
       try {
         const response = await fetch(
-          `http://localhost:3000/api/triggerdag?dagId=idp&projectId=${projectid}`,
+          `/api/triggerdag?dagId=idp&projectId=${projectid}`,
           {
             method: "POST",
             headers: {
@@ -239,21 +239,18 @@ export default function ProjectOPS() {
         <div className="mx-16">
           <div className="flex flex-row">
             <button
-              role="radio"
               onClick={() => handleChange("Approved")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-green-500 focus:bg-green-500"
             >
               Approved
             </button>
             <button
-              role="radio"
               onClick={() => handleChange("Rejected")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-red-500 focus:bg-red-500"
             >
               Rejected
             </button>
             <button
-              role="radio"
               onClick={() => handleChange("Under Review")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-amber-500 focus:bg-amber-500"
             >
