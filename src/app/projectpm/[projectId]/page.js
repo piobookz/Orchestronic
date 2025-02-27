@@ -37,7 +37,7 @@ export default function Projectdetails({ params }) {
     try {
       // console.log("Fetching data for requestId:", requestId);
       const res = await fetch(
-        `http://localhost:3000/api/resource/?requestId=${requestId}`,
+        `/api/resource/?requestId=${requestId}`,
         {
           method: "GET",
           headers: { "Content-Type": "application/json" },

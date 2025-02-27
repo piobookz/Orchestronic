@@ -8,6 +8,7 @@ import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 import { Typography } from "@material-tailwind/react";
 import { useUser } from "@clerk/nextjs";
+import { useSearchParams } from "next/navigation";
 
 export default function RequestList() {
   const { user } = useUser();
@@ -114,7 +115,8 @@ export default function RequestList() {
               return (
                 <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={`/projectpm/${projectid}`}>
+                    {/* <Link href={`/projectpm/${projectid}`}> */}
+                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
                       <Typography
                         variant="small"
                         color="blue-gray"
@@ -125,7 +127,7 @@ export default function RequestList() {
                     </Link>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={`/projectpm/${projectid}`}>
+                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
                       <Typography
                         variant="small"
                         color="blue-gray"
@@ -136,7 +138,7 @@ export default function RequestList() {
                     </Link>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={`/projectpm/${projectid}`}>
+                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
                       <Typography
                         variant="small"
                         color="blue-gray"
@@ -147,7 +149,7 @@ export default function RequestList() {
                     </Link>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={`/projectpm/${projectid}`}>
+                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
                       <Typography
                         variant="small"
                         className={`font-normal px-2 py-1 rounded-md 
@@ -165,7 +167,7 @@ export default function RequestList() {
                     </Link>
                   </td>
                   <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={`/projectpm/${projectid}`}>
+                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
                       <Typography
                         variant="small"
                         className={`font-normal px-2 py-1 rounded-md 
