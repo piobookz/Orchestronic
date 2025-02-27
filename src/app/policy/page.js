@@ -2,8 +2,12 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 export default function PolicyDetails() {
+  const { user } = useUser();
+  const userRole = user?.publicMetadata?.role;
+
   // Memory (RAM)
   const [memoryMes, setMemoryMes] = useState("");
 
@@ -27,6 +31,9 @@ export default function PolicyDetails() {
 
   // Note
   const [noteMes, setNoteMes] = useState("");
+
+  // State to track if the component is mounted
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // Fetch policy data from the API
@@ -71,12 +78,14 @@ export default function PolicyDetails() {
               Resource Allocation Terms and Policies
             </p>
           </div>
-          <Link
-            className="mr-4 py-2 px-10 text-sm text-black bg-[#E3E3E3] rounded"
-            href="/policy/edit"
-          >
-            Edit
-          </Link>
+          {userRole === "ops" && (
+            <Link
+              className="mr-4 py-2 px-10 text-sm text-black bg-[#E3E3E3] rounded"
+              href="/policy/edit"
+            >
+              Edit
+            </Link>
+          )}
         </div>
 
         {/* Policy details */}
