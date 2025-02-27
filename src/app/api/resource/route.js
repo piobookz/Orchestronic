@@ -48,9 +48,8 @@ export async function GET(req) {
 
     const url = new URL(req.url);
     const requestId = url.searchParams.get("requestId");
-    const userId = url.searchParams.get("userId");
 
-    const resources = await Resource.find({ userid: userId });
+    const resources = await Resource.find({ projectid: requestId });
 
     return NextResponse.json(resources, { status: 200 });
   } catch (error) {

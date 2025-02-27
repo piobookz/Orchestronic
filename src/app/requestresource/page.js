@@ -12,7 +12,6 @@ import { useAuth } from "@clerk/nextjs";
 
 export default function RequestResource() {
   const { userId } = useAuth();
-  const [project, setProject] = useState(null);
   const data = useProvider();
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const router = useRouter();
@@ -21,25 +20,33 @@ export default function RequestResource() {
   const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
   useEffect(() => {
-    console.log("projectDetails", data?.projectData);
-    console.log("projectName", projectName);
-    console.log("projectDescription", projectDescription);
-    console.log("pathWithNamespace", pathWithNamespace);
-    const fetchResources = async () => {
-      try {
-        const res = await fetch(`/api/resource?userId=${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    if (pathWithNamespace) {
+      fetchResources();
+    }
+  }, [pathWithNamespace]);
 
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} - ${res.statusText}`);
-        }
+  const fetchResources = async () => {
+    try {
+      const projectRes = await fetch(
+        `/api/project?pathWithNamespace=${pathWithNamespace}`
+      );
+      if (!projectRes.ok)
+        throw new Error(`Project fetch failed: ${projectRes.statusText}`);
 
-        const data = await res.json();
-        const rows = data.map((element) => ({
+      const projectData = await projectRes.json();
+      console.log("Fetched project:", projectData);
+
+      if (projectData.length > 0) {
+        const projectId = projectData[0]._id;
+        console.log("Project ID:", projectId);
+        const resourceRes = await fetch(`/api/resource?requestId=${projectId}`);
+        if (!resourceRes.ok)
+          throw new Error(`Resource fetch failed: ${resourceRes.statusText}`);
+
+        const resourceData = await resourceRes.json();
+        console.log("Fetched resources:", resourceData);
+
+        const rows = resourceData.map((element) => ({
           id: element._id,
           name: element.vmname,
           type: element.type,
@@ -48,14 +55,13 @@ export default function RequestResource() {
           statuspm: "Pending",
           statusops: "Pending",
         }));
-        setTableRowsCR(rows);
-      } catch (error) {
-        console.log("Failed to fetch resources:", error.message);
-      }
-    };
 
-    fetchResources();
-  }, [project]);
+        setTableRowsCR(rows); // 🔑 This should be the last action
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");
@@ -85,7 +91,7 @@ export default function RequestResource() {
 
   return (
     <div>
-      <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
+      <h1 className="text-5xl font-bold mx-16 my-5">{projectName}</h1>
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
         <div className="flex flex-row justify-between items-center">
           <h1 className="text-3xl font-semibold ml-4">Application Details</h1>

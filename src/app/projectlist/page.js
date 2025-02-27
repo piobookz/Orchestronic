@@ -24,14 +24,59 @@ export default function Projectlist() {
             "Content-Type": "application/json",
           },
         });
-        const result = await res.json();
-        if (Array.isArray(result)) {
-          setProjects(result); // Only set if it's an array
-        } else {
-          console.error("Expected array, but received:", result);
-          setProjects([]); // Default to an empty array if result isn't an array
+
+        const projectResult = await res.json();
+        console.log("Fetched projects:", projectResult);
+        const projectId = projectResult[0]?._id;
+        console.log("Project ID:", projectId);
+        try {
+          const res1 = await fetch(`/api/request?projectid=${projectId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const requestResult = await res1.json();
+          // console.log("Fetched requests:", requestResult);
+
+          if (requestResult.length > 0 && projectResult.length > 0) {
+            setProjects(projectResult);
+          } else if (requestResult.length === 0 && projectResult.length > 0) {
+            try {
+              const deleteRes = await fetch(
+                `/api/project?projectId=${projectId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              const deleteRes1 = await fetch(
+                `/api/resource?requestId=${projectId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              if (deleteRes.ok && deleteRes1.ok) {
+                console.log("Deleted successfully");
+                setProjects([]); // ✅ This will only run once
+              }
+            } catch (error) {
+              console.error("Error fetching requests:", error);
+            }
+          } else {
+            console.log("No projects found");
+          }
+        } catch (error) {
+          console.error("Error fetching requests:", error);
         }
-        console.log("Fetched projects:", result);
       } catch (error) {
         console.error("Error fetching project:", error);
       } finally {
@@ -44,8 +89,8 @@ export default function Projectlist() {
   // For search
   const filteredProjects = Array.isArray(projects)
     ? projects.filter((project) =>
-      project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+        project.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : [];
 
   return (
@@ -112,7 +157,6 @@ export default function Projectlist() {
         </div>
       </div>
 
-
       {/* Loading State */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
@@ -127,7 +171,10 @@ export default function Projectlist() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8 py-6">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project) => (
-              <Card key={project._id} className="hover:shadow-lg transition-shadow duration-300">
+              <Card
+                key={project._id}
+                className="hover:shadow-lg transition-shadow duration-300"
+              >
                 <div className="rounded-lg bg-white border p-6 shadow-md">
                   <h2 className="text-xl font-bold text-gray-900">
                     {project.projectName}
