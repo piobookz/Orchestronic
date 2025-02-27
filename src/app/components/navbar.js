@@ -1,12 +1,10 @@
 "use client";
 
 import logo from "../../../public/idp-logo.png";
-import person from "../../../public/image.png";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import {
-  ClerkProvider,
   SignInButton,
   SignedIn,
   SignedOut,
@@ -15,6 +13,27 @@ import {
 } from "@clerk/nextjs";
 
 export default function Navbar() {
+  const { user } = useUser();
+  const userRole = user?.publicMetadata?.role;
+
+  const menuItems = {
+    dev: [
+      { href: "/", label: "Home" },
+      { href: "/projectlist", label: "Projects" },
+      { href: "/policy", label: "Policy" },
+    ],
+    pm: [
+      { href: "/", label: "Home" },
+      { href: "/requestlist", label: "Request List" },
+      { href: "/policy", label: "Policy" },
+    ],
+    ops: [
+      { href: "/", label: "Home" },
+      { href: "/requestlist", label: "Request List" },
+      { href: "/policy", label: "Policy" },
+    ],
+  };
+
   return (
     <nav className="bg-[#07032B] text-white p-5">
       <div className="flex flex-row justify-between items-center">
@@ -22,32 +41,25 @@ export default function Navbar() {
           <Image
             src={logo}
             width={70}
-            height="auto"
+            height={70} // Provide explicit height for better optimization
             alt="logo"
-            priority="true"
+            priority={true}
             className="mr-5"
           />
           <SignedIn>
-            <ul className="flex flex-row space-x-6 text-center items-center">
-              <Link
-                href="/"
-                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-              >
-                <li>Home</li>
-              </Link>
-              <Link
-                href="/projectlist"
-                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-              >
-                <li>Projects</li>
-              </Link>
-              <Link
-                href="/policy"
-                className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
-              >
-                <li>Policy</li>
-              </Link>
-            </ul>
+            {userRole && (
+              <ul className="flex flex-row space-x-6 text-center items-center">
+                {menuItems[userRole]?.map(({ href, label }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="text-white hover:text-[#07032B] hover:bg-[rgba(255,255,255,0.85)] rounded px-2 py-1 transition duration-300"
+                  >
+                    <li>{label}</li>
+                  </Link>
+                ))}
+              </ul>
+            )}
           </SignedIn>
         </div>
         <div>

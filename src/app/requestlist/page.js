@@ -5,12 +5,17 @@ import unfilter from "../../../public/filter-circle.svg";
 import filter from "../../../public/filter-circle-fill.svg";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Typography } from "@material-tailwind/react";
+import { useUser } from "@clerk/nextjs";
 
 export default function RequestList() {
+  const { user } = useUser();
+  const userRole = user?.publicMetadata?.role;
+  if (userRole !== "pm" && userRole !== "ops") {
+    redirect("/"); // Or you can return a message like "Access Denied"
+  }
   const router = useRouter();
-
   // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
   const TABLE_HEAD_REQ = ["Project ID", "Request", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
