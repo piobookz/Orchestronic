@@ -31,6 +31,7 @@ export default function Projectdetails({ params }) {
   const fetchResource = async () => {
     try {
       // console.log("Fetching data for requestId:", requestId);
+
       const res = await fetch(`/api/resource/?requestId=${requestId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
