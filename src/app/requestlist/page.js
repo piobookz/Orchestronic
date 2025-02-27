@@ -18,7 +18,7 @@ export default function RequestList() {
   }
   const router = useRouter();
   // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
-  const TABLE_HEAD_REQ = ["Project ID", "Request", "Type", "Status PM", "Status Ops"];
+  const TABLE_HEAD_REQ = ["Project", "Request", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
 
@@ -108,86 +108,169 @@ export default function RequestList() {
             </tr>
           </thead>
           <tbody>
-            {sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
-              const isOdd = index % 2 === 1;
-              const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
 
-              return (
-                <tr key={id} className={`${rowBgColor} cursor-pointer`}>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    {/* <Link href={`/projectpm/${projectid}`}> */}
-                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {projectid}
-                      </Typography>
-                    </Link>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {requestname}
-                      </Typography>
-                    </Link>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
-                      <Typography
-                        variant="small"
-                        color="blue-gray"
-                        className="font-normal"
-                      >
-                        {type}
-                      </Typography>
-                    </Link>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
-                      <Typography
-                        variant="small"
-                        className={`font-normal px-2 py-1 rounded-md 
+            {userRole === 'pm' &&
+              sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
+                const isOdd = index % 2 === 1;
+                const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+
+                return (
+                  <tr key={id} className={`${rowBgColor} cursor-pointer`}>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      {/* <Link href={`/projectpm/${projectid}`}> */}
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {projectid}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {requestname}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {type}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          className={`font-normal px-2 py-1 rounded-md 
                           ${statuspm === "Approved"
-                            ? "text-green-600 bg-green-100 px-2"
-                            : statuspm === "Under Review"
-                              ? "text-amber-600 bg-amber-100"
-                              : statuspm === "Request"
-                                ? "text-gray-600 bg-gray-100"
-                                : "text-red-600 bg-red-100"
-                          }`}
-                      >
-                        {statuspm}
-                      </Typography>
-                    </Link>
-                  </td>
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Link href={{ pathname: "/projectpm", query: { projectid } }}>
-                      <Typography
-                        variant="small"
-                        className={`font-normal px-2 py-1 rounded-md 
+                              ? "text-green-600 bg-green-100 px-2"
+                              : statuspm === "Under Review"
+                                ? "text-amber-600 bg-amber-100"
+                                : statuspm === "Request"
+                                  ? "text-gray-600 bg-gray-100"
+                                  : "text-red-600 bg-red-100"
+                            }`}
+                        >
+                          {statuspm}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          className={`font-normal px-2 py-1 rounded-md 
                           ${statusops === "Approved"
-                            ? "text-green-600 bg-green-100 px-2"
-                            : statusops === "Under Review"
-                              ? "text-amber-600 bg-amber-100"
-                              : statusops === "Request"
-                                ? "text-gray-600 bg-gray-100"
-                                : "text-red-600 bg-red-100"
-                          }`}
-                      >
-                        {statusops}
-                      </Typography>
-                    </Link>
-                  </td>
-                </tr>
-              );
-            }
-            )}
+                              ? "text-green-600 bg-green-100 px-2"
+                              : statusops === "Under Review"
+                                ? "text-amber-600 bg-amber-100"
+                                : statusops === "Request"
+                                  ? "text-gray-600 bg-gray-100"
+                                  : "text-red-600 bg-red-100"
+                            }`}
+                        >
+                          {statusops}
+                        </Typography>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+
+            {userRole === 'ops' &&
+              sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
+                const isOdd = index % 2 === 1;
+                const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
+
+                return (
+                  <tr key={id} className={`${rowBgColor} cursor-pointer`}>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      {/* <Link href={`/projectpm/${projectid}`}> */}
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {projectid}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {requestname}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {type}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          className={`font-normal px-2 py-1 rounded-md 
+                          ${statuspm === "Approved"
+                              ? "text-green-600 bg-green-100 px-2"
+                              : statuspm === "Under Review"
+                                ? "text-amber-600 bg-amber-100"
+                                : statuspm === "Request"
+                                  ? "text-gray-600 bg-gray-100"
+                                  : "text-red-600 bg-red-100"
+                            }`}
+                        >
+                          {statuspm}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          className={`font-normal px-2 py-1 rounded-md 
+                          ${statusops === "Approved"
+                              ? "text-green-600 bg-green-100 px-2"
+                              : statusops === "Under Review"
+                                ? "text-amber-600 bg-amber-100"
+                                : statusops === "Request"
+                                  ? "text-gray-600 bg-gray-100"
+                                  : "text-red-600 bg-red-100"
+                            }`}
+                        >
+                          {statusops}
+                        </Typography>
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+
           </tbody>
         </table>
       </div>

@@ -49,7 +49,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const requestId = url.searchParams.get("requestId");
 
-    const resources = await Resource.find({ projectid: requestId });
+    const resources = await Resource.find({ _id: requestId });
 
     return NextResponse.json(resources, { status: 200 });
   } catch (error) {

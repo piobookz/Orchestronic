@@ -47,7 +47,7 @@ export default function ProjectMG() {
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-          const res = await fetch(`/api/resourcelist`, {
+        const res = await fetch(`/api/resourcelist`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -142,29 +142,31 @@ export default function ProjectMG() {
     }
 
     try {
-      await fetch("/api/request", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          statuspm: event,
-          projectid: projectId,
+      await Promise.all([
+        fetch("/api/request", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statuspm: event,
+            projectid: projectId,
+          }),
         }),
-      });
-      await fetch("/api/project", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          statuspm: event,
-          projectid: projectId,
+        fetch("/api/project", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statuspm: event,
+            projectid: projectId,
+          }),
         }),
-      });
-      redirect("/requstlist");
+      ]);
+      redirect("/requestlist");
     } catch (error) {
-      console.log("Failed to send request:", error.message);
+      console.error("Failed to send request:", error);
     }
   };
 
@@ -173,7 +175,7 @@ export default function ProjectMG() {
       {/* Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center">
-          <p className="text-5xl font-bold ml-16 my-5">Todo List</p>
+          <p className="text-5xl font-bold ml-16 my-5">{projectName}</p>
           <span
             className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${selectedButton === "Approved"
               ? "bg-green-500"
@@ -272,7 +274,7 @@ export default function ProjectMG() {
                   return (
                     <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={`/projectpm/${id}`}>
+                        <Link href={{ pathname: `/projectpm/${id}`, query: { id } }}>
                           <Typography
                             variant="small"
                             color="blue-gray"
@@ -283,7 +285,7 @@ export default function ProjectMG() {
                         </Link>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={`/projectpm/${id}`}>
+                        <Link href={{ pathname: `/projectpm/${id}`, query: { id } }}>
                           <Typography
                             variant="small"
                             color="blue-gray"
