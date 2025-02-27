@@ -399,7 +399,7 @@ export default function CloudResources({ params }) {
 
     fetchProject();
     filterVMSize();
-  }, [filterVMSize]);
+  });
   return (
     <div className="min-h-screen text-white">
       {/* Header */}

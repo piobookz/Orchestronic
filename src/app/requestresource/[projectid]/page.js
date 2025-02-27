@@ -59,7 +59,7 @@ export default function RequestDetails({ params }) {
     if (requestId) {
       fetchResource();
     }
-  }, [requestId, fetchResource]);
+  });
 
   const handleDelete = () => {
     toast.success("Resource deleted successfully");

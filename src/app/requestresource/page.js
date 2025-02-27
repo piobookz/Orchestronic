@@ -61,7 +61,7 @@ export default function RequestResource() {
     if (pathWithNamespace) {
       fetchResources();
     }
-  }, [pathWithNamespace, fetchResources]);
+  });
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");

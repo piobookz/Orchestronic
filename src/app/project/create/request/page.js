@@ -55,7 +55,7 @@ export default function RequestResource() {
 
   useEffect(() => {
     fetchResources();
-  }, [fetchResources]);
+  });
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");

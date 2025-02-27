@@ -50,9 +50,10 @@ export default function RequestResource() {
       console.log("Failed to fetch resources:", error.message);
     }
   };
+
   useEffect(() => {
     fetchResources();
-  }, [fetchResources]);
+  }, []);
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");

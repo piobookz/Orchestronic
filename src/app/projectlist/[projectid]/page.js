@@ -71,7 +71,7 @@ export default function Projectdetails({ params }) {
     if (requestId) {
       fetchResource();
     }
-  }, [requestId, fetchResource]);
+  });
 
   const handleDelete = async () => {
     toast.success("Resource deleted successfully");
