@@ -149,21 +149,18 @@ export default function ProjectMG() {
         <div className="mx-16">
           <div className="flex flex-row">
             <button
-              role="radio"
               onClick={() => handleChange("Approved")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-green-500 focus:bg-green-500"
             >
               Approved
             </button>
             <button
-              role="radio"
               onClick={() => handleChange("Rejected")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-red-500 focus:bg-red-500"
             >
               Rejected
             </button>
             <button
-              role="radio"
               onClick={() => handleChange("Under Review")}
               className="ml-2 py-2 px-5 text-sm text-white rounded hover:bg-amber-500 focus:bg-amber-500"
             >

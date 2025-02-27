@@ -287,7 +287,7 @@ export default function CloudResources({ params }) {
   const filterVMSize = async () => {
     // console.log(projectData);
     try {
-      const res = await fetch("http://localhost:3000/api/policy", {
+      const res = await fetch("/api/policy", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -399,7 +399,7 @@ export default function CloudResources({ params }) {
 
     fetchProject();
     filterVMSize();
-  }, [projectData]); // Re-run when projectData changes
+  }, [filterVMSize]);
   return (
     <div className="min-h-screen text-white">
       {/* Header */}

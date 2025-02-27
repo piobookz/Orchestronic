@@ -28,12 +28,6 @@ export default function Projectdetails({ params }) {
     });
   }, [params]);
 
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId]);
-
   const fetchResource = async () => {
     try {
       const res = await fetch(`/api/resource/?requestId=${requestId}`, {
@@ -63,6 +57,12 @@ export default function Projectdetails({ params }) {
       console.log("Error while fetching resource data:", error);
     }
   };
+
+  useEffect(() => {
+    if (requestId) {
+      fetchResource();
+    }
+  }, [requestId, fetchResource]);
 
   const handleDelete = async () => {
     toast.success("Resource deleted successfully");

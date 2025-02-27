@@ -80,8 +80,8 @@ export default function vmexplanation() {
           </ul>
           <h2 className="font-semibold mt-5 text-red-600">
             For detailed guidance on selecting the appropriate virtual machine
-            for your project, please click on "more information" next to each
-            family.
+            for your project, please click on `&quot;`more information`&quot;`
+            next to each family.
           </h2>
         </div>
       </div>

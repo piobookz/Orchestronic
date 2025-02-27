@@ -20,42 +20,42 @@ export default function RequestResource() {
   const projectDescription = data?.projectData?.projectDescription;
   const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
-  useEffect(() => {
-    console.log("projectDetails", data?.projectData);
-    console.log("projectName", projectName);
-    console.log("projectDescription", projectDescription);
-    console.log("pathWithNamespace", pathWithNamespace);
-    const fetchResources = async () => {
-      try {
-        const res = await fetch(`/api/resource?userId=${userId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  // console.log("projectDetails", data?.projectData);
+  // console.log("projectName", projectName);
+  // console.log("projectDescription", projectDescription);
+  // console.log("pathWithNamespace", pathWithNamespace);
+  const fetchResources = async () => {
+    try {
+      const res = await fetch(`/api/resource?userId=${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} - ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        const rows = data.map((element) => ({
-          id: element._id,
-          name: element.vmname,
-          type: element.type,
-          userid: element.userid,
-          projectid: element.projectid,
-          statuspm: "Pending",
-          statusops: "Pending",
-        }));
-        setTableRowsCR(rows);
-      } catch (error) {
-        console.log("Failed to fetch resources:", error.message);
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status} - ${res.statusText}`);
       }
-    };
 
+      const data = await res.json();
+      const rows = data.map((element) => ({
+        id: element._id,
+        name: element.vmname,
+        type: element.type,
+        userid: element.userid,
+        projectid: element.projectid,
+        statuspm: "Pending",
+        statusops: "Pending",
+      }));
+      setTableRowsCR(rows);
+    } catch (error) {
+      console.log("Failed to fetch resources:", error.message);
+    }
+  };
+
+  useEffect(() => {
     fetchResources();
-  }, [project]);
+  }, [fetchResources]);
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");
