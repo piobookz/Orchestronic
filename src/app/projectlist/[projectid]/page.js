@@ -23,9 +23,6 @@ export default function Projectdetails({ params }) {
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
   const [type, setType] = useState("Virtual Machine");
-  const projectName = data?.projectData?.projectName;
-  const projectDescription = data?.projectData?.projectDescription;
-  const pathWithNamespace = data?.projectData?.pathWithNamespace;
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -97,54 +94,6 @@ export default function Projectdetails({ params }) {
 
   return (
     <div>
-      {/* Details Box */}
-      <div className="flex flex-row items-center">
-        <h1 className="text-5xl font-bold mx-16 my-5">Todo List</h1>
-        {/* <span
-          className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
-            selectedButton === "Approved"
-              ? "bg-green-500"
-              : selectedButton === "Rejected"
-              ? "bg-red-500"
-              : selectedButton === "Under Review"
-              ? "bg-amber-500"
-              : "bg-gray-500"
-          }`}
-        >
-          {selectedButton}
-        </span> */}
-      </div>
-      {/* Project Details box */}
-      <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
-        {/* subtitle */}
-        <div className="flex flex-row justify-between items-center">
-          <h1 className="text-3xl font-semibold ml-4">Details</h1>
-        </div>
-        {/* Project name, description and source */}
-        <div className="grid grid-rows-1 grid-flow-col gap-3 items-top mx-2">
-          <div>
-            <p className="text-xl font-medium ml-5 -16 mt-5">
-              Application name
-            </p>
-            <p className="text-lg font-normal ml-5 mt-2">{projectName}</p>
-          </div>
-          <div>
-            <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">
-              {projectDescription}
-            </p>
-          </div>
-          {/* <div>
-            <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
-            <p className="text-lg font-normal ml-16 mt-2">Today</p>
-          </div>
-          <div>
-            <p className="text-xl font-medium mx-16 mt-5">Team</p>
-            <p className="text-lg font-normal ml-16 mt-2">group of people</p>
-          </div> */}
-        </div>
-      </div>
-
       {/* Cloud Resources Box */}
       <div className="bg-white mx-16 my-8 py-8 text-black text-xl rounded-2xl font-normal">
         <div className="flex flex-row justify-between items-center">
