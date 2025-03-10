@@ -9,30 +9,44 @@ export default function Projectdetails() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId"); // Get the requestId from the query
 
+  // Project information
   const [projectDetails, setProjectDetails] = useState({
     _id: "",
     projectName: "",
     projectDescription: "",
     lastUpdate: "",
   });
-
-  const [resource, setResource] = useState({
-    resourceName: "",
+ 
+  // VM resource information
+  const [vmDetails, setVMDetails] = useState({
+    vmName: "",
+    vmSize: "",
     region: "",
     os: "",
+    type: "Virtual Machine",
+    allocation: "",
+    resourceGroupName: "",
+  });
+
+  // Connection details
+  const [connectionDetails, setConnectionDetails] = useState({
     adminUser: "",
     adminPassword: "",
-    vmSize: "",
-    allocation: "",
-    type: "Virtual Machine",
+    publicIP: "",
+    privateIP: "",
+    connectionPort: "", // 22 for SSH, 3389 for RDP
+    connectionMethod: "SSH", // SSH or RDP
+    isConnected: false,
+    connectedUserId: null,
+    connectionStartTime: null,
   });
 
-  const [rg, setRG] = useState({
-    rgName: "",
+  // UI state
+  const [uiState, setUIState] = useState({
+    connectionStatus: "idle", // idle, connecting, connected, failed
+    showPassword: false,
+    isLoading: false
   });
-
-  const [connectionStatus, setConnectionStatus] = useState("idle");
-  const [showPassword, setShowPassword] = useState(false);
 
   const fetchProjectDetails = async () => {
     try {
@@ -65,31 +79,6 @@ export default function Projectdetails() {
     }
   };
 
-  // const fetchRequestStatus = async () => {
-  //     try {
-  //         const res = await fetch(`/api/request/?projectId=${requestId}`, {
-  //             method: "GET",
-  //             headers: { "Content-Type": "application/json" },
-  //         });
-
-  //         if (!res.ok) {
-  //             throw new Error(`Failed to fetch request: ${res.statusText}`);
-  //         }
-
-  //         const data = await res.json();
-  //         console.log("Request Data:", data);
-
-  //         if (data.length > 0) {
-  //             const request = data[0];
-  //             setRequestStatus(request.status);
-  //         } else {
-  //             console.log("No request found for this projectId.");
-  //         }
-  //     } catch (error) {
-  //         console.error("Error fetching request details:", error);
-  //         toast.error("Failed to load request details.");
-  //     }
-  // };
 
   const fetchResource = async () => {
     try {
@@ -107,15 +96,18 @@ export default function Projectdetails() {
 
       if (data.length > 0) {
         const resource = data[0];
-        setResource({
-          resourceName: resource.vmname,
+        setVMDetails({
+          vmName: resource.vmname,
           region: resource.region,
           os: resource.os,
-          adminUser: resource.username,
-          adminPassword: resource.password,
           vmSize: resource.vmsize,
           allocation: resource.allocationip,
-          type: resource.type,
+          resourceGroupName: `rg-${projectDetails._id}`, // Format: rg-<projectId>  
+        });
+
+        setConnectionDetails({
+          adminUser: resource.adminuser,
+          adminPassword: resource.adminpassword,
         });
 
         // console.log("Fetched Data:", data);
@@ -139,26 +131,11 @@ export default function Projectdetails() {
     }
   }, [requestId, fetchResource]);
 
-  // useEffect(() => {
-  //     if (requestId) {
-  //         fetchRequestStatus();
-  //     }
-  // }, [requestId]);
 
-  useEffect(() => {
-    if (projectDetails._id) {
-      setRG({
-        rgName: `rg-${projectDetails._id}`, // Format: rg-<projectId>
-      });
-    }
-  }, [projectDetails._id]);
 
   const handleConnectVM = async () => {
-    const { resourceName, os, adminUser, adminPassword } = resource;
-    const { rgName } = rg;
-
     try {
-      // Show loading toast
+      // Show loading 
       const loadingToast = toast.loading("Checking resources in Azure...");
 
       // Call your API endpoint
@@ -276,7 +253,7 @@ export default function Projectdetails() {
             <p className="text-lg font-normal ml-16 mt-2">{projectDetails.lastUpdate}</p>
           </div> */}
           <div>
-            <p className="text-xl font-medium mx-16 mt-5">Create By</p>
+            <p className="text-xl font-medium mx-16 mt-5">Created By</p>
             <p className="text-lg font-normal ml-16 mt-2">
               {projectDetails.pathWithNamespace}
             </p>
@@ -296,25 +273,24 @@ export default function Projectdetails() {
               Configure
             </button>  */}
             <button
-              className={`ml-4 text-sm text-white rounded py-3 px-5 ${
-                connectionStatus === "connecting"
+              className={`ml-4 text-sm text-white rounded py-3 px-5 ${connectionStatus === "connecting"
                   ? "bg-blue-400"
                   : connectionStatus === "connected"
-                  ? "bg-green-500"
-                  : connectionStatus === "failed"
-                  ? "bg-red-500"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
+                    ? "bg-green-500"
+                    : connectionStatus === "failed"
+                      ? "bg-red-500"
+                      : "bg-blue-500 hover:bg-blue-600"
+                }`}
               onClick={handleConnectVM}
               disabled={connectionStatus === "connecting"}
             >
               {connectionStatus === "connecting"
                 ? "Connecting..."
                 : connectionStatus === "connected"
-                ? "Connected"
-                : connectionStatus === "failed"
-                ? "Connection Failed"
-                : "Connect"}
+                  ? "Connected"
+                  : connectionStatus === "failed"
+                    ? "Connection Failed"
+                    : "Connect"}
             </button>
           </div>
         </div>
@@ -325,13 +301,13 @@ export default function Projectdetails() {
             <div className="flex flex-row">
               <p className="text-lg font-semibold w-32">Name</p>
               <p className="text-lg font-light items-center">
-                {resource.resourceName}
+                {vmDetails.vmName}
               </p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">VM Type</p>
-              <p className="text-lg font-light">{resource.type}</p>
+              <p className="text-lg font-light">{vmDetails.type}</p>
             </div>
 
             <div className="flex flex-row items-center">
@@ -340,24 +316,24 @@ export default function Projectdetails() {
                   VM Size
                 </p>
               </Link>
-              <p className="text-lg font-light">{resource.vmSize}</p>
+              <p className="text-lg font-light">{vmDetails.vmSize}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Region</p>
-              <p className="text-lg font-light">{resource.region}</p>
+              <p className="text-lg font-light">{vmDetails.region}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Username</p>
-              <p className="text-lg font-light">{resource.adminUser}</p>
+              <p className="text-lg font-light">{vmDetails.adminUser}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Password</p>
               <div className="flex items-center">
                 <p className="text-lg font-light mr-2">
-                  {showPassword ? resource.adminPassword : "••••••••••••"}
+                  {showPassword ? vmDetails.adminPassword : "••••••••••••"}
                 </p>
                 <button
                   onClick={() => setShowPassword(!showPassword)}
@@ -367,7 +343,7 @@ export default function Projectdetails() {
                 </button>
                 <button
                   onClick={() =>
-                    navigator.clipboard.writeText(resource.adminPassword)
+                    navigator.clipboard.writeText(vmDetails.adminPassword)
                   }
                   className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 ml-2"
                 >
@@ -378,14 +354,14 @@ export default function Projectdetails() {
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Operating System</p>
-              <p className="text-lg font-light">{resource.os}</p>
+              <p className="text-lg font-light">{vmDetails.os}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">
                 Private IP Allocation
               </p>
-              <p className="text-lg font-light">{resource.allocation}</p>
+              <p className="text-lg font-light">{vmDetails.allocation}</p>
             </div>
           </div>
         </div>

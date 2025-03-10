@@ -76,54 +76,54 @@ export default function Project() {
     }, [projectId]);
 
 
-    useEffect(() => {
-        const fetchProjectStatus = async () => {
-            try {
-                const res = await fetch("/api/request", {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+    // useEffect(() => {
+    //     const fetchProjectStatus = async () => {
+    //         try {
+    //             const res = await fetch("/api/request", {
+    //                 method: "GET",
+    //                 headers: {
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             });
 
-                if (!res.ok) {
-                    throw new Error(`Error: ${res.status} - ${res.statusText}`);
-                }
+    //             if (!res.ok) {
+    //                 throw new Error(`Error: ${res.status} - ${res.statusText}`);
+    //             }
 
-                const data = await res.json();
-                console.log("API Response:", data);
+    //             const data = await res.json();
+    //             console.log("API Response:", data);
 
-                if (!Array.isArray(data)) { // Check if data is an array directly
-                    console.error("Unexpected API response format. Expected an array but received:", data);
-                    return;
-                }
+    //             if (!Array.isArray(data)) { // Check if data is an array directly
+    //                 console.error("Unexpected API response format. Expected an array but received:", data);
+    //                 return;
+    //             }
 
-                const requests = data; // data is already the array
+    //             const requests = data; // data is already the array
 
-                if (TABLE_ROWS_CR.length === 0 || !TABLE_ROWS_CR[0]) {
-                    console.warn("No resources found for the project.");
-                    return;
-                }
+    //             if (TABLE_ROWS_CR.length === 0 || !TABLE_ROWS_CR[0]) {
+    //                 console.warn("No resources found for the project.");
+    //                 return;
+    //             }
 
-                const matchingRequest = requests.find(
-                    (item) => item.projectid === TABLE_ROWS_CR[0].projectid
-                );
+    //             const matchingRequest = requests.find(
+    //                 (item) => item.projectid === TABLE_ROWS_CR[0].projectid
+    //             );
 
-                if (matchingRequest) {
-                    setSelectedButton(matchingRequest.statuspm);
-                } else {
-                    console.warn(
-                        "No matching request found for project ID:",
-                        TABLE_ROWS_CR[0].projectid
-                    );
-                }
-            } catch (error) {
-                console.error("Failed to retrieve request:", error.message);
-            }
-        };
+    //             if (matchingRequest) {
+    //                 setSelectedButton(matchingRequest.statuspm);
+    //             } else {
+    //                 console.warn(
+    //                     "No matching request found for project ID:",
+    //                     TABLE_ROWS_CR[0].projectid
+    //                 );
+    //             }
+    //         } catch (error) {
+    //             console.error("Failed to retrieve request:", error.message);
+    //         }
+    //     };
 
-        fetchProjectStatus();
-    }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
+    //     fetchProjectStatus();
+    // }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
 
     const handleDelete = async () => {
         if (isDeleting) return;

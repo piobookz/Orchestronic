@@ -159,10 +159,11 @@ export default function CreateProject() {
       }
 
       setProjectData(projectDetails);
-      router.push({
-        pathname: "/requestresource",
-        query: { projectId: project._id }
-      });
+      router.push("/requestresource");
+      // router.push({
+      //   pathname: "/requestresource",
+      //   query: { projectId: project._id }
+      // });
     } catch (error) {
       console.error("Error saving project:", error);
       alert("Failed to save project. Please try again.");
