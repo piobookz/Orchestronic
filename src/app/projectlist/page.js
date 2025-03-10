@@ -39,7 +39,7 @@ export default function Projectlist() {
           const projectId = project._id;
 
           try {
-            const res1 = await fetch(`/api/request?projectid=${projectId}`, {
+            const res1 = await fetch(`/api/request?projectId=${projectId}`, {
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export default function Projectlist() {
                 );
 
                 const deleteResource = await fetch(
-                  `/api/resource?requestId=${projectId}`,
+                  `/api/resource?projectRequest=${projectId}`,
                   {
                     method: "DELETE",
                     headers: {
@@ -95,7 +95,7 @@ export default function Projectlist() {
           }
         }
 
-        setProjects(filteredProjects); // ✅ Only set remaining projects
+        setProjects(filteredProjects);
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {

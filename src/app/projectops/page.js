@@ -6,20 +6,49 @@ import { Card, Typography } from "@material-tailwind/react";
 import React, { useState, useEffect, use } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import { redirect, useSearchParams } from "next/navigation";
+import { useRouter, redirect, useSearchParams } from "next/navigation";
 
 export default function ProjectMG() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectid");
 
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [rootPath, setRootPath] = useState("");
-  const [statuspm, setStatuspm] = useState("Pending");
-
   const TABLE_HEAD_CR = ["Name", "Type"];
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const [selectedButton, setSelectedButton] = useState("Pending");
+
+  const updateStatus = async (newStatus) => {
+    try {
+      await Promise.all([
+        fetch("/api/request", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statusops: newStatus,
+            projectid: projectId,
+          }),
+        }),
+        fetch("/api/project", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            statusops: newStatus,
+            projectid: projectId,
+          }),
+        }),
+      ]);
+      router.push("/requestlist");
+    } catch (error) {
+      console.error("Unexpected error:", error);
+    }
+  };
 
   const sendMessageToQueue = async (message, queue) => {
     //console.log("Message:", message, "Queue:", queue);
@@ -43,40 +72,41 @@ export default function ProjectMG() {
     }
   };
 
-  useEffect(() => {
-    const fetchProjectDetails = async () => {
-      try {
-        const res = await fetch(`/api/project`);
-        const data = await res.json();
-        const project = data.find((proj) => proj._id === projectId);
-        if (project) {
-          setProjectName(project.projectName);
-          setProjectDescription(project.projectDescription);
-          setRootPath(project.rootPath);
-          setStatuspm(project.statusops); // Set the project status
-        } else {
-          console.error("Project not found");
-          // Optionally, handle the case where the project is not found
-        }
-      } catch (error) {
-        console.error("Failed to fetch project details:", error.message);
+  const fetchProjectDetails = async () => {
+    try {
+      const res = await fetch(`/api/project`);
+      const data = await res.json();
+      const project = data.find((proj) => proj._id === projectId);
+      if (project) {
+        setProjectName(project.projectName);
+        setProjectDescription(project.projectDescription);
+        setRootPath(project.rootPath);
+      } else {
+        console.log("Project not found");
+        // Optionally, handle the case where the project is not found
       }
-    };
+    } catch (error) {
+      console.error("Failed to fetch project details:", error.message);
+    }
+  };
 
-    fetchProjectDetails();
+  useEffect(() => {
+    if (projectId) {
+      fetchProjectDetails();
+    }
   }, [projectId]);
 
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch(`/api/resourcelist`, {
+        const res = await fetch(`/api/resource`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
         const data = await res.json();
-        console.log("API Response for /api/resourcelist:", data);
+        console.log("API Response for /api/resource:", data);
         // Find the resources matching the projectId
         const resources = data.filter(
           (resource) => resource.projectid === projectId
@@ -88,7 +118,7 @@ export default function ProjectMG() {
           name: element.vmname,
           type: element.type,
           userid: element.userid,
-          statuspm: "Pending",
+          projectid: element.projectid,
         }));
 
         // Update the state with the fetched rows
@@ -116,7 +146,7 @@ export default function ProjectMG() {
         }
 
         const data = await res.json();
-        console.log("API Response:", data);
+        // console.log("API Response:", data);
 
         if (!Array.isArray(data)) {
           // Check if data is an array directly
@@ -128,7 +158,7 @@ export default function ProjectMG() {
         }
 
         const requests = data; // data is already the array
-
+        // console.log("Request", requests);
         if (TABLE_ROWS_CR.length === 0 || !TABLE_ROWS_CR[0]) {
           console.warn("No resources found for the project.");
           return;
@@ -152,20 +182,21 @@ export default function ProjectMG() {
     };
 
     fetchProjectStatus();
-  }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
+  });
 
   const handleChange = async (event) => {
     setSelectedButton(event);
 
     if (event === "Rejected") {
       toast.error("Request rejected");
+      updateStatus(event);
       return;
     } else if (event === "Approved") {
       toast.success("Request approved");
-
       sendMessageToQueue(projectId, "create-vm");
+
       try {
-        const res = await fetch(`/api/request/?projectid=${projectId}`, {
+        const res = await fetch(`/api/request/?projectId=${projectId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -193,47 +224,21 @@ export default function ProjectMG() {
               throw new Error(`HTTP error! Status: ${res.status}`);
             }
 
-            return await res.json(); // Or handle the response as needed
+            updateStatus(event);
+            return await res.json();
           } catch (error) {
             console.error("Error triggering DAG:", error);
-            throw error; // Re-throw to allow the caller to handle the error
+            throw error;
           }
         }
       } catch (error) {
         console.error("Error:", error);
       }
     } else {
+      updateStatus(event);
       toast.error("Request under review", {
         icon: "🟡",
       });
-    }
-
-    try {
-      await Promise.all([
-        fetch("/api/request", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            statusops: event,
-            projectid: projectId,
-          }),
-        }),
-        fetch("/api/project", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            statusops: event,
-            projectid: projectId,
-          }),
-        }),
-      ]);
-      redirect("/requestlist");
-    } catch (error) {
-      console.error("Failed to send request:", error);
     }
   };
 
@@ -346,8 +351,8 @@ export default function ProjectMG() {
                       <td className="p-4 border-b border-blue-gray-50">
                         <Link
                           href={{
-                            pathname: `/projectops/${id}`,
-                            query: { id },
+                            pathname: `/projectops/${projectId}`,
+                            query: { projectId },
                           }}
                         >
                           <Typography
@@ -362,8 +367,8 @@ export default function ProjectMG() {
                       <td className="p-4 border-b border-blue-gray-50">
                         <Link
                           href={{
-                            pathname: `/projectops/${id}`,
-                            query: { id },
+                            pathname: `/projectops/${projectId}`,
+                            query: { projectId },
                           }}
                         >
                           <Typography

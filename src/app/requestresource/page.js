@@ -4,7 +4,7 @@ import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProvider } from "../components/ConText";
@@ -13,6 +13,7 @@ import { useAuth } from "@clerk/nextjs";
 export default function RequestResource() {
   const { userId } = useAuth();
   const data = useProvider();
+  const TABLE_HEAD_CR = ["Name", "Type"];
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const router = useRouter();
   const projectName = data?.projectData?.projectName;
@@ -145,12 +146,16 @@ export default function RequestResource() {
             <table className="w-full min-w-max table-auto text-left">
               <thead>
                 <tr>
-                  <th className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold">
-                    Name
-                  </th>
-                  <th className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold">
-                    Type
-                  </th>
+                  {TABLE_HEAD_CR.map((head) => (
+                    <th
+                      key={head}
+                      className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
+                    >
+                      <Typography variant="small" className="font-medium">
+                        {head}
+                      </Typography>
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>

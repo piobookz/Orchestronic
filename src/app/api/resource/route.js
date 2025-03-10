@@ -79,9 +79,20 @@ export async function DELETE(req) {
   // Parse JSON
   const url = new URL(req.url);
   const requestId = url.searchParams.get("requestId");
+  const projectRequest = url.searchParams.get("projectRequest");
+
+  const query = {};
+
+  // Add filters dynamically
+  if (requestId) {
+    query._id = requestId;
+  }
+  if (projectRequest) {
+    query.projectid = projectRequest;
+  }
 
   // Delete resource
-  await Resource.deleteOne({ _id: requestId });
+  await Resource.deleteOne(query);
 
   return NextResponse.json(
     { message: "Successfully deleted resource" },
