@@ -8,8 +8,8 @@ import Azure from "../../../../public/azure-logo.png";
 import toast from "react-hot-toast";
 
 export default function RequestDetails({ params }) {
-  const [requestId, setRequestId] = useState(null);
   const router = useRouter();
+  const [requestId, setRequestId] = useState(null);
   const [resourceName, setResourceName] = useState("");
   const [region, setRegion] = useState("");
   const [os, setOS] = useState("");
@@ -21,51 +21,51 @@ export default function RequestDetails({ params }) {
 
   useEffect(() => {
     params.then((resolvedParams) => {
-      setRequestId(resolvedParams.requestId);
+      setRequestId(resolvedParams.projectId);
     });
   }, [params]);
 
-  const fetchResource = async () => {
-    try {
-      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Failed to fetch resource: ${res.statusText}`);
-      }
-
-      const data = await res.json();
-      if (data.length > 0) {
-        const resource = data[0];
-        setResourceName(resource.vmname);
-        setRegion(resource.region);
-        setOS(resource.os);
-        setAdminUser(resource.username);
-        setAdminPassword(resource.password);
-        setVMSize(resource.vmsize);
-        setAllocation(resource.allocationip);
-        setType(resource.type);
-      }
-    } catch (error) {
-      console.log("Error while fetching resource data:", error);
-    }
-  };
-
   useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  });
+    if (!requestId) return;
+    // console.log(requestId);
+    const fetchResource = async () => {
+      try {
+        const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-  const handleDelete = () => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch resource: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+        if (data.length > 0) {
+          const resource = data[0];
+          setResourceName(resource.vmname);
+          setRegion(resource.region);
+          setOS(resource.os);
+          setAdminUser(resource.username);
+          setAdminPassword(resource.password);
+          setVMSize(resource.vmsize);
+          setAllocation(resource.allocationip);
+          setType(resource.type);
+        }
+      } catch (error) {
+        console.log("Error while fetching resource data:", error);
+      }
+    };
+
+    fetchResource();
+  }, [requestId]);
+
+  const handleDelete = async () => {
     toast.success("Resource deleted successfully");
 
     try {
-      fetch(`/api/resource/?requestId=${requestId}`, {
+      await fetch(`/api/resource/?requestId=${requestId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -85,10 +85,8 @@ export default function RequestDetails({ params }) {
       {/* Header */}
       <div className="mx-16 my-6">
         <h1 className="text-4xl font-bold">Create Cloud Resource</h1>
-        <h2 className="text-lg text-gray-400 ml-1 mt-4">
-          Create Cloud Resource → Todo List
-        </h2>
       </div>
+
       {/* Form Container */}
       <div className="bg-white text-black mx-16 my-8 p-8 rounded-lg shadow-lg">
         {/* Section Title */}

@@ -6,9 +6,10 @@ import { Card, Typography } from "@material-tailwind/react";
 import React, { useState, useEffect, use } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import { redirect, useSearchParams } from "next/navigation";
+import { useRouter, redirect, useSearchParams } from "next/navigation";
 
 export default function ProjectMG() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectid");
 
@@ -47,16 +48,18 @@ export default function ProjectMG() {
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch(`/api/resourcelist`, {
+        const res = await fetch(`/api/resource`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
         const data = await res.json();
-        console.log("API Response for /api/resourcelist:", data);
+        console.log("API Response for /api/resource:", data);
         // Find the resources matching the projectId
-        const resources = data.filter((resource) => resource.projectid === projectId); // corrected line
+        const resources = data.filter(
+          (resource) => resource.projectid === projectId
+        ); // corrected line
 
         // Map the data to table rows
         const rows = resources.map((element) => ({
@@ -64,7 +67,7 @@ export default function ProjectMG() {
           name: element.vmname,
           type: element.type,
           userid: element.userid,
-          statuspm: "Pending",
+          projectid: element.projectid,
         }));
 
         // Update the state with the fetched rows
@@ -76,7 +79,6 @@ export default function ProjectMG() {
 
     fetchTableRows();
   }, [projectId]);
-
 
   useEffect(() => {
     const fetchProjectStatus = async () => {
@@ -95,8 +97,12 @@ export default function ProjectMG() {
         const data = await res.json();
         console.log("API Response:", data);
 
-        if (!Array.isArray(data)) { // Check if data is an array directly
-          console.error("Unexpected API response format. Expected an array but received:", data);
+        if (!Array.isArray(data)) {
+          // Check if data is an array directly
+          console.error(
+            "Unexpected API response format. Expected an array but received:",
+            data
+          );
           return;
         }
 
@@ -164,7 +170,7 @@ export default function ProjectMG() {
           }),
         }),
       ]);
-      redirect("/requestlist");
+      router.push("/requestlist");
     } catch (error) {
       console.error("Failed to send request:", error);
     }
@@ -177,14 +183,15 @@ export default function ProjectMG() {
         <div className="flex flex-row items-center">
           <p className="text-5xl font-bold ml-16 my-5">{projectName}</p>
           <span
-            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${selectedButton === "Approved"
-              ? "bg-green-500"
-              : selectedButton === "Rejected"
+            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
+              selectedButton === "Approved"
+                ? "bg-green-500"
+                : selectedButton === "Rejected"
                 ? "bg-red-500"
                 : selectedButton === "Under Review"
-                  ? "bg-amber-500"
-                  : "bg-gray-500"
-              }`}
+                ? "bg-amber-500"
+                : "bg-gray-500"
+            }`}
           >
             {selectedButton}
           </span>
@@ -228,7 +235,9 @@ export default function ProjectMG() {
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">{projectDescription}</p>
+            <p className="text-lg font-normal ml-16 mt-2">
+              {projectDescription}
+            </p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Repository</p>
@@ -274,7 +283,12 @@ export default function ProjectMG() {
                   return (
                     <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={{ pathname: `/projectpm/${id}`, query: { id } }}>
+                        <Link
+                          href={{
+                            pathname: `/projectpm/${projectId}`,
+                            query: { projectId },
+                          }}
+                        >
                           <Typography
                             variant="small"
                             color="blue-gray"
@@ -285,7 +299,12 @@ export default function ProjectMG() {
                         </Link>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <Link href={{ pathname: `/projectpm/${id}`, query: { id } }}>
+                        <Link
+                          href={{
+                            pathname: `/projectpm/${projectId}`,
+                            query: { projectId },
+                          }}
+                        >
                           <Typography
                             variant="small"
                             color="blue-gray"

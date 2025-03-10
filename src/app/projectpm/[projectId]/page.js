@@ -67,8 +67,7 @@ export default function Projectdetails({ params }) {
 
   const fetchResource = async () => {
     try {
-
-      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+      const res = await fetch(`/api/resource/?projectRequest=${requestId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -114,33 +113,35 @@ export default function Projectdetails({ params }) {
     }
   }, [requestId]);
 
-  const handleDelete = async () => {
-    toast.success("Resource deleted successfully");
+  // const handleDelete = async () => {
+  //   toast.success("Resource deleted successfully");
 
-    try {
-      const response = await fetch(`/api/resource/?requestId=${requestId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  //   try {
+  //     const response = await fetch(`/api/resource/?requestId=${requestId}`, {
+  //       method: "DELETE",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`Failed to delete resource: ${response.statusText}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`Failed to delete resource: ${response.statusText}`);
+  //     }
 
-      router.push("/projectops");
-    } catch (error) {
-      console.error("Error while deleting resource:", error);
-      toast.error("Failed to delete resource");
-    }
-  };
+  //     router.push("/projectpm");
+  //   } catch (error) {
+  //     console.error("Error while deleting resource:", error);
+  //     toast.error("Failed to delete resource");
+  //   }
+  // };
 
   return (
     <div>
       {/* Details Box */}
       <div className="flex flex-row items-center">
-        <h1 className="text-5xl font-bold mx-16 my-5">{projectDetails.projectName}</h1>
+        <h1 className="text-5xl font-bold mx-16 my-5">
+          {projectDetails.projectName}
+        </h1>
         {/* <span
           className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
             selectedButton === "Approved"
@@ -167,11 +168,15 @@ export default function Projectdetails({ params }) {
             <p className="text-xl font-medium ml-5 -16 mt-5">
               Application name
             </p>
-            <p className="text-lg font-normal ml-5 mt-2">{projectDetails.projectName}</p>
+            <p className="text-lg font-normal ml-5 mt-2">
+              {projectDetails.projectName}
+            </p>
           </div>
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Description</p>
-            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.projectDescription}</p>
+            <p className="text-lg font-normal ml-16 mt-2">
+              {projectDetails.projectDescription}
+            </p>
           </div>
           {/* <div>
             <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
@@ -179,7 +184,9 @@ export default function Projectdetails({ params }) {
           </div> */}
           <div>
             <p className="text-xl font-medium mx-16 mt-5">Create By</p>
-            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.pathWithNamespace}</p>
+            <p className="text-lg font-normal ml-16 mt-2">
+              {projectDetails.pathWithNamespace}
+            </p>
           </div>
         </div>
       </div>
@@ -209,7 +216,9 @@ export default function Projectdetails({ params }) {
           <div className="flex flex-col space-y-4 mt-4">
             <div className="flex flex-row">
               <p className="text-lg font-semibold w-32">Name</p>
-              <p className="text-lg font-light items-center">{resource.resourceName}</p>
+              <p className="text-lg font-light items-center">
+                {resource.resourceName}
+              </p>
             </div>
 
             <div className="flex flex-row items-center">

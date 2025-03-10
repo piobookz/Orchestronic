@@ -10,6 +10,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const pathWithNamespace = url.searchParams.get("pathWithNamespace");
     const userId = url.searchParams.get("userId");
+    const projectId = url.searchParams.get("projectId");
 
     let query = {};
 
@@ -19,6 +20,10 @@ export async function GET(req) {
 
     if (userId) {
       query.userId = userId;
+    }
+
+    if (projectId) {
+      query._id = projectId;
     }
 
     const projects = await Project.find(query);
@@ -119,27 +124,44 @@ export async function DELETE(req) {
 }
 
 export async function PUT(req) {
-  const { projectid, ...updates } = await req.json(); // Destructure the project JSON
+  try {
+    const { projectid, ...updates } = await req.json();
+    console.log("Updating Project:", projectid, updates);
 
-  // Check if there is a valid `projectid` and update fields are not empty
-  if (!projectid || Object.keys(updates).length === 0) {
+    // Connect to MongoDB
+    await connectMongoDB();
+
+    // Validate input
+    if (!projectid || Object.keys(updates).length === 0) {
+      return NextResponse.json(
+        { message: "Project ID and update fields are required" },
+        { status: 400 }
+      );
+    }
+
+    // Perform the update and return the updated document
+    const updatedProject = await Project.findOneAndUpdate(
+      { _id: projectid },
+      { $set: updates },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProject) {
+      return NextResponse.json(
+        { message: "Project not found" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Invalid input, project ID and updates are required" },
-      { status: 400 }
+      { message: "Successfully updated request", updatedProject },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error", error: error.message },
+      { status: 500 }
     );
   }
-
-  // Connect to MongoDB
-  await connectMongoDB();
-
-  // Perform the update
-  const updatedProjects = await Project.updateMany(
-    { projectid },
-    { $set: updates } // Only update fields provided in the body
-  );
-
-  return NextResponse.json(
-    { message: "Successfully updated requests", updatedProjects },
-    { status: 200 }
-  );
 }

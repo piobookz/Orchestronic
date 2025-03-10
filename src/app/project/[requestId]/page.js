@@ -60,7 +60,7 @@ export default function Projectdetails() {
       }
 
       const data = await res.json();
-
+      console.log(data);
       if (data.length > 0) {
         const project = data[0];
         setProjectDetails({
@@ -82,7 +82,7 @@ export default function Projectdetails() {
 
   const fetchResource = async () => {
     try {
-      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+      const res = await fetch(`/api/resource/?projectRequest=${requestId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
