@@ -4,7 +4,7 @@ import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProvider } from "../components/ConText";
