@@ -46,7 +46,7 @@ export default function Projectdetails() {
       }
 
       const data = await res.json();
-
+      console.log(data);
       if (data.length > 0) {
         const project = data[0];
         setProjectDetails({
@@ -93,7 +93,7 @@ export default function Projectdetails() {
 
   const fetchResource = async () => {
     try {
-      const res = await fetch(`/api/resource/?requestId=${requestId}`, {
+      const res = await fetch(`/api/resource/?projectRequest=${requestId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -276,7 +276,7 @@ export default function Projectdetails() {
             <p className="text-lg font-normal ml-16 mt-2">{projectDetails.lastUpdate}</p>
           </div> */}
           <div>
-            <p className="text-xl font-medium mx-16 mt-5">Create By</p>
+            <p className="text-xl font-medium mx-16 mt-5">Created By</p>
             <p className="text-lg font-normal ml-16 mt-2">
               {projectDetails.pathWithNamespace}
             </p>

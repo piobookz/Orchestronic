@@ -10,6 +10,7 @@ export async function GET(req) {
     const url = new URL(req.url);
     const pathWithNamespace = url.searchParams.get("pathWithNamespace");
     const userId = url.searchParams.get("userId");
+    const projectId = url.searchParams.get("projectId");
 
     let query = {};
 
@@ -19,6 +20,10 @@ export async function GET(req) {
 
     if (userId) {
       query.userId = userId;
+    }
+
+    if (projectId) {
+      query._id = projectId;
     }
 
     const projects = await Project.find(query);
@@ -120,6 +125,9 @@ export async function DELETE(req) {
 
 export async function PUT(req) {
   const { projectid, ...updates } = await req.json(); // Destructure the project JSON
+  console.log(projectid, updates);
+  // Connect to MongoDB
+  await connectMongoDB();
 
   // Check if there is a valid `projectid` and update fields are not empty
   if (!projectid || Object.keys(updates).length === 0) {
@@ -128,9 +136,6 @@ export async function PUT(req) {
       { status: 400 }
     );
   }
-
-  // Connect to MongoDB
-  await connectMongoDB();
 
   // Perform the update
   const updatedProjects = await Project.updateMany(

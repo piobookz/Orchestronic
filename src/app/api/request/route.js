@@ -48,6 +48,9 @@ export async function POST(req) {
 export async function PUT(req) {
   const { projectid, ...updates } = await req.json(); // Destructure the request JSON
 
+  // Connect to MongoDB
+  await connectMongoDB();
+
   // Check if there is a valid `projectid` and update fields are not empty
   if (!projectid || Object.keys(updates).length === 0) {
     return NextResponse.json(
@@ -55,9 +58,6 @@ export async function PUT(req) {
       { status: 400 }
     );
   }
-
-  // Connect to MongoDB
-  await connectMongoDB();
 
   // Perform the update
   const updatedRequests = await Request.updateMany(
