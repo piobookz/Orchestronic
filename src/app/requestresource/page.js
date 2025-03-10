@@ -35,27 +35,31 @@ export default function RequestResource() {
       console.log("projectid", data);
       console.log("Fetched project:", data._id);
 
+      console.log("project length", projectData.length);
       if (projectData.length > 0) {
-        const projectId = projectData[0]._id;
-        console.log("Project ID:", projectId);
-        const resourceRes = await fetch(`/api/resource?requestId=${projectId}`);
+        const projectRequest = projectData[0]._id;
+        console.log("Project ID:", projectRequest);
+
+        const resourceRes = await fetch(
+          `/api/resource?projectRequest=${projectRequest}`
+        );
         if (!resourceRes.ok)
           throw new Error(`Resource fetch failed: ${resourceRes.statusText}`);
 
         const resourceData = await resourceRes.json();
         console.log("Fetched resources:", resourceData);
 
-        const rows = resourceData.map((element) => ({
-          id: element._id,
-          name: element.vmname,
-          type: element.type,
-          userid: element.userid,
-          projectid: element.projectid,
-          statuspm: "Pending",
-          statusops: "Pending",
-        }));
-
-        setTableRowsCR(rows);
+        setTableRowsCR(
+          resourceData.map((element) => ({
+            id: element._id,
+            name: element.vmname,
+            type: element.type,
+            userid: element.userid,
+            projectid: element.projectid,
+            statuspm: "Pending",
+            statusops: "Pending",
+          }))
+        );
       }
     } catch (error) {
       console.log(error.message);
@@ -63,10 +67,10 @@ export default function RequestResource() {
   };
 
   useEffect(() => {
-    if (pathWithNamespace) {
+    if (data) {
       fetchResources();
     }
-  }, [pathWithNamespace]);
+  }, [data]);
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");
@@ -83,6 +87,7 @@ export default function RequestResource() {
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
       } else {
+        await fetchResources(); // Refetch resources after request
         router.push("/projectlist");
       }
     } catch (error) {
