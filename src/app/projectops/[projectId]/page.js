@@ -195,12 +195,12 @@ export default function Projectdetails({ params }) {
             >
               Configure
             </button>  */}
-            <button
+            {/* <button
               className="ml-4 text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600"
               onClick={handleDelete}
             >
               Destroy
-            </button>
+            </button> */}
           </div>
         </div>
 

@@ -25,6 +25,7 @@ export default function Projectdetails() {
         vmSize: "",
         allocation: "",
         type: "Virtual Machine",
+        publicIP: "", // Store the public IP address
     });
 
     const [rg, setRG] = useState({
@@ -51,7 +52,7 @@ export default function Projectdetails() {
                 const project = data[0];
                 setProjectDetails({
                     _id: project._id,
-                    projectName: project.projectName, // Fixed field names
+                    projectName: project.projectName,
                     projectDescription: project.projectDescription,
                     lastUpdate: project.lastUpdate,
                     pathWithNamespace: project.pathWithNamespace,
@@ -65,35 +66,8 @@ export default function Projectdetails() {
         }
     };
 
-    // const fetchRequestStatus = async () => {
-    //     try {
-    //         const res = await fetch(`/api/request/?projectId=${requestId}`, {
-    //             method: "GET",
-    //             headers: { "Content-Type": "application/json" },
-    //         });
-
-    //         if (!res.ok) {
-    //             throw new Error(`Failed to fetch request: ${res.statusText}`);
-    //         }
-
-    //         const data = await res.json();
-    //         console.log("Request Data:", data);
-
-    //         if (data.length > 0) {
-    //             const request = data[0];
-    //             setRequestStatus(request.status);
-    //         } else {
-    //             console.log("No request found for this projectId.");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error fetching request details:", error);
-    //         toast.error("Failed to load request details.");
-    //     }
-    // };
-
     const fetchResource = async () => {
         try {
-
             const res = await fetch(`/api/resource/?requestId=${requestId}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
@@ -104,7 +78,7 @@ export default function Projectdetails() {
             }
 
             const data = await res.json();
-            console.log("data", data);
+            console.log("Resource data:", data);
 
             if (data.length > 0) {
                 const resource = data[0];
@@ -117,9 +91,8 @@ export default function Projectdetails() {
                     vmSize: resource.vmsize,
                     allocation: resource.allocationip,
                     type: resource.type,
+                    publicIP: resource.publicIP || "Not available yet", // Use the stored IP or default message
                 });
-
-                // console.log("Fetched Data:", data);
             } else {
                 console.log("No resource found for this requestId.");
             }
@@ -140,12 +113,6 @@ export default function Projectdetails() {
         }
     }, [requestId]);
 
-    // useEffect(() => {
-    //     if (requestId) {
-    //         fetchRequestStatus();
-    //     }
-    // }, [requestId]);
-
     useEffect(() => {
         if (projectDetails._id) {
             setRG({
@@ -155,88 +122,99 @@ export default function Projectdetails() {
     }, [projectDetails._id]);
 
     const handleConnectVM = async () => {
-        const { resourceName, os, adminUser, adminPassword } = resource;
-        const { rgName } = rg;
+        console.log("Connect button clicked");
+        
+        const { resourceName, os, adminUser, adminPassword, publicIP } = resource;
+        console.log("Resource details:", { resourceName, os, adminUser, publicIP });
+
+        // If publicIP is not available yet, show an error
+        if (!publicIP || publicIP === "Not available yet") {
+            console.log("Public IP not available, showing error");
+            toast.error("Public IP address is not available yet. Please wait for the VM to be fully provisioned.");
+            return;
+        }
 
         try {
-            // Show loading toast
-            const loadingToast = toast.loading("Checking resources in Azure...");
-
-            // Call your API endpoint
-            const response = await fetch('/api/connect-vm', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resourceName, rgName, os })
-            });
-
-            // Parse the response first
-            const data = await response.json();
-            toast.dismiss(loadingToast);
-
-            // Handle resource not found scenarios
-            if (!response.ok) {
-                if (response.status === 404) {
-                    if (data.resourceGroupExists === false) {
-                        toast.error(`Resource group '${rgName}' doesn't exist in Azure`);
-                    } else if (data.vmExists === false) {
-                        toast.error(`VM '${resourceName}' doesn't exist in resource group '${rgName}'`);
-                    } else {
-                        toast.error(data.message || "Resource not found");
-                    }
-                    return;
-                }
-
-                // Other errors
-                throw new Error(data.message || "Failed to connect to VM");
-            }
-
-            if (data.success) {
-                toast.success(`VM '${resourceName}' found in Azure and ready to connect`);
-                const { publicIP } = data.vmDetails;
-
-                // For Linux VMs, provide SSH command
-                if (os.toLowerCase().includes("linux")) {
+            setConnectionStatus("connecting");
+            console.log("Connection status set to connecting");
+            
+            // Show a loading toast
+            const loadingToast = toast.loading("Preparing connection details...");
+            console.log("Loading toast displayed");
+            
+            // For direct connection without API call
+            const directConnect = () => {
+                console.log("Starting direct connect process");
+                toast.dismiss(loadingToast);
+                
+                // For Linux or Ubuntu VMs, provide SSH command
+                if (os.toLowerCase().includes("linux") || os.toLowerCase().includes("ubuntu")) {
+                    console.log("Detected Linux/Ubuntu OS, preparing SSH command");
                     const sshCommand = `ssh ${adminUser}@${publicIP}`;
                     toast.success(`Run this command to connect: ${sshCommand}`);
 
                     // Copy to clipboard
                     navigator.clipboard.writeText(sshCommand)
-                        .then(() => toast.success("SSH command copied to clipboard"))
-                        .catch(() => console.error("Failed to copy command"));
+                        .then(() => {
+                            console.log("SSH command copied to clipboard");
+                            toast.success("SSH command copied to clipboard");
+                        })
+                        .catch((err) => {
+                            console.error("Failed to copy command:", err);
+                            toast.error("Failed to copy command to clipboard");
+                        });
+                    
+                    setConnectionStatus("connected");
                 }
-
                 // For Windows VMs, generate RDP file
                 else if (os.toLowerCase().includes("windows")) {
-                    const rdpContent = `
-                full address:s:${publicIP}
-                username:s:${adminUser}
-                password:s:${adminPassword}
-              `;
+                    console.log("Detected Windows OS, preparing RDP file");
+                    const rdpContent = `full address:s:${publicIP}\nusername:s:${adminUser}\npassword:s:${adminPassword}`;
 
-                    // Download RDP file
-                    const blob = new Blob([rdpContent], { type: "application/rdp" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${resourceName}.rdp`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+                    try {
+                        // Download RDP file
+                        const blob = new Blob([rdpContent], { type: "application/rdp" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `${resourceName}.rdp`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        console.log("RDP file download initiated");
 
-                    toast.success("RDP file downloaded. Open it to connect to the VM.");
+                        toast.success("RDP file downloaded. Open it to connect to the VM.");
+                        setConnectionStatus("connected");
+                    } catch (rdpError) {
+                        console.error("Error creating RDP file:", rdpError);
+                        toast.error("Failed to create RDP file");
+                        setConnectionStatus("error");
+                    }
                 } else {
-                    toast.error("Unsupported OS for connection.");
+                    console.log("Unsupported OS:", os);
+                    toast.error(`Unsupported OS for connection: ${os}`);
+                    setConnectionStatus("error");
                 }
-            } else {
-                toast.error("Failed to get VM connection details.");
-            }
+            };
+            
+            // Use setTimeout to ensure the UI updates before processing
+            setTimeout(directConnect, 500);
+            
         } catch (error) {
             console.error("Error connecting to VM:", error);
-            toast.error(error.message || "Failed to connect to VM.");
+            toast.error("Failed to prepare connection details: " + error.message);
+            setConnectionStatus("error");
         }
     };
-    
+
+    const handleRefreshResource = async () => {
+        toast.loading("Refreshing resource information...");
+        await fetchResource();
+        toast.dismiss();
+        toast.success("Resource information updated");
+    };
+
     return (
         <div>
             {/* Details Box */}
@@ -261,12 +239,8 @@ export default function Projectdetails() {
                         <p className="text-xl font-medium mx-16 mt-5">Description</p>
                         <p className="text-lg font-normal ml-16 mt-2">{projectDetails.projectDescription}</p>
                     </div>
-                    {/* <div>
-            <p className="text-xl font-medium mx-16 mt-5">Last Update</p>
-            <p className="text-lg font-normal ml-16 mt-2">{projectDetails.lastUpdate}</p>
-          </div> */}
                     <div>
-                        <p className="text-xl font-medium mx-16 mt-5">Create By</p>
+                        <p className="text-xl font-medium mx-16 mt-5">Created By</p>
                         <p className="text-lg font-normal ml-16 mt-2">{projectDetails.pathWithNamespace}</p>
                     </div>
                 </div>
@@ -277,37 +251,37 @@ export default function Projectdetails() {
                 <div className="flex flex-row justify-between items-center">
                     <h1 className="text-3xl font-semibold ml-4">Cloud Resources</h1>
                     <div className="flex flex-row justify-between items-center px-4">
-                        {/* <button
-              className="text-sm text-black bg-[#E3E3E3] rounded py-3 px-5"
-              // onClick={}
-            >
-              Configure
-            </button>  */}
                         <button
-                            className={`ml-4 text-sm text-white rounded py-3 px-5 ${connectionStatus === "connecting"
-                                ? "bg-blue-400"
-                                : connectionStatus === "connected"
-                                    ? "bg-green-500"
-                                    : connectionStatus === "failed"
-                                        ? "bg-red-500"
-                                        : "bg-blue-500 hover:bg-blue-600"
-                                }`}
+                            className={`ml-4 text-sm text-white rounded py-3 px-5 ${
+                                connectionStatus === "connecting"
+                                    ? "bg-blue-400"
+                                    : connectionStatus === "connected"
+                                        ? "bg-green-500"
+                                        : connectionStatus === "error"
+                                            ? "bg-red-500"
+                                            : "bg-blue-500 hover:bg-blue-600"
+                            }`}
                             onClick={handleConnectVM}
-                            disabled={connectionStatus === "connecting"}
+                            disabled={connectionStatus === "connecting" || !resource.publicIP || resource.publicIP === "Not available yet"}
                         >
                             {connectionStatus === "connecting"
                                 ? "Connecting..."
                                 : connectionStatus === "connected"
                                     ? "Connected"
-                                    : connectionStatus === "failed"
-                                        ? "Connection Failed"
+                                    : connectionStatus === "error"
+                                        ? "Try Again"
                                         : "Connect"}
+                        </button>
+                        <button
+                            className="ml-4 text-sm text-white bg-gray-500 hover:bg-gray-600 rounded py-3 px-5"
+                            onClick={handleRefreshResource}
+                        >
+                            Refresh
                         </button>
                     </div>
                 </div>
 
                 <div className="ml-20 mt-5">
-                    {/* <p className="text-xl font-semibold">Create Resource Group</p> */}
                     <div className="flex flex-col space-y-4 mt-4">
                         <div className="flex flex-row">
                             <p className="text-lg font-semibold w-32">Name</p>
@@ -351,7 +325,10 @@ export default function Projectdetails() {
                                     {showPassword ? "Hide" : "Show"}
                                 </button>
                                 <button
-                                    onClick={() => navigator.clipboard.writeText(resource.adminPassword)}
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(resource.adminPassword);
+                                        toast.success("Password copied to clipboard");
+                                    }}
                                     className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 ml-2"
                                 >
                                     Copy
@@ -370,9 +347,23 @@ export default function Projectdetails() {
                             </p>
                             <p className="text-lg font-light">{resource.allocation}</p>
                         </div>
+
+                        <div className="flex flex-row items-center">
+                            <p className="text-lg font-semibold w-32">
+                                Public IP Address
+                            </p>
+                            <p className="text-lg font-light">{resource.publicIP || "Not available"}</p>
+                        </div>
+
+                        <div className="flex flex-row items-center">
+                            <p className="text-lg font-semibold w-32">
+                                Resource Group
+                            </p>
+                            <p className="text-lg font-light">{rg.rgName}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
-};
+}

@@ -109,7 +109,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "67bfe68bfdb410e6b628f762"
+        return received_message if received_message is not None else ""
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")
@@ -461,7 +461,7 @@ with DAG(
         "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
         "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
     },
-    retries=3,
+    retries=3, 
     retry_delay=timedelta(minutes=5),
 )
 

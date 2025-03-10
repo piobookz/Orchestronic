@@ -12,6 +12,7 @@ export default function Project() {
     const searchParams = useSearchParams();
     const projectId = searchParams.get("projectId");
     console.log("projectId", projectId);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
@@ -125,6 +126,7 @@ export default function Project() {
     }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
 
     const handleDelete = async () => {
+        if (isDeleting) return;
         toast.success("Resource deleted successfully");
 
         try {
@@ -138,6 +140,7 @@ export default function Project() {
             if (!response.ok) {
                 throw new Error(`Failed to delete resource: ${response.statusText}`);
             }
+            redirect("/projec");
         } catch (error) {
             console.error("Error while deleting resource:", error);
             toast.error("Failed to delete resource");
@@ -152,12 +155,12 @@ export default function Project() {
                     <p className="text-5xl font-bold ml-16 my-5">{projectName}</p>
                 </div>
                 <div className="flex flex-row justify-between items-center px-4">
-                    <button
+                    {/* <button
                         className="mr-10 text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600"
-                    //onClick={handleDelete}
+                        onClick={handleDelete}
                     >
                         Destroy
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

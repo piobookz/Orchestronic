@@ -5,12 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, Typography } from "@material-tailwind/react";
 import React, { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProvider } from "../components/ConText";
 import { useAuth } from "@clerk/nextjs";
 
 export default function RequestResource() {
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");
+  console.log("projectId", projectId);
   const { userId } = useAuth();
   const data = useProvider();
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
@@ -21,14 +24,16 @@ export default function RequestResource() {
 
   const fetchResources = async () => {
     try {
-      const projectRes = await fetch(
+      const res = await fetch(
         `/api/project?pathWithNamespace=${pathWithNamespace}`
       );
+      console.log(projectRes);
       if (!projectRes.ok)
         throw new Error(`Project fetch failed: ${projectRes.statusText}`);
 
-      const projectData = await projectRes.json();
-      console.log("Fetched project:", projectData);
+      const data = await res.json();
+      console.log("projectid", data);
+      console.log("Fetched project:", data._id);
 
       if (projectData.length > 0) {
         const projectId = projectData[0]._id;
@@ -61,7 +66,7 @@ export default function RequestResource() {
     if (pathWithNamespace) {
       fetchResources();
     }
-  });
+  }, [pathWithNamespace]);
 
   const handleRequest = async () => {
     toast.success("Request sent successfully");
