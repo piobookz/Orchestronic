@@ -55,7 +55,7 @@ export default function ProjectMG() {
           setRootPath(project.rootPath);
           setStatuspm(project.statusops); // Set the project status
         } else {
-          console.error("Project not found");
+          console.log("Project not found");
           // Optionally, handle the case where the project is not found
         }
       } catch (error) {
