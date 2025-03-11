@@ -4,7 +4,6 @@ from airflow.operators.bash import BashOperator
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from pymongo import MongoClient
-from dotenv import load_dotenv
 from bson.json_util import dumps
 import pika
 from urllib.parse import urlparse
@@ -12,6 +11,7 @@ import os
 import json
 import socketio
 import time
+from bson.objectid import ObjectId
 
 # Load environment variables
 load_dotenv('/opt/airflow/dags/.env')
@@ -109,7 +109,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "67bfe68bfdb410e6b628f762"
+        return received_message if received_message is not None else ""
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")
@@ -135,6 +135,47 @@ def fetch_from_mongo(received_message):
         client.close()
 
     return dumps(data)
+
+def send_vm_notification(project_id):
+    sio = socketio.Client()
+
+    # Fetch Project data
+    try:
+        load_dotenv('/opt/airflow/dags/.env')
+        uri = os.getenv("MONGODB_URI")
+        if not uri:
+            raise Exception("MONGODB_URI is not set")
+
+        client = MongoClient(uri)
+        database = client["test"]
+        collection = database["projects"]
+
+        data = list(collection.find({ "_id": ObjectId(project_id)}))
+        print("Fetched data:", data)
+
+        if(data):
+            # Send notification
+            project = data[0]
+            try:
+                sio.connect("http://host.docker.internal:4000")
+                if sio.connected:
+                    sio.emit('notification', {'projectName': project["projectName"],
+                                            'message': 'Your virtual machine is being created now',
+                                            'userId': project["userId"]})
+                    time.sleep(2)
+                    sio.disconnect()
+                    return "Notification sent successfully"
+                else:
+                    return "Failed to establish a Socket.IO connection"
+
+            except Exception as e:
+                return f"Failed to send notification: {str(e)}"
+
+    except Exception as e:
+        raise Exception(f"The following error occurred: {str(e)}")
+    
+    finally:
+        client.close()
 
 def create_terraform_directory(project_id):
     """
@@ -377,21 +418,6 @@ variable "database_resources" {
         print(f"Error writing variables.tf file: {e}")
         raise
 
-def send_vm_notification():
-    sio = socketio.Client()
-    try:
-        sio.connect('http://localhost:4000', namespaces=[""])  # Use default namespace
-        time.sleep(2)  # Give time to connect
-
-        if sio.connected:
-            sio.emit('notification', {'message': 'Your virtual machine is being created now'})
-            sio.disconnect()
-            return "Notification sent successfully"
-        else:
-            return "Failed to establish a Socket.IO connection"
-
-    except Exception as e:
-        return f"Failed to send notification: {str(e)}"
 
 # Default args for DAG
 default_args = {
@@ -422,6 +448,12 @@ with DAG(
     provide_context=True,
     )
 
+    send_createvm_notification = PythonOperator(
+        task_id='send_notification',
+        op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],
+        python_callable=send_vm_notification,
+    )
+
 # Task to create Terraform directory
     create_directory = PythonOperator(
         task_id='create_directory',
@@ -450,6 +482,7 @@ with DAG(
         op_args=["{{ ti.xcom_pull(task_ids='rabbitmq_consumer') | trim | replace('\"', '') }}"],  # Use project_id from RabbitMQ
     )
 
+
     # Task to run `terraform apply`
     terraform_apply = BashOperator(
     task_id='terraform_apply',
@@ -465,11 +498,6 @@ with DAG(
     retry_delay=timedelta(minutes=5),
 )
 
-
-    send_notification = PythonOperator(
-        task_id='send_notification',
-        python_callable=send_vm_notification,
-    )
 
     terraform_rollback = BashOperator(
         task_id='terraform_destroy',
@@ -487,4 +515,4 @@ with DAG(
 
 
 
-consume_rabbitmq >> fetch_requests >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> send_notification >> terraform_rollback
+consume_rabbitmq >> fetch_requests >> send_createvm_notification >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> terraform_rollback

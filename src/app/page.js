@@ -6,10 +6,13 @@ import { SignInButton } from "@clerk/nextjs";
 import { io } from "socket.io-client";
 import Image from "next/image";
 import envelope from "../../public/envelope-solid.svg";
+import bell from "../../public/bell.png";
 
 export default function HomePage() {
   const { user } = useUser();
   const [message, setMessage] = useState("");
+  const [projectName, setProjectName] = useState("");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -23,12 +26,19 @@ export default function HomePage() {
     socket.on("notification", (data) => {
       // console.log("Received notification:", data);
       setMessage(data.message);
+      setProjectName(data.projectName);
+      setUserId(data.userId);
     });
 
     return () => {
       socket.disconnect();
     };
   }, [user]);
+
+  const save_notification = async () => {
+    // const res = await fetch('api/notification'){
+    // }
+  };
 
   if (!user) {
     return (
@@ -72,17 +82,44 @@ export default function HomePage() {
       <div className="m-16">
         <h1 className="mt-8 text-4xl font-bold text-white">Updates</h1>
 
-        {message && (
-          <div className="mt-8 p-6 bg-white text-black font-semibold rounded-md">
-            <div className="flex flex-row">
+        {message && projectName && userId === user.id && (
+          <div className="mt-8 p-6 bg-white text-black font-semibold rounded-lg shadow-lg border-l-4 border-blue-500">
+            <div className="flex items-start gap-4">
+              {/* Icon */}
               <Image
                 src={envelope}
-                width="20"
-                height="20"
+                width={24}
+                height={24}
                 alt="envelope"
-                className="mr-4"
+                className="mt-1"
               />
-              {message}
+
+              {/* Notification Content */}
+              <div className="flex flex-col w-full">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {projectName}
+                </h3>
+                <p className="mt-1 text-sm font-normal text-gray-700">
+                  {message}
+                </p>
+
+                {/* Footer Section */}
+                <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                  <p>Date: {new Date().toLocaleDateString()}</p>
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={bell}
+                      width={24}
+                      height={24}
+                      alt="bell"
+                      className="mt-[2px]"
+                    />
+                    <p className="text-sm font-medium text-gray-700">
+                      New Notification
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

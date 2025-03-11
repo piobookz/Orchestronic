@@ -3,27 +3,56 @@ from airflow.operators.python import PythonOperator
 import socketio
 import time
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 def send_vm_notification():
     sio = socketio.Client()
+    project_id = "67ce8b052d19b61bdafaf478"
 
+    # Fetch Project data
     try:
-        sio.connect("http://host.docker.internal:4000")
-        if sio.connected:
-            sio.emit('notification', {'message': 'Your virtual machine is being created now'})
-            time.sleep(2)
-            sio.disconnect()
-            return "Notification sent successfully"
-        else:
-            return "Failed to establish a Socket.IO connection"
+        load_dotenv('/opt/airflow/dags/.env')
+        uri = os.getenv("MONGODB_URI")
+        if not uri:
+            raise Exception("MONGODB_URI is not set")
+
+        client = MongoClient(uri)
+        database = client["test"]
+        collection = database["projects"]
+
+        data = list(collection.find({ "_id": ObjectId(project_id)}))
+        print("Fetched data:", data)
+
+        if(data):
+            # Send notification
+            project = data[0]
+            try:
+                sio.connect("http://host.docker.internal:4000")
+                if sio.connected:
+                    sio.emit('notification', {'projectName': project["projectName"],
+                                            'message': 'Your virtual machine is being created now',
+                                            'userId': project["userId"]})
+                    time.sleep(2)
+                    sio.disconnect()
+                    return "Notification sent successfully"
+                else:
+                    return "Failed to establish a Socket.IO connection"
+
+            except Exception as e:
+                return f"Failed to send notification: {str(e)}"
 
     except Exception as e:
-        return f"Failed to send notification: {str(e)}"
+        raise Exception(f"The following error occurred: {str(e)}")
+    
+    finally:
+        client.close()
 
 default_args = {
     'owner': 'airflow',
     'depends_on_past': False,
-    'start_date': datetime(2025, 1, 19),
     'retries': 1,
 }
 
