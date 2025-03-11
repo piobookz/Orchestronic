@@ -14,6 +14,7 @@ const resourceSchema = new Schema({
   username: { type: String },
   password: { type: String },
   allocationip: { type: String },
+  // publicipenabled: { type: Boolean },
   projectid: { type: String },
 });
 

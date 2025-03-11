@@ -17,6 +17,7 @@ export default function CloudResources({ params }) {
   const [adminPassword, setAdminPassword] = useState("");
   const [vmSize, setVMSize] = useState("");
   const [allocation, setAllocation] = useState("");
+  // const [publicIpEnabled, setPublicIpEnabled] = useState(true);
   const [alert, setAlert] = useState("");
   const [availableVM, setAvailableVM] = useState([]);
   const [warning, setWarning] = useState("");
@@ -378,6 +379,7 @@ export default function CloudResources({ params }) {
           adminPassword,
           vmSize,
           allocation,
+          // publicIpEnabled,
           projectID,
         }),
       });
@@ -688,7 +690,7 @@ export default function CloudResources({ params }) {
           </div>
 
           {/* Admin Password */}
-          <div className="mt-4">
+          <div>
             <label htmlFor="adminPassword" className="font-medium block mb-2">
               Admin Password
             </label>
@@ -737,6 +739,23 @@ export default function CloudResources({ params }) {
               <option value="Static">Static</option>
             </select>
           </div>
+
+          {/* Public IP Configuration */}
+          {/* <div>
+            <label htmlFor="publicIpEnabled" className="font-medium block mb-2">
+              Public IP Address
+            </label>
+            <select
+              id="publicIpEnabled"
+              name="publicIpEnabled"
+              className="border border-slate-300 rounded w-full px-4 py-2 text-base"
+              onChange={(e) => setPublicIpEnabled(e.target.value === "true")}
+            >
+              <option value="">Select public IP option</option>
+              <option value="true">Enable Public IP</option>
+              <option value="false">Disable Public IP</option>
+            </select>
+          </div> */}
         </div>
 
         {/* Optional Details
