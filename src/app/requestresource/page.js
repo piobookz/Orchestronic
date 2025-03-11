@@ -1,5 +1,5 @@
 "use client";
-
+ 
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useProvider } from "../components/ConText";
 import { useAuth } from "@clerk/nextjs";
-
+ 
 export default function RequestResource() {
   const { userId } = useAuth();
   const data = useProvider();
@@ -19,7 +19,7 @@ export default function RequestResource() {
   const projectName = data?.projectData?.projectName;
   const projectDescription = data?.projectData?.projectDescription;
   const pathWithNamespace = data?.projectData?.pathWithNamespace;
-
+ 
   const fetchResources = async () => {
     try {
       const projectRes = await fetch(
@@ -27,24 +27,24 @@ export default function RequestResource() {
       );
       if (!projectRes.ok)
         throw new Error(`Project fetch failed: ${projectRes.statusText}`);
-
+ 
       const projectData = await projectRes.json();
       console.log("Fetched project:", projectData);
-
+ 
       console.log("project length", projectData.length);
       if (projectData.length > 0) {
         const projectRequest = projectData[0]._id;
         console.log("Project ID:", projectRequest);
-
+ 
         const resourceRes = await fetch(
           `/api/resource?projectRequest=${projectRequest}`
         );
         if (!resourceRes.ok)
           throw new Error(`Resource fetch failed: ${resourceRes.statusText}`);
-
+ 
         const resourceData = await resourceRes.json();
         console.log("Fetched resources:", resourceData);
-
+ 
         setTableRowsCR(
           resourceData.map((element) => ({
             id: element._id,
@@ -61,16 +61,16 @@ export default function RequestResource() {
       console.log(error.message);
     }
   };
-
+ 
   useEffect(() => {
     if (data) {
       fetchResources();
     }
   }, [data]);
-
+ 
   const handleRequest = async () => {
     toast.success("Request sent successfully");
-
+ 
     try {
       const res = await fetch("/api/request", {
         method: "POST",
@@ -79,7 +79,7 @@ export default function RequestResource() {
         },
         body: JSON.stringify(TABLE_ROWS_CR),
       });
-
+ 
       if (!res.ok) {
         throw new Error(`Error: ${res.status} - ${res.statusText}`);
       } else {
@@ -90,11 +90,11 @@ export default function RequestResource() {
       console.log("Error while saving request:", error.message);
     }
   };
-
+ 
   if (!data.projectData) {
     return <p>Loading project details...</p>;
   }
-
+ 
   return (
     <div>
       <h1 className="text-5xl font-bold mx-16 my-5">{projectName}</h1>
@@ -129,7 +129,7 @@ export default function RequestResource() {
             </div>
           </div>
         </div>
-
+ 
         <div className="grid grid-rows-[auto,auto] grid-flow-col mt-10">
           <div className="flex flex-row items-center h-12">
             <p className="text-xl font-medium ml-16 mr-5 mt-5">
@@ -141,7 +141,7 @@ export default function RequestResource() {
               </button>
             </Link>
           </div>
-
+ 
           <Card className="overflow-hidden rounded-lg shadow-lg mx-16 mt-8">
             <table className="w-full min-w-max table-auto text-left">
               <thead>

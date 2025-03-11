@@ -109,7 +109,7 @@ def rabbitmq_consumer():
             connection.close()
         print("Listener stopped.")
         
-        return received_message if received_message is not None else "67bfe68bfdb410e6b628f762"
+        return received_message if received_message is not None else ""
 
 def fetch_from_mongo(received_message):
     print(f"Received message from XCom: {received_message}")
@@ -245,6 +245,16 @@ resource "azurerm_subnet" "project_subnet" {{
     address_prefixes     = ["10.0.1.0/24"]
 }}
 
+# Public IP Addresses
+resource "azurerm_public_ip" "vm_public_ip" {{
+    for_each = {{ for vm in var.vm_resources : vm.name => vm }}
+    
+    name                = "${{each.value.name}}-public-ip"
+    location            = azurerm_resource_group.project_rg.location
+    resource_group_name = azurerm_resource_group.project_rg.name
+    allocation_method   = "Dynamic"
+}}
+
 # Network Interfaces
 resource "azurerm_network_interface" "vm_nic" {{
     for_each = {{ for vm in var.vm_resources : vm.name => vm }}
@@ -257,8 +267,11 @@ resource "azurerm_network_interface" "vm_nic" {{
         name                          = "internal"
         subnet_id                     = azurerm_subnet.project_subnet.id
         private_ip_address_allocation = "Dynamic"
+        public_ip_address_id          = azurerm_public_ip.vm_public_ip[each.key].id
     }}
 }}
+
+
 
 # Virtual Machines
 resource "azurerm_virtual_machine" "vm" {{
@@ -461,7 +474,7 @@ with DAG(
         "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
         "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
     },
-    retries=3,
+    retries=3, 
     retry_delay=timedelta(minutes=5),
 )
 

@@ -4,11 +4,14 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getVMConnectionDetails } from './actions';
+import ConnectionModal from '../../components/ConnectionModal';
 
 export default function Projectdetails() {
   const searchParams = useSearchParams();
   const requestId = searchParams.get("requestId"); // Get the requestId from the query
 
+  // Project information
   const [projectDetails, setProjectDetails] = useState({
     _id: "",
     projectName: "",
@@ -16,23 +19,51 @@ export default function Projectdetails() {
     lastUpdate: "",
   });
 
-  const [resource, setResource] = useState({
-    resourceName: "",
+  // VM resource information
+  const [vmDetails, setVMDetails] = useState({
+    vmName: "",
+    vmSize: "",
     region: "",
     os: "",
+    type: "Virtual Machine",
+    allocation: "",
+    resourceGroupName: "",
+  });
+
+  // Connection details
+  const [connectionDetails, setConnectionDetails] = useState({
     adminUser: "",
     adminPassword: "",
-    vmSize: "",
-    allocation: "",
-    type: "Virtual Machine",
+    publicIP: "",
+    privateIP: "",
+    connectionPort: "", // 22 for SSH, 3389 for RDP
+    connectionMethod: "SSH", // SSH or RDP
+    isConnected: false,
   });
 
-  const [rg, setRG] = useState({
-    rgName: "",
+  // UI state
+  const [uiState, setUIState] = useState({
+    connectionStatus: "idle", // idle, connecting, connected, failed
+    showPassword: false,
+    isLoading: false
   });
 
-  const [connectionStatus, setConnectionStatus] = useState("idle");
-  const [showPassword, setShowPassword] = useState(false);
+  const [connectionInstructions, setConnectionInstructions] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch project details
+  useEffect(() => {
+    if (requestId) {
+      fetchProjectDetails();
+    }
+  }, [requestId]);
+
+  // Fetch resource details after project details are loaded
+  useEffect(() => {
+    if (requestId && projectDetails._id) {
+      fetchResource();
+    }
+  }, [requestId, projectDetails._id]);
 
   const fetchProjectDetails = async () => {
     try {
@@ -53,7 +84,6 @@ export default function Projectdetails() {
           _id: project._id,
           projectName: project.projectName, // Fixed field names
           projectDescription: project.projectDescription,
-          lastUpdate: project.lastUpdate,
           pathWithNamespace: project.pathWithNamespace,
         });
       } else {
@@ -65,31 +95,6 @@ export default function Projectdetails() {
     }
   };
 
-  // const fetchRequestStatus = async () => {
-  //     try {
-  //         const res = await fetch(`/api/request/?projectId=${requestId}`, {
-  //             method: "GET",
-  //             headers: { "Content-Type": "application/json" },
-  //         });
-
-  //         if (!res.ok) {
-  //             throw new Error(`Failed to fetch request: ${res.statusText}`);
-  //         }
-
-  //         const data = await res.json();
-  //         console.log("Request Data:", data);
-
-  //         if (data.length > 0) {
-  //             const request = data[0];
-  //             setRequestStatus(request.status);
-  //         } else {
-  //             console.log("No request found for this projectId.");
-  //         }
-  //     } catch (error) {
-  //         console.error("Error fetching request details:", error);
-  //         toast.error("Failed to load request details.");
-  //     }
-  // };
 
   const fetchResource = async () => {
     try {
@@ -107,18 +112,21 @@ export default function Projectdetails() {
 
       if (data.length > 0) {
         const resource = data[0];
-        setResource({
-          resourceName: resource.vmname,
+        setVMDetails({
+          vmName: resource.vmname,
           region: resource.region,
           os: resource.os,
-          adminUser: resource.username,
-          adminPassword: resource.password,
+          type: resource.type,
           vmSize: resource.vmsize,
           allocation: resource.allocationip,
-          type: resource.type,
+          resourceGroupName: `rg-${projectDetails._id}`, // Format: rg-<projectId>  
         });
 
-        // console.log("Fetched Data:", data);
+        setConnectionDetails({
+          adminUser: resource.username,
+          adminPassword: resource.password,
+        });
+
       } else {
         console.log("No resource found for this requestId.");
       }
@@ -127,119 +135,110 @@ export default function Projectdetails() {
     }
   };
 
-  useEffect(() => {
-    if (requestId) {
-      fetchProjectDetails();
-    }
-  }, [requestId]);
-
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId, fetchResource]);
-
-  // useEffect(() => {
-  //     if (requestId) {
-  //         fetchRequestStatus();
-  //     }
-  // }, [requestId]);
-
-  useEffect(() => {
-    if (projectDetails._id) {
-      setRG({
-        rgName: `rg-${projectDetails._id}`, // Format: rg-<projectId>
-      });
-    }
-  }, [projectDetails._id]);
 
   const handleConnectVM = async () => {
-    const { resourceName, os, adminUser, adminPassword } = resource;
-    const { rgName } = rg;
-
     try {
-      // Show loading toast
-      const loadingToast = toast.loading("Checking resources in Azure...");
+      // Show loading state
+      setUIState(prev => ({ ...prev, connectionStatus: "connecting", isLoading: true }));
+      const loadingToast = toast.loading("Connecting to VM...");
 
-      // Call your API endpoint
-      const response = await fetch("/api/connect-vm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resourceName, rgName, os }),
-      });
+      // Call the server action
+      const result = await getVMConnectionDetails(
+        vmDetails.vmName,
+        vmDetails.resourceGroupName,
+        vmDetails.os
+      );
 
-      // Parse the response first
-      const data = await response.json();
       toast.dismiss(loadingToast);
+      setUIState(prev => ({ ...prev, isLoading: false }));
 
-      // Handle resource not found scenarios
-      if (!response.ok) {
-        if (response.status === 404) {
-          if (data.resourceGroupExists === false) {
-            toast.error(`Resource group '${rgName}' doesn't exist in Azure`);
-          } else if (data.vmExists === false) {
-            toast.error(
-              `VM '${resourceName}' doesn't exist in resource group '${rgName}'`
-            );
-          } else {
-            toast.error(data.message || "Resource not found");
-          }
-          return;
-        }
-
-        // Other errors
-        throw new Error(data.message || "Failed to connect to VM");
+      // Handle result
+      if (!result.success) {
+        setUIState(prev => ({ ...prev, connectionStatus: "failed" }));
+        toast.error(result.message || "Failed to connect to VM");
+        return;
       }
 
-      if (data.success) {
-        toast.success(
-          `VM '${resourceName}' found in Azure and ready to connect`
-        );
-        const { publicIP } = data.vmDetails;
+      // Success - update UI and provide connection instructions
+      setUIState(prev => ({ ...prev, connectionStatus: "connected" }));
+      const { publicIP, username } = result.vmDetails;
 
-        // For Linux VMs, provide SSH command
-        if (os.toLowerCase().includes("linux")) {
-          const sshCommand = `ssh ${adminUser}@${publicIP}`;
-          toast.success(`Run this command to connect: ${sshCommand}`);
+      handleSSHConnection(publicIP, username);
 
-          // Copy to clipboard
-          navigator.clipboard
-            .writeText(sshCommand)
-            .then(() => toast.success("SSH command copied to clipboard"))
-            .catch(() => console.error("Failed to copy command"));
-        }
-
-        // For Windows VMs, generate RDP file
-        else if (os.toLowerCase().includes("windows")) {
-          const rdpContent = `
-                full address:s:${publicIP}
-                username:s:${adminUser}
-                password:s:${adminPassword}
-              `;
-
-          // Download RDP file
-          const blob = new Blob([rdpContent], { type: "application/rdp" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `${resourceName}.rdp`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          toast.success("RDP file downloaded. Open it to connect to the VM.");
-        } else {
-          toast.error("Unsupported OS for connection.");
-        }
-      } else {
-        toast.error("Failed to get VM connection details.");
-      }
+      // Open the modal
+      setIsModalOpen(true);
     } catch (error) {
       console.error("Error connecting to VM:", error);
-      toast.error(error.message || "Failed to connect to VM.");
+      setUIState(prev => ({ ...prev, connectionStatus: "failed", isLoading: false }));
+      toast.error("Failed to connect to VM");
     }
   };
+
+  const handleSSHConnection = (publicIP, username) => {
+    const user = username || connectionDetails.adminUser;
+    const sshCommand = `ssh ${user}@${publicIP}`;
+
+    setConnectionDetails(prev => ({
+      ...prev,
+      publicIP,
+      adminUser: user,
+      connectionPort: "22",
+      connectionMethod: "SSH"
+    }));
+
+    setConnectionInstructions(`
+      <div>
+        <h3 class="text-xl font-bold mb-4">SSH Connection Instructions</h3>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connection Details:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Host: ${publicIP}</li>
+            <li>Port: 22</li>
+            <li>Username: ${user}</li>
+            <li>Password: ${connectionDetails.adminPassword}</li>
+          </ul>
+        </div>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connection Command:</p>
+          <div class="bg-gray-800 text-white p-2 rounded font-mono mb-2">${sshCommand}</div>
+          <button id="copy-ssh-command" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+            Copy Command
+          </button>
+        </div>
+        
+        <div>
+          <p class="font-medium mb-1">Connection Steps:</p>
+          <ol class="list-decimal pl-5 space-y-1">
+            <li>Open Terminal (Mac/Linux) or Command Prompt/PowerShell (Windows)</li>
+            <li>Paste and run the command above</li>
+            <li>Enter your password when prompted</li>
+          </ol>
+        </div>
+      </div>
+    `);
+
+    navigator.clipboard.writeText(sshCommand)
+      .then(() => toast.success("SSH command copied to clipboard"))
+      .catch(() => console.error("Failed to copy command"));
+
+    toast.success("VM is ready to connect via SSH");
+
+    // Set up event listener for the copy button (will be added after modal renders)
+    setTimeout(() => {
+      const copyButton = document.getElementById('copy-ssh-command');
+      if (copyButton) {
+        copyButton.addEventListener('click', () => {
+          navigator.clipboard.writeText(sshCommand)
+            .then(() => toast.success("SSH command copied to clipboard"))
+            .catch(() => console.error("Failed to copy command"));
+        });
+      }
+    }, 200);
+  };
+
 
   return (
     <div>
@@ -295,27 +294,29 @@ export default function Projectdetails() {
             >
               Configure
             </button>  */}
+            {/* Connection button */}
             <button
-              className={`ml-4 text-sm text-white rounded py-3 px-5 ${
-                connectionStatus === "connecting"
-                  ? "bg-blue-400"
-                  : connectionStatus === "connected"
-                  ? "bg-green-500"
-                  : connectionStatus === "failed"
-                  ? "bg-red-500"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
               onClick={handleConnectVM}
-              disabled={connectionStatus === "connecting"}
+              disabled={uiState.isLoading}
+              className={`px-4 py-2 rounded text-white ${uiState.connectionStatus === "connecting" ? "bg-blue-400" :
+                uiState.connectionStatus === "connected" ? "bg-green-500" :
+                  uiState.connectionStatus === "failed" ? "bg-red-500" :
+                    "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
-              {connectionStatus === "connecting"
-                ? "Connecting..."
-                : connectionStatus === "connected"
-                ? "Connected"
-                : connectionStatus === "failed"
-                ? "Connection Failed"
-                : "Connect"}
+              {uiState.isLoading ? "Connecting..." :
+                uiState.connectionStatus === "connected" ? "Connected" :
+                  uiState.connectionStatus === "failed" ? "Failed" :
+                    "Connect"}
             </button>
+
+            {/* Connection instructions */}
+            <ConnectionModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            >
+              <div dangerouslySetInnerHTML={{ __html: connectionInstructions }} />
+            </ConnectionModal>
           </div>
         </div>
 
@@ -325,13 +326,13 @@ export default function Projectdetails() {
             <div className="flex flex-row">
               <p className="text-lg font-semibold w-32">Name</p>
               <p className="text-lg font-light items-center">
-                {resource.resourceName}
+                {vmDetails.vmName}
               </p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">VM Type</p>
-              <p className="text-lg font-light">{resource.type}</p>
+              <p className="text-lg font-light">{vmDetails.type}</p>
             </div>
 
             <div className="flex flex-row items-center">
@@ -340,34 +341,34 @@ export default function Projectdetails() {
                   VM Size
                 </p>
               </Link>
-              <p className="text-lg font-light">{resource.vmSize}</p>
+              <p className="text-lg font-light">{vmDetails.vmSize}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Region</p>
-              <p className="text-lg font-light">{resource.region}</p>
+              <p className="text-lg font-light">{vmDetails.region}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Username</p>
-              <p className="text-lg font-light">{resource.adminUser}</p>
+              <p className="text-lg font-light">{connectionDetails.adminUser}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Password</p>
               <div className="flex items-center">
                 <p className="text-lg font-light mr-2">
-                  {showPassword ? resource.adminPassword : "••••••••••••"}
+                  {uiState.showPassword ? connectionDetails.adminPassword : "••••••••••••"}
                 </p>
                 <button
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setUIState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
                   className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {uiState.showPassword ? "Hide" : "Show"}
                 </button>
                 <button
                   onClick={() =>
-                    navigator.clipboard.writeText(resource.adminPassword)
+                    navigator.clipboard.writeText(vmDetails.adminPassword)
                   }
                   className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 ml-2"
                 >
@@ -378,14 +379,14 @@ export default function Projectdetails() {
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Operating System</p>
-              <p className="text-lg font-light">{resource.os}</p>
+              <p className="text-lg font-light">{vmDetails.os}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">
                 Private IP Allocation
               </p>
-              <p className="text-lg font-light">{resource.allocation}</p>
+              <p className="text-lg font-light">{vmDetails.allocation}</p>
             </div>
           </div>
         </div>
