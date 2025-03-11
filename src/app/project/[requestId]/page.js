@@ -4,6 +4,8 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { getVMConnectionDetails } from './actions';
+import ConnectionModal from '../../components/ConnectionModal';
 
 export default function Projectdetails() {
   const searchParams = useSearchParams();
@@ -16,7 +18,7 @@ export default function Projectdetails() {
     projectDescription: "",
     lastUpdate: "",
   });
- 
+
   // VM resource information
   const [vmDetails, setVMDetails] = useState({
     vmName: "",
@@ -37,8 +39,6 @@ export default function Projectdetails() {
     connectionPort: "", // 22 for SSH, 3389 for RDP
     connectionMethod: "SSH", // SSH or RDP
     isConnected: false,
-    connectedUserId: null,
-    connectionStartTime: null,
   });
 
   // UI state
@@ -47,6 +47,23 @@ export default function Projectdetails() {
     showPassword: false,
     isLoading: false
   });
+
+  const [connectionInstructions, setConnectionInstructions] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch project details
+  useEffect(() => {
+    if (requestId) {
+      fetchProjectDetails();
+    }
+  }, [requestId]);
+
+  // Fetch resource details after project details are loaded
+  useEffect(() => {
+    if (requestId && projectDetails._id) {
+      fetchResource();
+    }
+  }, [requestId, projectDetails._id]);
 
   const fetchProjectDetails = async () => {
     try {
@@ -67,7 +84,6 @@ export default function Projectdetails() {
           _id: project._id,
           projectName: project.projectName, // Fixed field names
           projectDescription: project.projectDescription,
-          lastUpdate: project.lastUpdate,
           pathWithNamespace: project.pathWithNamespace,
         });
       } else {
@@ -106,8 +122,8 @@ export default function Projectdetails() {
         });
 
         setConnectionDetails({
-          adminUser: resource.adminuser,
-          adminPassword: resource.adminpassword,
+          adminUser: resource.username,
+          adminPassword: resource.password,
         });
 
         // console.log("Fetched Data:", data);
@@ -119,104 +135,185 @@ export default function Projectdetails() {
     }
   };
 
-  useEffect(() => {
-    if (requestId) {
-      fetchProjectDetails();
-    }
-  }, [requestId]);
-
-  useEffect(() => {
-    if (requestId) {
-      fetchResource();
-    }
-  }, [requestId, fetchResource]);
-
-
 
   const handleConnectVM = async () => {
     try {
-      // Show loading 
-      const loadingToast = toast.loading("Checking resources in Azure...");
+      // Show loading state
+      setUIState(prev => ({ ...prev, connectionStatus: "connecting", isLoading: true }));
+      const loadingToast = toast.loading("Connecting to VM...");
 
-      // Call your API endpoint
-      const response = await fetch("/api/connect-vm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resourceName, rgName, os }),
-      });
+      // Call the server action
+      const result = await getVMConnectionDetails(
+        vmDetails.vmName,
+        vmDetails.resourceGroupName,
+        vmDetails.os
+      );
 
-      // Parse the response first
-      const data = await response.json();
       toast.dismiss(loadingToast);
+      setUIState(prev => ({ ...prev, isLoading: false }));
 
-      // Handle resource not found scenarios
-      if (!response.ok) {
-        if (response.status === 404) {
-          if (data.resourceGroupExists === false) {
-            toast.error(`Resource group '${rgName}' doesn't exist in Azure`);
-          } else if (data.vmExists === false) {
-            toast.error(
-              `VM '${resourceName}' doesn't exist in resource group '${rgName}'`
-            );
-          } else {
-            toast.error(data.message || "Resource not found");
-          }
-          return;
-        }
-
-        // Other errors
-        throw new Error(data.message || "Failed to connect to VM");
+      // Handle result
+      if (!result.success) {
+        setUIState(prev => ({ ...prev, connectionStatus: "failed" }));
+        toast.error(result.message || "Failed to connect to VM");
+        return;
       }
 
-      if (data.success) {
-        toast.success(
-          `VM '${resourceName}' found in Azure and ready to connect`
-        );
-        const { publicIP } = data.vmDetails;
+      // Success - update UI and provide connection instructions
+      setUIState(prev => ({ ...prev, connectionStatus: "connected" }));
+      const { publicIP, username } = result.vmDetails;
 
-        // For Linux VMs, provide SSH command
-        if (os.toLowerCase().includes("linux")) {
-          const sshCommand = `ssh ${adminUser}@${publicIP}`;
-          toast.success(`Run this command to connect: ${sshCommand}`);
+      // Generate the appropriate connection instructions based on OS
+      if (vmDetails.os.toLowerCase().includes("linux") || vmDetails.os.toLowerCase().includes("ubuntu")) {
+        handleLinuxConnection(publicIP, username);
+      } else if (vmDetails.os.toLowerCase().includes("windows")) {
+        handleWindowsConnection(publicIP, username);
+      } else {
+        toast.error("Unsupported OS for connection");
+      }
 
-          // Copy to clipboard
-          navigator.clipboard
-            .writeText(sshCommand)
+      // Open the modal
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error connecting to VM:", error);
+      setUIState(prev => ({ ...prev, connectionStatus: "failed", isLoading: false }));
+      toast.error("Failed to connect to VM");
+    }
+  };
+
+  const handleLinuxConnection = (publicIP, username) => {
+    const user = username || connectionDetails.adminUser;
+    const sshCommand = `ssh ${user}@${publicIP}`;
+
+    setConnectionDetails(prev => ({
+      ...prev,
+      publicIP,
+      adminUser: user,
+      connectionPort: "22",
+      connectionMethod: "SSH"
+    }));
+
+    setConnectionInstructions(`
+      <div>
+        <h3 class="text-xl font-bold mb-4">SSH Connection Instructions</h3>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connection Details:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Host: ${publicIP}</li>
+            <li>Port: 22</li>
+            <li>Username: ${user}</li>
+            <li>Password: ${connectionDetails.adminPassword}</li>
+          </ul>
+        </div>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connection Command:</p>
+          <div class="bg-gray-800 text-white p-2 rounded font-mono mb-2">${sshCommand}</div>
+          <button id="copy-ssh-command" 
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+            Copy Command
+          </button>
+        </div>
+        
+        <div>
+          <p class="font-medium mb-1">Connection Steps:</p>
+          <ol class="list-decimal pl-5 space-y-1">
+            <li>Open Terminal (Mac/Linux) or Command Prompt/PowerShell (Windows)</li>
+            <li>Paste and run the command above</li>
+            <li>Enter your password when prompted</li>
+          </ol>
+        </div>
+      </div>
+    `);
+
+    navigator.clipboard.writeText(sshCommand)
+      .then(() => toast.success("SSH command copied to clipboard"))
+      .catch(() => console.error("Failed to copy command"));
+
+    toast.success("VM is ready to connect via SSH");
+
+    // Set up event listener for the copy button (will be added after modal renders)
+    setTimeout(() => {
+      const copyButton = document.getElementById('copy-ssh-command');
+      if (copyButton) {
+        copyButton.addEventListener('click', () => {
+          navigator.clipboard.writeText(sshCommand)
             .then(() => toast.success("SSH command copied to clipboard"))
             .catch(() => console.error("Failed to copy command"));
-        }
+        });
+      }
+    }, 200);
+  };
 
-        // For Windows VMs, generate RDP file
-        else if (os.toLowerCase().includes("windows")) {
-          const rdpContent = `
-                full address:s:${publicIP}
-                username:s:${adminUser}
-                password:s:${adminPassword}
-              `;
+  const handleWindowsConnection = (publicIP, username) => {
+    const user = username || connectionDetails.adminUser;
 
-          // Download RDP file
-          const blob = new Blob([rdpContent], { type: "application/rdp" });
-          const url = URL.createObjectURL(blob);
+    setConnectionDetails(prev => ({
+      ...prev,
+      publicIP,
+      adminUser: user,
+      connectionPort: "3389",
+      connectionMethod: "RDP"
+    }));
+
+    const rdpContent = `full address:s:${publicIP}:3389
+  username:s:${user}
+  password:s:${connectionDetails.adminPassword}
+  prompt for credentials:i:0`;
+
+    setConnectionInstructions(`
+      <div>
+        <h3 class="text-xl font-bold mb-4">RDP Connection Instructions</h3>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connection Details:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Host: ${publicIP}</li>
+            <li>Port: 3389</li>
+            <li>Username: ${user}</li>
+            <li>Password: ${connectionDetails.adminPassword}</li>
+          </ul>
+        </div>
+        
+        <div class="mb-4">
+          <p class="font-medium mb-1">Connect to VM:</p>
+          <button id="download-rdp-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            Download RDP File
+          </button>
+        </div>
+      </div>
+    `);
+
+    // Create and download RDP file
+    const blob = new Blob([rdpContent], { type: "application/rdp" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${vmDetails.vmName}.rdp`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Set up event listener for the button after rendering
+    setTimeout(() => {
+      const button = document.getElementById('download-rdp-button');
+      if (button) {
+        button.addEventListener('click', () => {
           const a = document.createElement("a");
-          a.href = url;
-          a.download = `${resourceName}.rdp`;
+          a.href = URL.createObjectURL(new Blob([rdpContent], { type: "application/rdp" }));
+          a.download = `${vmDetails.vmName}.rdp`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-
-          toast.success("RDP file downloaded. Open it to connect to the VM.");
-        } else {
-          toast.error("Unsupported OS for connection.");
-        }
-      } else {
-        toast.error("Failed to get VM connection details.");
+        });
       }
-    } catch (error) {
-      console.error("Error connecting to VM:", error);
-      toast.error(error.message || "Failed to connect to VM.");
-    }
+    }, 200);
+
+    toast.success("RDP file downloaded. Open it to connect to the VM.");
   };
+
 
   return (
     <div>
@@ -272,26 +369,29 @@ export default function Projectdetails() {
             >
               Configure
             </button>  */}
+            {/* Connection button */}
             <button
-              className={`ml-4 text-sm text-white rounded py-3 px-5 ${connectionStatus === "connecting"
-                  ? "bg-blue-400"
-                  : connectionStatus === "connected"
-                    ? "bg-green-500"
-                    : connectionStatus === "failed"
-                      ? "bg-red-500"
-                      : "bg-blue-500 hover:bg-blue-600"
-                }`}
               onClick={handleConnectVM}
-              disabled={connectionStatus === "connecting"}
+              disabled={uiState.isLoading}
+              className={`px-4 py-2 rounded text-white ${uiState.connectionStatus === "connecting" ? "bg-blue-400" :
+                uiState.connectionStatus === "connected" ? "bg-green-500" :
+                  uiState.connectionStatus === "failed" ? "bg-red-500" :
+                    "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
-              {connectionStatus === "connecting"
-                ? "Connecting..."
-                : connectionStatus === "connected"
-                  ? "Connected"
-                  : connectionStatus === "failed"
-                    ? "Connection Failed"
-                    : "Connect"}
+              {uiState.isLoading ? "Connecting..." :
+                uiState.connectionStatus === "connected" ? "Connected" :
+                  uiState.connectionStatus === "failed" ? "Failed" :
+                    "Connect"}
             </button>
+
+            {/* Connection instructions */}
+            <ConnectionModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            >
+              <div dangerouslySetInnerHTML={{ __html: connectionInstructions }} />
+            </ConnectionModal>
           </div>
         </div>
 
@@ -333,13 +433,13 @@ export default function Projectdetails() {
               <p className="text-lg font-semibold w-32">Admin Password</p>
               <div className="flex items-center">
                 <p className="text-lg font-light mr-2">
-                  {showPassword ? vmDetails.adminPassword : "••••••••••••"}
+                  {uiState.showPassword ? vmDetails.adminPassword : "••••••••••••"}
                 </p>
                 <button
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => setUIState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
                   className="text-xs px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {uiState.showPassword ? "Hide" : "Show"}
                 </button>
                 <button
                   onClick={() =>

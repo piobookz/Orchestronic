@@ -18,41 +18,100 @@ export default function RequestList() {
   }
   const router = useRouter();
   // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
-  const TABLE_HEAD_REQ = ["Project", "Request", "Type", "Status PM", "Status Ops"];
+  const TABLE_HEAD_REQ = ["Project ID", "Project Name","Request", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
+
+  // useEffect(() => {
+  //   // Fetch request data from the API
+  //   const fetchRequests = async () => {
+  //     try {
+  //       const res = await fetch("/api/request", {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
+
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         console.log("data", data)
+  //         const rows = data.map((element) => ({
+  //           id: element.requestid,
+  //           projectid: element.projectid,
+  //           requestname: element.name,
+  //           type: element.type,
+  //           statuspm: element.statuspm,
+  //           statusops: element.statusops,
+  //         }));
+  //         console.log("rows", rows)
+  //         setTableRowsReq(rows);
+  //       }
+  //     } catch (error) {
+  //       console.log("Failed to send request:", error.message);
+  //     }
+  //   };
+  //   fetchRequests();
+  // }, []);
 
   useEffect(() => {
     // Fetch request data from the API
     const fetchRequests = async () => {
       try {
-        const res = await fetch("/api/request", {
+        // First, fetch all requests
+        const resRequests = await fetch("/api/request", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-
-        if (res.ok) {
-          const data = await res.json();
-          console.log("data", data)
-          const rows = data.map((element) => ({
-            id: element.requestid,
-            projectid: element.projectid,
-            requestname: element.name,
-            type: element.type,
-            statuspm: element.statuspm,
-            statusops: element.statusops,
-          }));
-          console.log("rows", rows)
-          setTableRowsReq(rows);
+  
+        if (!resRequests.ok) {
+          throw new Error("Failed to fetch requests");
         }
+  
+        const requestsData = await resRequests.json();
+        
+        // Then, fetch all projects
+        const resProjects = await fetch("/api/project", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (!resProjects.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+  
+        const projectsData = await resProjects.json();
+        
+        // Create a map of project IDs to project names for quick lookup
+        const projectMap = {};
+        projectsData.forEach(project => {
+          projectMap[project._id] = project.projectName;
+        });
+  
+        // Now map request data and include project names
+        const rows = requestsData.map((element) => ({
+          id: element.requestid,
+          projectid: element.projectid,
+          projectname: projectMap[element.projectid] || "Unknown Project", // Add project name
+          requestname: element.name,
+          type: element.type,
+          statuspm: element.statuspm,
+          statusops: element.statusops,
+        }));
+  
+        console.log("Requests with project names:", rows);
+        setTableRowsReq(rows);
       } catch (error) {
-        console.log("Failed to send request:", error.message);
+        console.error("Failed to fetch data:", error.message);
       }
     };
     fetchRequests();
   }, []);
+
 
   const sortOrder = ["Request", "Under Review", "Rejected", "Approved"];
 
@@ -110,7 +169,7 @@ export default function RequestList() {
           <tbody>
 
             {userRole === 'pm' &&
-              sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
+              sortedRows.map(({ id, projectid, projectname,requestname, type, statuspm, statusops }, index) => {
                 const isOdd = index % 2 === 1;
                 const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
 
@@ -125,6 +184,17 @@ export default function RequestList() {
                           className="font-normal"
                         >
                           {projectid}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectpm", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {projectname}
                         </Typography>
                       </Link>
                     </td>
@@ -191,7 +261,7 @@ export default function RequestList() {
               })}
 
             {userRole === 'ops' &&
-              sortedRows.map(({ id, projectid, requestname, type, statuspm, statusops }, index) => {
+              sortedRows.map(({ id, projectid, projectname, requestname, type, statuspm, statusops }, index) => {
                 const isOdd = index % 2 === 1;
                 const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
 
@@ -206,6 +276,17 @@ export default function RequestList() {
                           className="font-normal"
                         >
                           {projectid}
+                        </Typography>
+                      </Link>
+                    </td>
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Link href={{ pathname: "/projectops", query: { projectid } }}>
+                        <Typography
+                          variant="small"
+                          color="blue-gray"
+                          className="font-normal"
+                        >
+                          {projectname}
                         </Typography>
                       </Link>
                     </td>
