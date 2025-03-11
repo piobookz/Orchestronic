@@ -116,6 +116,7 @@ export default function Projectdetails() {
           vmName: resource.vmname,
           region: resource.region,
           os: resource.os,
+          type: resource.type,
           vmSize: resource.vmsize,
           allocation: resource.allocationip,
           resourceGroupName: `rg-${projectDetails._id}`, // Format: rg-<projectId>  
@@ -126,7 +127,6 @@ export default function Projectdetails() {
           adminPassword: resource.password,
         });
 
-        // console.log("Fetched Data:", data);
       } else {
         console.log("No resource found for this requestId.");
       }
@@ -163,14 +163,7 @@ export default function Projectdetails() {
       setUIState(prev => ({ ...prev, connectionStatus: "connected" }));
       const { publicIP, username } = result.vmDetails;
 
-      // Generate the appropriate connection instructions based on OS
-      if (vmDetails.os.toLowerCase().includes("linux") || vmDetails.os.toLowerCase().includes("ubuntu")) {
-        handleLinuxConnection(publicIP, username);
-      } else if (vmDetails.os.toLowerCase().includes("windows")) {
-        handleWindowsConnection(publicIP, username);
-      } else {
-        toast.error("Unsupported OS for connection");
-      }
+      handleSSHConnection(publicIP, username);
 
       // Open the modal
       setIsModalOpen(true);
@@ -181,7 +174,7 @@ export default function Projectdetails() {
     }
   };
 
-  const handleLinuxConnection = (publicIP, username) => {
+  const handleSSHConnection = (publicIP, username) => {
     const user = username || connectionDetails.adminUser;
     const sshCommand = `ssh ${user}@${publicIP}`;
 
@@ -244,74 +237,6 @@ export default function Projectdetails() {
         });
       }
     }, 200);
-  };
-
-  const handleWindowsConnection = (publicIP, username) => {
-    const user = username || connectionDetails.adminUser;
-
-    setConnectionDetails(prev => ({
-      ...prev,
-      publicIP,
-      adminUser: user,
-      connectionPort: "3389",
-      connectionMethod: "RDP"
-    }));
-
-    const rdpContent = `full address:s:${publicIP}:3389
-  username:s:${user}
-  password:s:${connectionDetails.adminPassword}
-  prompt for credentials:i:0`;
-
-    setConnectionInstructions(`
-      <div>
-        <h3 class="text-xl font-bold mb-4">RDP Connection Instructions</h3>
-        
-        <div class="mb-4">
-          <p class="font-medium mb-1">Connection Details:</p>
-          <ul class="list-disc pl-5 space-y-1">
-            <li>Host: ${publicIP}</li>
-            <li>Port: 3389</li>
-            <li>Username: ${user}</li>
-            <li>Password: ${connectionDetails.adminPassword}</li>
-          </ul>
-        </div>
-        
-        <div class="mb-4">
-          <p class="font-medium mb-1">Connect to VM:</p>
-          <button id="download-rdp-button" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            Download RDP File
-          </button>
-        </div>
-      </div>
-    `);
-
-    // Create and download RDP file
-    const blob = new Blob([rdpContent], { type: "application/rdp" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${vmDetails.vmName}.rdp`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    // Set up event listener for the button after rendering
-    setTimeout(() => {
-      const button = document.getElementById('download-rdp-button');
-      if (button) {
-        button.addEventListener('click', () => {
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(new Blob([rdpContent], { type: "application/rdp" }));
-          a.download = `${vmDetails.vmName}.rdp`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        });
-      }
-    }, 200);
-
-    toast.success("RDP file downloaded. Open it to connect to the VM.");
   };
 
 
@@ -426,14 +351,14 @@ export default function Projectdetails() {
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Username</p>
-              <p className="text-lg font-light">{vmDetails.adminUser}</p>
+              <p className="text-lg font-light">{connectionDetails.adminUser}</p>
             </div>
 
             <div className="flex flex-row items-center">
               <p className="text-lg font-semibold w-32">Admin Password</p>
               <div className="flex items-center">
                 <p className="text-lg font-light mr-2">
-                  {uiState.showPassword ? vmDetails.adminPassword : "••••••••••••"}
+                  {uiState.showPassword ? connectionDetails.adminPassword : "••••••••••••"}
                 </p>
                 <button
                   onClick={() => setUIState(prev => ({ ...prev, showPassword: !prev.showPassword }))}
