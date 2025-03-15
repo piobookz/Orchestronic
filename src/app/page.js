@@ -13,6 +13,26 @@ export default function HomePage() {
   const [message, setMessage] = useState("");
   const [projectName, setProjectName] = useState("");
   const [userId, setUserId] = useState("");
+  const [notificationList, setNotificationList] = useState([]);
+
+  const fetch_notification = async (userId) => {
+    try {
+      const res = await fetch(`/api/notification?userId=${userId}`, {
+        method: "GET",
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch notifications");
+      }
+
+      const data = await res.json();
+      setNotificationList(data);
+      // console.log("Notifications:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -20,7 +40,7 @@ export default function HomePage() {
     const socket = io("http://localhost:4000");
 
     socket.on("connect", () => {
-      console.log("Connected to WebSocket");
+      // console.log("Connected to WebSocket");
     });
 
     socket.on("notification", (data) => {
@@ -30,15 +50,11 @@ export default function HomePage() {
       setUserId(data.userId);
     });
 
+    fetch_notification(user.id);
     return () => {
       socket.disconnect();
     };
   }, [user]);
-
-  const save_notification = async () => {
-    // const res = await fetch('api/notification'){
-    // }
-  };
 
   if (!user) {
     return (
@@ -82,46 +98,54 @@ export default function HomePage() {
       <div className="m-16">
         <h1 className="mt-8 text-4xl font-bold text-white">Updates</h1>
 
-        {message && projectName && userId === user.id && (
-          <div className="mt-8 p-6 bg-white text-black font-semibold rounded-lg shadow-lg border-l-4 border-blue-500">
-            <div className="flex items-start gap-4">
-              {/* Icon */}
-              <Image
-                src={envelope}
-                width={24}
-                height={24}
-                alt="envelope"
-                className="mt-1"
-              />
+        {notificationList.map(
+          (notification) =>
+            notification.detail &&
+            notification.projectName &&
+            notification.userId === user.id && (
+              <div
+                key={notification._id}
+                className="mt-8 p-6 bg-white text-black font-semibold rounded-lg shadow-lg border-l-4 border-blue-500"
+              >
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <Image
+                    src={envelope}
+                    width={24}
+                    height={24}
+                    alt="envelope"
+                    className="mt-1"
+                  />
 
-              {/* Notification Content */}
-              <div className="flex flex-col w-full">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {projectName}
-                </h3>
-                <p className="mt-1 text-sm font-normal text-gray-700">
-                  {message}
-                </p>
-
-                {/* Footer Section */}
-                <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                  <p>Date: {new Date().toLocaleDateString()}</p>
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={bell}
-                      width={24}
-                      height={24}
-                      alt="bell"
-                      className="mt-[2px]"
-                    />
-                    <p className="text-sm font-medium text-gray-700">
-                      New Notification
+                  {/* Notification Content */}
+                  <div className="flex flex-col w-full">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {notification.projectName}
+                    </h3>
+                    <p className="mt-1 text-sm font-normal text-gray-700">
+                      {notification.detail}
                     </p>
+
+                    {/* Footer Section */}
+                    <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                      <p>Date: {new Date().toLocaleDateString()}</p>
+                      <div className="flex items-center gap-2">
+                        <Image
+                          src={bell}
+                          width={24}
+                          height={24}
+                          alt="bell"
+                          className="mt-[2px]"
+                        />
+                        <p className="text-sm font-medium text-gray-700">
+                          New Notification
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            )
         )}
       </div>
     </>

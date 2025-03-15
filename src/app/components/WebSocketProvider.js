@@ -39,6 +39,19 @@ export const WebSocketProvider = ({ children }) => {
           setMessage(data.message);
           setProjectName(data.projectName);
 
+          fetch(
+            `/api/notification?projectName=${data.projectName}&detail=${data.message}&userId=${data.userId}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((response) => response.json())
+            .then((result) => console.log("Project saved:", result))
+            .catch((error) => console.error("Error saving project:", error));
+
           toast.custom((t) => (
             <div
               className={`${
