@@ -10,7 +10,7 @@ from bson.objectid import ObjectId
 
 def send_vm_notification():
     sio = socketio.Client()
-    project_id = "67ce8b052d19b61bdafaf478"
+    project_id = "67d001419cc9dc98a8ca17ee"
 
     # Fetch Project data
     try:
@@ -33,7 +33,7 @@ def send_vm_notification():
                 sio.connect("http://host.docker.internal:4000")
                 if sio.connected:
                     sio.emit('notification', {'projectName': project["projectName"],
-                                            'message': 'Your virtual machine is being created now',
+                                            'message': 'Virtual machine is being created now',
                                             'userId': project["userId"]})
                     time.sleep(2)
                     sio.disconnect()

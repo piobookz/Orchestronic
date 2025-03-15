@@ -160,7 +160,7 @@ def send_vm_notification(project_id):
                 sio.connect("http://host.docker.internal:4000")
                 if sio.connected:
                     sio.emit('notification', {'projectName': project["projectName"],
-                                            'message': 'Your virtual machine is being created now',
+                                            'message': 'Virtual machine is being created now',
                                             'userId': project["userId"]})
                     time.sleep(2)
                     sio.disconnect()
@@ -512,20 +512,5 @@ with DAG(
 )
 
 
-    terraform_rollback = BashOperator(
-        task_id='terraform_destroy',
-        bash_command='terraform destroy -auto-approve',
-        cwd="{{ ti.xcom_pull(task_ids='create_directory') }}",
-        env={
-            "ARM_SUBSCRIPTION_ID": os.getenv("AZURE_SUBSCRIPTION_ID"),
-            "ARM_CLIENT_ID": os.getenv("AZURE_CLIENT_ID"),
-            "ARM_CLIENT_SECRET": os.getenv("AZURE_CLIENT_SECRET"),
-            "ARM_TENANT_ID": os.getenv("AZURE_TENANT_ID"),
-        },
-        trigger_rule="all_failed",  # Run only if the previous task fails
-    )
 
-
-
-
-consume_rabbitmq >> fetch_requests >> send_createvm_notification >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply >> terraform_rollback
+consume_rabbitmq >> fetch_requests >> send_createvm_notification >> create_directory >> [generate_tfvars_task, generate_main_tf_task, generate_variables_tf_task] >> terraform_apply

@@ -34,25 +34,25 @@ export default function RootLayout({ children }) {
             content="width=device-width, initial-scale=1.0"
           />
         </head>
-        <WebSocketProvider>
-          <Provider>
-            <body
-              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-              {/* Signed-In Users */}
-              <SignedIn>
+        <Provider>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            {/* Signed-In Users */}
+            <SignedIn>
+              <WebSocketProvider>
                 <Navbar />
                 <Toaster position="top-right" />
                 {children}
-              </SignedIn>
+              </WebSocketProvider>
+            </SignedIn>
 
-              {/* Signed-Out Users */}
-              <SignedOut>
-                <HomePage />
-              </SignedOut>
-            </body>
-          </Provider>
-        </WebSocketProvider>
+            {/* Signed-Out Users */}
+            <SignedOut>
+              <HomePage />
+            </SignedOut>
+          </body>
+        </Provider>
       </html>
     </ClerkProvider>
   );
