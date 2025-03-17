@@ -72,7 +72,7 @@ export default function RequestResource() {
     toast.success("Request sent successfully");
 
     try {
-      const res = await fetch("/api/request", {
+      const resRequest = await fetch("/api/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -80,10 +80,20 @@ export default function RequestResource() {
         body: JSON.stringify(TABLE_ROWS_CR),
       });
 
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} - ${res.statusText}`);
+      const resRequesttype = await fetch(`/api/requesttype?projectid=${projectid}&status=created`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        
+      });
+      
+
+      if (!resRequest.ok) {
+        throw new Error(`Error: ${resRequest.status} - ${resRequest.statusText}`);
       } else {
         await fetchResources(); // Refetch resources after request
+
         router.push("/projectlist");
       }
     } catch (error) {
