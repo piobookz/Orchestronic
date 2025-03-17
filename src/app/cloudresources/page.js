@@ -736,7 +736,6 @@ export default function CloudResources({ params }) {
             >
               <option value="">Select private IP allocation</option>
               <option value="Dynamic">Dynamic</option>
-              <option value="Static">Static</option>
             </select>
           </div>
 

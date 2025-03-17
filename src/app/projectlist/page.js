@@ -193,7 +193,7 @@ export default function Projectlist() {
             filteredProjects.map((project) => (
               <Card
                 key={project._id}
-                className="hover:shadow-lg transition-shadow duration-300"
+                className="hover:shadow-lg transition-shadow duration-300 rounded-lg"
               >
                 <div className="rounded-lg bg-white border p-6 shadow-md">
                   <h2 className="text-xl font-bold text-gray-900">

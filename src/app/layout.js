@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Provider } from "../app/components/ConText";
 import HomePage from "../app/page.js";
+import { WebSocketProvider } from "../app/components/WebSocketProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,9 +40,11 @@ export default function RootLayout({ children }) {
           >
             {/* Signed-In Users */}
             <SignedIn>
-              <Navbar />
-              <Toaster position="top-right" />
-              {children}
+              <WebSocketProvider>
+                <Navbar />
+                <Toaster position="top-right" />
+                {children}
+              </WebSocketProvider>
             </SignedIn>
 
             {/* Signed-Out Users */}
