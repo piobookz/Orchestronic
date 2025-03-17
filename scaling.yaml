@@ -1,0 +1,12 @@
+properties:
+  configuration:
+    minReplicas: 1
+    maxReplicas: 10
+  template:
+    scale:
+      rules:
+        - name: cpu-scale
+          custom:
+            type: cpu
+            metadata:
+              value: "80" # CPU usage percentage (80%)

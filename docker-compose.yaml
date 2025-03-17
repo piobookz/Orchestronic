@@ -49,8 +49,12 @@ x-airflow-common: &airflow-common
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.4}
-  build: .
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
+  image: ${AIRFLOW_IMAGE:-orchestronic.azurecr.io/orchestronic-app:airflow-webserver-latest}
   environment: &airflow-common-env
+    PYTHONWARNINGS: "ignore"
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
@@ -83,6 +87,33 @@ x-airflow-common: &airflow-common
       condition: service_healthy
 
 services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile.website
+    image: ${WEBSITE_IMAGE:-orchestronic.azurecr.io/orchestronic-app:website-latest}
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+    command: ["npm", "run", start]
+    depends_on:
+      - socket-server
+    restart: always
+
+  socket-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.socket-server
+    image: ${WEBSITE_IMAGE:-orchestronic.azurecr.io/orchestronic-app:socket-server-latest}
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+    working_dir: /server
+    command: ["node", "server.js"]
+    restart: always
+
   rabbitmq:
     image: rabbitmq:management-alpine
     tty: true
@@ -128,9 +159,12 @@ services:
     <<: *airflow-common
     command: webserver
     ports:
-      - "8080:8080"
+      - "8081:8081"
+    environment:
+      <<: *airflow-common-env
+      AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8081"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "--fail", "http://localhost:8081/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -260,7 +294,7 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: ""
     user: "0:0"
     volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ${AIRFLOW_PROJ_DIR:-.}:/opt/airflow
 
   airflow-cli:
     <<: *airflow-common
