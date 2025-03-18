@@ -17,10 +17,10 @@ export default function RequestList() {
     redirect("/"); // Or you can return a message like "Access Denied"
   }
   const router = useRouter();
-  // const TABLE_HEAD_REQ = ["ID", "Title", "Describe", "Last Update", "Status"];
   const TABLE_HEAD_REQ = ["Project Name", "Describe", "Type", "Status PM", "Status Ops"];
   const [TABLE_ROWS_REQ, setTableRowsReq] = useState([]);
   const [sortAsc, setSortAsc] = useState(true);
+  const [sortKey, setSortKey] = useState("statuspm");
 
   useEffect(() => {
     // Fetch request data from the API
@@ -40,7 +40,7 @@ export default function RequestList() {
           },
         });
 
-        if (resProjects.ok) {
+        if (resProjects.ok && resRequesttype.ok) {
           const ProjectData = await resProjects.json();
           const RequesttypeData = await resRequesttype.json();
 
@@ -57,7 +57,6 @@ export default function RequestList() {
             statuspm: element.statuspm,
             statusops: element.statusops,
           }));
-          console.log("rows", rows)
           setTableRowsReq(rows);
         }
       } catch (error) {
@@ -69,23 +68,36 @@ export default function RequestList() {
 
 
 
-  const sortOrder = ["Request", "Under Review", "Rejected", "Approved"];
+  const statusSortOrder = ["Request", "Under Review", "Rejected", "Approved"];
+  const typeSortOrder = ["create", "destroy"];
 
   // Sorting function
-  const sortRows = (rows, sortAsc) => {
+  const sortRows = (rows, key, asc) => {
     return [...rows].sort((a, b) => {
-      const orderA = sortOrder.indexOf(a.statuspm);
-      const orderB = sortOrder.indexOf(b.statuspm);
+      let valA = a[key];
+      let valB = b[key];
 
-      return sortAsc ? orderA - orderB : orderB - orderA;
+      if (key === "statuspm" || key === "statusops") {
+        valA = statusSortOrder.indexOf(valA);
+        valB = statusSortOrder.indexOf(valB);
+      } else if (key === "type") {
+        valA = typeSortOrder.indexOf(valA);
+        valB = typeSortOrder.indexOf(valB);
+      }
+      return asc ? valA - valB : valB - valA;
     });
   };
 
-  const toggleSortOrder = () => {
-    setSortAsc((prev) => !prev);
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortKey(key);
+      setSortAsc(true);
+    }
   };
 
-  const sortedRows = sortRows(TABLE_ROWS_REQ, sortAsc);
+  const sortedRows = sortRows(TABLE_ROWS_REQ, sortKey, sortAsc);
 
   return (
     <div>
@@ -96,34 +108,40 @@ export default function RequestList() {
         <table className="table-fixed w-full">
           <thead>
             <tr>
-              {TABLE_HEAD_REQ.map((head) => (
-                <th
-                  key={head}
-                  className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
-                >
-                  <Typography
-                    variant="small"
-                    className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
-                    onClick={["Status PM", "Status Ops"].includes(head) ? toggleSortOrder : undefined}
+              {TABLE_HEAD_REQ.map((head, index) => {
+                const sortColumn =
+                  head === "Type" ? "type" :
+                    head === "Status PM" ? "statuspm" :
+                      head === "Status Ops" ? "statusops" :
+                        null;
+                return (
+                  <th
+                    key={index}
+                    className="border-b border-blue-gray-100 bg-gray-100 p-4 text-black font-semibold"
+                    onClick={sortColumn ? () => handleSort(sortColumn) : undefined}
                   >
-                    {["Status PM", "Status Ops"].includes(head) && (
-                      <span className="mr-2">
-                        <Image
-                          src={sortAsc ? filter : unfilter}
-                          alt="filter"
-                          height="20"
-                          width="20"
-                        />
-                      </span>
-                    )}
-                    {head}
-                  </Typography>
-                </th>
-              ))}
+                    <Typography
+                      variant="small"
+                      className="font-medium text-sm leading-none opacity-70 flex flex-row items-center"
+                    >
+                      {sortColumn && (
+                        <span className="mr-2">
+                          <Image
+                            src={sortKey === sortColumn && sortAsc ? filter : unfilter}
+                            alt="filter"
+                            height="20"
+                            width="20"
+                          />
+                        </span>
+                      )}
+                      {head}
+                    </Typography>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-
             {userRole === 'pm' &&
               sortedRows.map(({ projectid, projectname, describe, type, statuspm, statusops }, index) => {
                 const isOdd = index % 2 === 1;
