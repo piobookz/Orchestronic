@@ -80,7 +80,7 @@ export default function RequestResource() {
         body: JSON.stringify(TABLE_ROWS_CR),
       });
 
-      const resRequesttype = await fetch(`/api/requesttype?projectid=${projectid}&status=created`, {
+      const resRequesttype = await fetch(`/api/requesttype?projectid=${projectid}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
