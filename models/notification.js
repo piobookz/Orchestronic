@@ -4,7 +4,7 @@ const notificationSchema = new Schema({
   projectName: { type: String },
   detail: { type: String },
   userId: { type: String },
-  date: { type: Date },
+  date: { type: Date, default: Date.now },
 });
 
 const Notification =

@@ -17,21 +17,33 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  // Connect to MongoDB
-  await connectMongoDB();
+  try {
+    await connectMongoDB();
 
-  const url = new URL(req.url);
-  const projectid = url.searchParams.get("projectid");
-  
-  const requesttype = await Requesttype({
-    projectid,
-    status: "created",
-  }).save();
+    // Parse the JSON body from the request
+    const body = await req.json();
 
-  return NextResponse.json(
-    { message: "Successfully added requests", requests: requesttype },
-    { status: 201 }
-  );
+    // Validate required fields
+    if (!body.projectid) throw new Error("Missing projectid");
+
+    // Set default status if not provided
+    const requestData = {
+      projectid: body.projectid,
+      status: body.status,
+    };
+
+    // Save to database
+    const requesttype = new Requesttype(requestData);
+    const saveRequestType = await requesttype.save();
+
+    return NextResponse.json({ saveRequestType }, { status: 200 });
+  } catch (error) {
+    console.error("Error creating request:", error);
+    return NextResponse.json(
+      { message: "Error creating request", error: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(req) {
@@ -43,25 +55,26 @@ export async function PUT(req) {
 
     // Update requesttype or create if it doesn't exist
     const updatedRequestType = await Requesttype.findOneAndUpdate(
-        { projectid },
-        { status },
-        { new: true, upsert: true }
-      );
-  
-      return NextResponse.json(
-        { message: "Successfully updated request type", requesttype: updatedRequestType },
-        { status: 200 }
-      );
-    } catch (error) {
-      console.error("Error updating request type:", error);
-      return NextResponse.json(
-        { message: "Internal Server Error", error: error.message },
-        { status: 500 }
-      );
-    }
-  }
+      { projectid },
+      { status },
+      { new: true, upsert: true }
+    );
 
-  
+    return NextResponse.json(
+      {
+        message: "Successfully updated request type",
+        requesttype: updatedRequestType,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating request type:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error", error: error.message },
+      { status: 500 }
+    );
+  }
+}
 
 export async function DELETE(req) {
   await connectMongoDB();
