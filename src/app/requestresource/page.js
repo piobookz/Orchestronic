@@ -97,7 +97,7 @@ export default function RequestResource() {
       // Prepare JSON data for /api/requesttype
       const requestTypeData = {
         projectid: TABLE_ROWS_CR[0].projectid,
-        status: "created",
+        status: "create",
       };
 
       // Send request to /api/requesttype with JSON body
@@ -122,6 +122,7 @@ export default function RequestResource() {
       console.error("Error while saving request:", error.message);
     }
   };
+
   return (
     <div>
       <h1 className="text-5xl font-bold mx-16 my-5">{projectName}</h1>
