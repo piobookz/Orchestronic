@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Project() {
   const searchParams = useSearchParams();
@@ -17,6 +18,7 @@ export default function Project() {
   const [selectedButton, setSelectedButton] = useState("");
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
   const TABLE_HEAD_CR = ["Name", "Type"];
+  const router = useRouter();
 
   // Fetch project details
   useEffect(() => {
@@ -90,16 +92,27 @@ export default function Project() {
   const handleDelete = async () => {
     toast.success("Destroy sent successfully");
     try {
-      const response = await fetch(`/api/requesttype`, {
-        method: "POST",
+      const requestTypeData = {
+        projectid: projectId,
+        status: "destroy",
+      };
+
+      const resRequesttype = await fetch("/api/requesttype", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify(requestTypeData),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to delete resource: ${response.statusText}`);
+      if (!resRequesttype.ok) {
+        const errorMessage = await resRequesttype.text();
+        throw new Error(
+          `RequestType API failed: ${resRequesttype.status} - ${errorMessage}`
+        );
       }
+
+      router.push("/projectlist");
     } catch (error) {
       console.error("Error while deleting resource:", error);
       toast.error("Failed to delete resource");
