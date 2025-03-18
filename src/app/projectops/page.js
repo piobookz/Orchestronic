@@ -193,7 +193,6 @@ export default function ProjectMG() {
       return;
     } else if (event === "Approved") {
       toast.success("Request approved");
-      sendMessageToQueue(projectId, "create-vm");
 
       try {
         const res = await fetch(`/api/request/?projectId=${projectId}`, {
@@ -209,6 +208,7 @@ export default function ProjectMG() {
 
         const data = await res.json();
         if (data[0].statuspm === event) {
+          sendMessageToQueue(projectId, "create-vm");
           try {
             const res = await fetch(
               `/api/triggerdag/?dagId=idp&projectId=${projectId}`,
