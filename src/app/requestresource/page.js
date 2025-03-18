@@ -29,12 +29,12 @@ export default function RequestResource() {
         throw new Error(`Project fetch failed: ${projectRes.statusText}`);
 
       const projectData = await projectRes.json();
-      console.log("Fetched project:", projectData);
+      // console.log("Fetched project:", projectData);
 
-      console.log("project length", projectData.length);
+      // console.log("project length", projectData.length);
       if (projectData.length > 0) {
         const projectRequest = projectData[0]._id;
-        console.log("Project ID:", projectRequest);
+        // console.log("Project ID:", projectRequest);
 
         const resourceRes = await fetch(
           `/api/resource?projectRequest=${projectRequest}`
@@ -43,7 +43,7 @@ export default function RequestResource() {
           throw new Error(`Resource fetch failed: ${resourceRes.statusText}`);
 
         const resourceData = await resourceRes.json();
-        console.log("Fetched resources:", resourceData);
+        // console.log("Fetched resources:", resourceData);
 
         setTableRowsCR(
           resourceData.map((element) => ({
@@ -72,6 +72,13 @@ export default function RequestResource() {
     toast.success("Request sent successfully");
 
     try {
+      console.log("TABLE_ROWS_CR before request:", TABLE_ROWS_CR);
+
+      if (!TABLE_ROWS_CR || TABLE_ROWS_CR.length === 0) {
+        throw new Error("TABLE_ROWS_CR is empty or undefined.");
+      }
+
+      // Send request to /api/request
       const resRequest = await fetch("/api/request", {
         method: "POST",
         headers: {
@@ -80,27 +87,41 @@ export default function RequestResource() {
         body: JSON.stringify(TABLE_ROWS_CR),
       });
 
-      const resRequesttype = await fetch(`/api/requesttype?projectid=${projectid}&status=created`, {
+      if (!resRequest.ok) {
+        const errorMessage = await resRequest.text();
+        throw new Error(
+          `Request API failed: ${resRequest.status} - ${errorMessage}`
+        );
+      }
+
+      // Prepare JSON data for /api/requesttype
+      const requestTypeData = {
+        projectid: TABLE_ROWS_CR[0].projectid,
+        status: "created",
+      };
+
+      // Send request to /api/requesttype with JSON body
+      const resRequesttype = await fetch("/api/requesttype", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        
+        body: JSON.stringify(requestTypeData),
       });
-      
 
-      if (!resRequest.ok) {
-        throw new Error(`Error: ${resRequest.status} - ${resRequest.statusText}`);
-      } else {
-        await fetchResources(); // Refetch resources after request
-
-        router.push("/projectlist");
+      if (!resRequesttype.ok) {
+        const errorMessage = await resRequesttype.text();
+        throw new Error(
+          `RequestType API failed: ${resRequesttype.status} - ${errorMessage}`
+        );
       }
+
+      await fetchResources(); // Refetch resources after request
+      router.push("/projectlist");
     } catch (error) {
-      console.log("Error while saving request:", error.message);
+      console.error("Error while saving request:", error.message);
     }
   };
-
   return (
     <div>
       <h1 className="text-5xl font-bold mx-16 my-5">{projectName}</h1>

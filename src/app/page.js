@@ -27,7 +27,7 @@ export default function HomePage() {
 
       const data = await res.json();
       setNotificationList(data);
-      // console.log("Notifications:", data);
+      console.log("Notifications:", data);
       return data;
     } catch (error) {
       console.error("Error fetching notifications:", error);
@@ -128,7 +128,12 @@ export default function HomePage() {
 
                     {/* Footer Section */}
                     <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                      <p>Date: {new Date().toLocaleDateString()}</p>
+                      <p>
+                        Date:{" "}
+                        {new Date(notification.date).toLocaleDateString(
+                          "en-US"
+                        )}
+                      </p>
                       <div className="flex items-center gap-2">
                         <Image
                           src={bell}
