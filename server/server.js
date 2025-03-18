@@ -14,16 +14,23 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Listen for notifications from the backend (Airflow)
   socket.on("notification", (data) => {
     console.log("Received notification:", data);
-    // Broadcast to all connected clients
     io.emit("notification", data);
   });
 
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });
+});
+
+// Add a GET route to check the socket status
+app.get("/status", (req, res) => {
+  if (io.engine.clientsCount > 0) {
+    res.json({ message: "Socket is working", clients: io.engine.clientsCount });
+  } else {
+    res.status(503).json({ message: "No active connections" });
+  }
 });
 
 server.listen(4000, () => {

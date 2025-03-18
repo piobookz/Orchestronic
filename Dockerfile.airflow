@@ -31,7 +31,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose the port for the Airflow webserver
-EXPOSE 8081
+EXPOSE 8080
 
 # Set the default command to start the webserver
-CMD ["airflow", "webserver", "--port", "8081"]
+CMD ["airflow", "webserver", "--port", "8080"]
