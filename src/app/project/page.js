@@ -3,23 +3,22 @@
 import gitlab from "../../../public/gitlab-logo-500.svg";
 import Image from "next/image";
 import { Card, Typography } from "@material-tailwind/react";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Link from "next/link";
-import { redirect, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export default function Project() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectId");
-  console.log("projectId", projectId);
-
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [rootPath, setRootPath] = useState("");
-
-  const TABLE_HEAD_CR = ["Name", "Type"];
+  const [selectedButton, setSelectedButton] = useState("");
   const [TABLE_ROWS_CR, setTableRowsCR] = useState([]);
+  const TABLE_HEAD_CR = ["Name", "Type"];
 
+  // Fetch project details
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
@@ -32,7 +31,6 @@ export default function Project() {
           setRootPath(project.rootPath);
         } else {
           console.error("Project not found");
-          // Optionally, handle the case where the project is not found
         }
       } catch (error) {
         console.error("Failed to fetch project details:", error.message);
@@ -42,31 +40,20 @@ export default function Project() {
     fetchProjectDetails();
   }, [projectId]);
 
+  // Fetch table rows for resources
   useEffect(() => {
     const fetchTableRows = async () => {
       try {
-        const res = await fetch(`/api/resourcelist`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(`/api/resourcelist`);
         const data = await res.json();
-        console.log("API Response for /api/resourcelist:", data);
-        // Find the resources matching the projectId
         const resources = data.filter(
           (resource) => resource.projectid === projectId
-        ); // corrected line
-
-        // Map the data to table rows
+        );
         const rows = resources.map((element) => ({
           id: element._id,
           name: element.vmname,
           type: element.type,
-          userid: element.userid,
         }));
-
-        // Update the state with the fetched rows
         setTableRowsCR(rows);
       } catch (error) {
         console.error("Failed to fetch resources:", error.message);
@@ -76,50 +63,20 @@ export default function Project() {
     fetchTableRows();
   }, [projectId]);
 
+  // Fetch project status
   useEffect(() => {
     const fetchProjectStatus = async () => {
       try {
-        const res = await fetch("/api/request", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(`Error: ${res.status} - ${res.statusText}`);
-        }
-
+        const res = await fetch("/api/request");
         const data = await res.json();
-        console.log("API Response:", data);
-
-        if (!Array.isArray(data)) {
-          // Check if data is an array directly
-          console.error(
-            "Unexpected API response format. Expected an array but received:",
-            data
+        if (Array.isArray(data)) {
+          const requests = data;
+          const matchingRequest = requests.find(
+            (item) => item.projectid === projectId
           );
-          return;
-        }
-
-        const requests = data; // data is already the array
-
-        if (TABLE_ROWS_CR.length === 0 || !TABLE_ROWS_CR[0]) {
-          console.warn("No resources found for the project.");
-          return;
-        }
-
-        const matchingRequest = requests.find(
-          (item) => item.projectid === TABLE_ROWS_CR[0].projectid
-        );
-
-        if (matchingRequest) {
-          setSelectedButton(matchingRequest.statuspm);
-        } else {
-          console.warn(
-            "No matching request found for project ID:",
-            TABLE_ROWS_CR[0].projectid
-          );
+          if (matchingRequest) {
+            setSelectedButton(matchingRequest.statuspm);
+          }
         }
       } catch (error) {
         console.error("Failed to retrieve request:", error.message);
@@ -127,14 +84,14 @@ export default function Project() {
     };
 
     fetchProjectStatus();
-  }, [TABLE_ROWS_CR]); // Re-runs whenever TABLE_ROWS_CR changes
+  }, [projectId, TABLE_ROWS_CR]);
 
+  // Handle delete action
   const handleDelete = async () => {
-    toast.success("Resource deleted successfully");
-
+    toast.success("Destroy sent successfully");
     try {
-      const response = await fetch(`/api/resource/?requestId=${requestId}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/requesttype`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -152,14 +109,27 @@ export default function Project() {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-row items-center">
-          <p className="text-5xl font-bold ml-16 my-5">{projectName}</p>
+      <div className="flex flex-row justify-between items-center px-4 py-5">
+        <div className="flex flex-row items-center space-x-8 ml-12">
+          <p className="text-5xl font-bold">{projectName}</p>
+          <span
+            className={`rounded-2xl px-6 py-1 mt-3 ml-8 ${
+              selectedButton === "Approved"
+                ? "bg-green-500 text-white"
+                : selectedButton === "Rejected"
+                ? "bg-red-500 text-white"
+                : selectedButton === "Under Review"
+                ? "bg-amber-500 text-white"
+                : "bg-gray-500 text-white"
+            }`}
+          >
+            {selectedButton}
+          </span>
         </div>
-        <div className="flex flex-row justify-between items-center px-4">
+        <div className="flex flex-row items-center">
           <button
-            className="mr-10 text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600"
-            //onClick={handleDelete}
+            className="text-sm text-white bg-red-500 rounded py-3 px-5 hover:bg-red-600 mr-14"
+            onClick={handleDelete}
           >
             Destroy
           </button>
@@ -224,7 +194,6 @@ export default function Project() {
                 {TABLE_ROWS_CR.map(({ id, name, type }, index) => {
                   const isOdd = index % 2 === 1;
                   const rowBgColor = isOdd ? "bg-gray-50" : "bg-white";
-                  // console.log(TABLE_ROWS_CR);
                   return (
                     <tr key={id} className={`${rowBgColor} cursor-pointer`}>
                       <td className="p-4 border-b border-blue-gray-50">
